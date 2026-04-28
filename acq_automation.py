@@ -42,14 +42,19 @@ OF_REHAB     = 'cPCQEuwOJNMtoWR8CrLR'
 
 
 def load_processed():
+    # Returns dict: {contactId: last_processed_recording_url}
     if os.path.exists(PROCESSED_FILE):
         with open(PROCESSED_FILE) as f:
-            return set(json.load(f))
-    return set()
+            data = json.load(f)
+            # Handle old format (list of IDs) → upgrade to dict
+            if isinstance(data, list):
+                return {cid: '' for cid in data}
+            return data
+    return {}
 
 def save_processed(processed):
     with open(PROCESSED_FILE, 'w') as f:
-        json.dump(sorted(processed), f)
+        json.dump(processed, f, indent=2)
 
 
 def get_google_services():
@@ -196,9 +201,6 @@ def process_contact(cid, oid, google_svc):
     contact = r.json().get('contact', {})
     cfields = {f['id']: (f.get('value') or '') for f in contact.get('customFields', [])}
 
-    if cfields.get(CF_AI_TX):
-        return 'has_transcript'
-
     rec_url = cfields.get(CF_CALL_REC, '')
     if not rec_url:
         return 'no_rec'
@@ -220,7 +222,14 @@ def process_contact(cid, oid, google_svc):
 
     data = extract_fields(transcript)
 
-    cu = {CF_AI_TX: transcript[:5000]}
+    # Append to existing transcript so multiple calls are all preserved
+    existing_tx = cfields.get(CF_AI_TX, '')
+    if existing_tx:
+        date_stamp = datetime.now().strftime('%Y-%m-%d %H:%M')
+        combined = f"{existing_tx}\n\n--- New Call {date_stamp} ---\n{transcript}"
+    else:
+        combined = transcript
+    cu = {CF_AI_TX: combined[:5000]}
     if 'misc-media-ct.s3.amazonaws.com' in (cfields.get(CF_CALL_REC) or ''):
         cu[CF_CALL_REC] = rec_url
     ou = {}
@@ -272,24 +281,55 @@ def process_contact(cid, oid, google_svc):
 def main():
     print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] ACQ Automation starting...')
 
-    processed = load_processed()
+    processed = load_processed()  # {cid: last_processed_url}
     google_svc = get_google_services()
     print(f'Google Drive: {"ready" if google_svc else "not configured"}')
     print(f'Processed cache: {len(processed)} contacts')
 
     entries = fetch_acq_entries()
-    new_entries = [e for e in entries if e['cid'] not in processed]
-    print(f'Total: {len(entries)} | To check: {len(new_entries)}')
+    print(f'Total in pipeline: {len(entries)}')
 
     ok = fail = skipped = 0
-    for e in new_entries:
-        result = process_contact(e['cid'], e['oid'], google_svc)
+    for e in entries:
+        cid, oid = e['cid'], e['oid']
+
+        # Quick fetch to get recording URL before doing full processing
+        r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
+        if r.status_code != 200:
+            time.sleep(0.05)
+            continue
+        contact = r.json().get('contact', {})
+        cfields = {f['id']: (f.get('value') or '') for f in contact.get('customFields', [])}
+        rec_url = cfields.get(CF_CALL_REC, '')
+
+        if not rec_url:
+            processed[cid] = ''
+            time.sleep(0.05)
+            continue
+
+        # Normalize URL for comparison (strip query params, convert S3→CF)
+        if 's3.amazonaws.com' in rec_url:
+            path = urlparse(rec_url).path
+            rec_url_normalized = f'https://d3njiazx9u20q.cloudfront.net{path}'
+        else:
+            rec_url_normalized = rec_url.split('?')[0]
+
+        # Skip only if we already processed THIS exact recording URL
+        if processed.get(cid) == rec_url_normalized:
+            skipped += 1
+            continue
+
+        # New or updated recording — process it
+        print(f'New recording for {contact.get("firstName","")} {contact.get("lastName","")}')
+        result = process_contact(cid, oid, google_svc)
         time.sleep(0.1)
 
-        if result in ('ok', 'has_transcript', 'no_rec'):
-            processed.add(e['cid'])
-            if result == 'ok': ok += 1
-            else: skipped += 1
+        if result == 'ok':
+            processed[cid] = rec_url_normalized
+            ok += 1
+        elif result in ('has_transcript', 'no_rec'):
+            processed[cid] = rec_url_normalized
+            skipped += 1
         else:
             fail += 1
 
