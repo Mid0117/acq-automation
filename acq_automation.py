@@ -95,28 +95,35 @@ def create_rehab_doc(svc, address, data, transcript):
         ).execute()
         doc_id = copy['id']
 
-        today = datetime.now().strftime('%B %d, %Y')
-        replacements = {
-            '{{ADDRESS}}': address,      '[ADDRESS]': address,
-            '{{DATE}}': today,            '[DATE]': today,
-            '{{BEDS}}': data.get('beds','N/A'),
-            '{{BATHS}}': data.get('baths','N/A'),
-            '{{SQFT}}': data.get('sqft','N/A'),
-            '{{CONDITION}}': data.get('condition','N/A'),
-            '{{TIMELINE}}': data.get('timeline','N/A'),
-            '{{ASKING_PRICE}}': data.get('asking_price','N/A'),
-            '{{TRANSCRIPT}}': transcript[:3000] if transcript else '',
-            '[TRANSCRIPT]': transcript[:3000] if transcript else '',
-        }
+        # Get doc end index for appending
+        doc = svc['docs'].documents().get(documentId=doc_id).execute()
+        end_index = doc['body']['content'][-1]['endIndex'] - 1
+
+        beds  = data.get('beds', '')
+        baths = data.get('baths', '')
+
         reqs = [
-            {'replaceAllText': {
-                'containsText': {'text': ph, 'matchCase': False},
-                'replaceText': str(val)
-            }}
-            for ph, val in replacements.items() if val and val != 'N/A'
+            {'replaceAllText': {'containsText': {'text': 'Property Address:  ', 'matchCase': False},
+                                'replaceText': f'Property Address: {address}'}},
+            {'replaceAllText': {'containsText': {'text': 'Property Address: \n', 'matchCase': False},
+                                'replaceText': f'Property Address: {address}\n'}},
+            {'replaceAllText': {'containsText': {'text': 'Bed/Bath:\n', 'matchCase': False},
+                                'replaceText': f'Bed/Bath: {beds}/{baths}\n'}},
+            {'replaceAllText': {'containsText': {'text': 'SQFT: \n', 'matchCase': False},
+                                'replaceText': f'SQFT: {data.get("sqft","")}\n'}},
         ]
-        if reqs:
-            svc['docs'].documents().batchUpdate(documentId=doc_id, body={'requests': reqs}).execute()
+
+        notes = f'\n\n─────────────────────────────\nCall Notes  ({datetime.now().strftime("%Y-%m-%d")})\n─────────────────────────────\n'
+        if data.get('va_notes'): notes += f'{data["va_notes"]}\n'
+        if data.get('asking_price'): notes += f'Asking Price: ${data["asking_price"]}\n'
+        if data.get('condition'):    notes += f'Condition: {data["condition"]}\n'
+        if data.get('timeline'):     notes += f'Timeline: {data["timeline"]}\n'
+        if transcript:
+            notes += f'\n─────────────────────────────\nCall Transcript\n─────────────────────────────\n{transcript[:3000]}\n'
+
+        reqs.append({'insertText': {'location': {'index': end_index}, 'text': notes}})
+
+        svc['docs'].documents().batchUpdate(documentId=doc_id, body={'requests': reqs}).execute()
         return f'https://docs.google.com/document/d/{doc_id}/edit'
     except Exception as e:
         print(f'  Rehab doc error: {e}')
