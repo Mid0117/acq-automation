@@ -95,14 +95,6 @@ def create_rehab_doc(svc, address, data, transcript):
         ).execute()
         doc_id = copy['id']
 
-        # Find last paragraph end for safe insertion
-        doc = svc['docs'].documents().get(documentId=doc_id).execute()
-        end_index = 1
-        for elem in reversed(doc['body']['content']):
-            if 'paragraph' in elem:
-                end_index = elem['endIndex'] - 1
-                break
-
         beds  = data.get('beds', '')
         baths = data.get('baths', '')
 
@@ -125,7 +117,7 @@ def create_rehab_doc(svc, address, data, transcript):
         if transcript:
             notes += f'\n─────────────────────────────\nCall Transcript\n─────────────────────────────\n{transcript[:3000]}\n'
 
-        reqs.append({'insertText': {'location': {'index': end_index}, 'text': notes}})
+        reqs.append({'insertText': {'endOfSegmentLocation': {'segmentId': ''}, 'text': notes}})
 
         svc['docs'].documents().batchUpdate(documentId=doc_id, body={'requests': reqs}).execute()
         return f'https://docs.google.com/document/d/{doc_id}/edit'
