@@ -1,0 +1,34 @@
+name: ACQ Call Recording Automation
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 minutes
+  workflow_dispatch:           # manual trigger from GitHub UI
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache processed contacts
+        uses: actions/cache@v4
+        with:
+          path: processed_contacts.json
+          key: processed-${{ github.ref }}
+          restore-keys: processed-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run automation
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+          DG_KEY: ${{ secrets.DG_KEY }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+        run: python acq_automation.py
