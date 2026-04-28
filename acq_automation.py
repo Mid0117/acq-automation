@@ -95,9 +95,13 @@ def create_rehab_doc(svc, address, data, transcript):
         ).execute()
         doc_id = copy['id']
 
-        # Get doc end index for appending
+        # Find last paragraph end for safe insertion
         doc = svc['docs'].documents().get(documentId=doc_id).execute()
-        end_index = doc['body']['content'][-1]['endIndex'] - 1
+        end_index = 1
+        for elem in reversed(doc['body']['content']):
+            if 'paragraph' in elem:
+                end_index = elem['endIndex'] - 1
+                break
 
         beds  = data.get('beds', '')
         baths = data.get('baths', '')
