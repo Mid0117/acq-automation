@@ -12,6 +12,7 @@ warnings.filterwarnings('ignore')
 GHL_TOKEN      = os.environ['GHL_TOKEN']
 DG_KEY         = os.environ['DG_KEY']
 ANTHROPIC_KEY  = os.environ.get('ANTHROPIC_API_KEY', '')
+APIFY_TOKEN    = os.environ.get('APIFY_TOKEN', '')
 GHL_LOCATION   = 'RCkiUmWqXX4BYQ39JXmm'
 PIPELINE_ID    = 'O8wzIa6E3SgD8HLg6gh9'
 TEMPLATE_ID    = '1xYeKGmcbxJqCykxGXo1mEHBDEPQfbEHqXuS3cKrIliM'
@@ -37,6 +38,7 @@ CF_DEAL_TYPE     = 'xzdGu36ZWBTQBNLuCuG7'
 CF_REPAIRS       = 'dbYoYFVTiCbqoJxC9HkR'
 CF_ARV           = 'nCWzIGfZHki0dv84gUem'
 CF_70_ARV        = 'R7QUzOdOnJXgoGRPwxdF'
+CF_ZILLOW        = '48pr9cc9hDFas111fDpF'
 
 # Opportunity custom fields
 OF_BED        = 'NdjIxlmD8KGBJH7xQ0rv'
@@ -195,6 +197,52 @@ def extract_fields_regex(text):
     return d
 
 
+# ── Apify (Zillow property lookup) ───────────────────────────────────────────
+HOME_TYPE_MAP = {
+    'SINGLE_FAMILY': 'Single Family', 'CONDO': 'Condo', 'TOWNHOUSE': 'Townhouse',
+    'MULTI_FAMILY': 'Multi-Family',   'APARTMENT': 'Multi-Family',
+    'MANUFACTURED': 'Mobile Home',    'LOT': 'Land',
+}
+
+
+def lookup_property(addr1, city, state):
+    if not (APIFY_TOKEN and addr1 and city and state):
+        return None
+    s = addr1.replace(',', '').strip().replace(' ', '-')
+    c = city.replace(',', '').strip().replace(' ', '-')
+    url = f'https://www.zillow.com/homes/{s},-{c}-{state.strip()}_rb/'
+    try:
+        r = requests.post(
+            f'https://api.apify.com/v2/acts/quiet_bark~zillow-scraper/run-sync-get-dataset-items?token={APIFY_TOKEN}',
+            json={'mode': 'DETAIL', 'startUrls': [{'url': url}]},
+            timeout=240
+        )
+        if r.status_code not in (200, 201):
+            print(f'  Apify HTTP {r.status_code}: {r.text[:120]}')
+            return None
+        items = r.json()
+        if not items:
+            return None
+        i = items[0]
+        rf = i.get('resoFacts') or {}
+        return {
+            'beds':       i.get('bedrooms')  or rf.get('bedrooms'),
+            'baths':      i.get('bathrooms') or rf.get('bathrooms'),
+            'sqft':       i.get('livingAreaValue') or rf.get('livingArea'),
+            'year_built': i.get('yearBuilt'),
+            'lot_size':   i.get('lotAreaValue'),
+            'lot_unit':   i.get('lotAreaUnitsShort') or 'acres',
+            'home_type':  HOME_TYPE_MAP.get(i.get('homeType',''), i.get('homeType')),
+            'zestimate':  i.get('zestimate') or i.get('price'),
+            'rent_zest':  i.get('rentZestimate'),
+            'zpid':       i.get('zpid'),
+            'zillow_url': f"https://www.zillow.com{i.get('hdpUrl','')}" if i.get('hdpUrl') else url,
+        }
+    except Exception as e:
+        print(f'  Apify error: {e}')
+        return None
+
+
 # ── Deepgram ─────────────────────────────────────────────────────────────────
 def transcribe(audio_bytes):
     r = requests.post(
@@ -231,7 +279,20 @@ def create_rehab_doc(svc, address, data, transcript):
                                 'replaceText': f'SQFT: {sqft}\n'}},
         ]
 
-        notes = f'\n\n─────────────────────────────\nCall Briefing  ({datetime.now().strftime("%Y-%m-%d")})\n─────────────────────────────\n'
+        notes = ''
+        ap = data.get('_apify') or {}
+        if ap:
+            notes += f'\n\n─────────────────────────────\nProperty Data (Zillow)\n─────────────────────────────\n'
+            if ap.get('beds') or ap.get('baths'):  notes += f'Beds/Baths:    {ap.get("beds") or "?"}/{ap.get("baths") or "?"}\n'
+            if ap.get('sqft'):                     notes += f'Living Area:   {ap["sqft"]:,} sqft\n'
+            if ap.get('year_built'):               notes += f'Year Built:    {ap["year_built"]}\n'
+            if ap.get('lot_size'):                 notes += f'Lot Size:      {ap["lot_size"]} {ap.get("lot_unit") or ""}\n'
+            if ap.get('home_type'):                notes += f'Property Type: {ap["home_type"]}\n'
+            if ap.get('zestimate'):                notes += f'Zestimate:     ${int(ap["zestimate"]):,}\n'
+            if ap.get('rent_zest'):                notes += f'Rent Estimate: ${int(ap["rent_zest"]):,}/mo\n'
+            if ap.get('zillow_url'):               notes += f'Zillow Link:   {ap["zillow_url"]}\n'
+
+        notes += f'\n\n─────────────────────────────\nCall Briefing  ({datetime.now().strftime("%Y-%m-%d")})\n─────────────────────────────\n'
         if data.get('va_notes_summary'):
             notes += f'{data["va_notes_summary"]}\n\n'
         if data.get('lead_temp'):           notes += f'Lead Temperature: {data["lead_temp"]}\n'
@@ -331,6 +392,19 @@ def process_contact(cid, oid, google_svc):
     # Claude first; regex fallback
     data = analyze_with_claude(transcript) or extract_fields_regex(transcript)
 
+    # Apify property lookup — authoritative for sqft/year/Zestimate
+    addr1 = contact.get('address1','').strip()
+    city  = contact.get('city','').strip()
+    state = contact.get('state','').strip()
+    prop  = lookup_property(addr1, city, state) if (addr1 and city and state) else None
+    if prop:
+        if prop.get('beds')        and not data.get('beds'):           data['beds']        = prop['beds']
+        if prop.get('baths')       and not data.get('baths'):          data['baths']       = prop['baths']
+        if prop.get('sqft'):                                            data['sqft']        = prop['sqft']
+        if prop.get('home_type')   and not data.get('property_type'):  data['property_type']= prop['home_type']
+        if prop.get('zestimate'):                                       data['estimated_arv']= prop['zestimate']
+        data['_apify'] = prop
+
     # Append transcript so multiple calls preserved
     existing_tx = cfields.get(CF_AI_TX, '')
     if existing_tx:
@@ -367,10 +441,11 @@ def process_contact(cid, oid, google_svc):
 
     if data.get('asking_price') and not cfields.get(CF_ASK_PRICE):
         cu[CF_ASK_PRICE] = str(data['asking_price'])
-    if data.get('estimated_arv') and not cfields.get(CF_ARV):
-        cu[CF_ARV] = str(data['estimated_arv'])
-        if not cfields.get(CF_70_ARV):
-            cu[CF_70_ARV] = str(int(data['estimated_arv'] * 0.7))
+    if data.get('estimated_arv'):
+        cu[CF_ARV]    = str(int(data['estimated_arv']))
+        cu[CF_70_ARV] = str(int(int(data['estimated_arv']) * 0.7))
+    if data.get('_apify', {}).get('zillow_url') and not cfields.get(CF_ZILLOW):
+        cu[CF_ZILLOW] = data['_apify']['zillow_url']
 
     # VA Notes summary — overwrite each call so it stays fresh
     summary = data.get('va_notes_summary') or transcript[:800]
