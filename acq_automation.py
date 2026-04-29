@@ -213,8 +213,34 @@ HOME_TYPE_MAP = {
 }
 
 
+_APIFY_BUDGET_OK = None
+
+def apify_has_budget():
+    """Cache budget check across calls; skip if over monthly cap."""
+    global _APIFY_BUDGET_OK
+    if _APIFY_BUDGET_OK is not None:
+        return _APIFY_BUDGET_OK
+    if not APIFY_TOKEN:
+        _APIFY_BUDGET_OK = False
+        return False
+    try:
+        r = requests.get(f'https://api.apify.com/v2/users/me/limits?token={APIFY_TOKEN}', timeout=15)
+        d = r.json().get('data', {})
+        used = (d.get('current') or {}).get('monthlyUsageUsd', 0)
+        cap  = (d.get('limits')  or {}).get('maxMonthlyUsageUsd', 29)
+        _APIFY_BUDGET_OK = (cap - used) > 1.0   # need $1+ headroom for a call
+        if not _APIFY_BUDGET_OK:
+            print(f'  Apify budget exhausted: ${used:.2f}/${cap}; skipping property + comps lookups.')
+        return _APIFY_BUDGET_OK
+    except Exception:
+        _APIFY_BUDGET_OK = True
+        return True
+
+
 def lookup_property(addr1, city, state):
     if not (APIFY_TOKEN and addr1 and city and state):
+        return None
+    if not apify_has_budget():
         return None
     s = addr1.replace(',', '').strip().replace(' ', '-')
     c = city.replace(',', '').strip().replace(' ', '-')
@@ -254,6 +280,8 @@ def lookup_property(addr1, city, state):
 def fetch_sold_comps(city, state, zipcode, max_items=30):
     """Pull recently-sold listings near the property. Apify returns SOLD when given a /sold/ URL as a search query."""
     if not (APIFY_TOKEN and city and state):
+        return []
+    if not apify_has_budget():
         return []
     c = city.replace(' ', '-').strip().lower()
     s = state.strip().lower()
