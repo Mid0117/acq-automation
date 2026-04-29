@@ -249,7 +249,7 @@ def fetch_sold_comps(city, state, zipcode, max_items=30):
         return []
     c = city.replace(' ', '-').strip().lower()
     s = state.strip().lower()
-    z = (zipcode or '').strip()
+    z = (zipcode or '').strip().split('-')[0]  # ZIP+4 -> 5-digit
     url = f'https://www.zillow.com/{c}-{s}-{z}/sold/' if z else f'https://www.zillow.com/{c}-{s}/sold/'
     try:
         r = requests.post(
