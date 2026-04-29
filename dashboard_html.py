@@ -44,12 +44,12 @@ def to_et(iso):
 
 
 def read_sheet_kill_and_templates():
-    """Returns (kill_on: bool, templates_rows: list of {stage, idx, msg})."""
+    """Returns (kill_on: bool, templates_rows: list, templates_tab_gid: str)."""
     if not SHEET_ID:
-        return True, []
+        return True, [], ''
     token_json = os.environ.get('GOOGLE_TOKEN_JSON', '')
     if not token_json:
-        return True, []
+        return True, [], ''
     try:
         from google.oauth2.credentials import Credentials
         from google.auth.transport.requests import Request
@@ -83,9 +83,20 @@ def read_sheet_kill_and_templates():
         except Exception:
             pass
 
-        return kill_on, rows
+        # Find the gid for the Templates tab so we can embed it directly
+        templates_gid = ''
+        try:
+            meta = svc.spreadsheets().get(spreadsheetId=SHEET_ID).execute()
+            for s in meta.get('sheets', []):
+                if s['properties']['title'] == 'Templates':
+                    templates_gid = str(s['properties']['sheetId'])
+                    break
+        except Exception:
+            pass
+
+        return kill_on, rows, templates_gid
     except Exception:
-        return True, []
+        return True, [], ''
 
 
 def fetch_active():
@@ -367,13 +378,20 @@ footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top
   </section>
 
   <section>
-    <h2 class="section-title"><span class="dot gray"></span> Active SMS Templates</h2>
+    <h2 class="section-title"><span class="dot gray"></span> SMS Templates — Edit Live</h2>
     <div style="margin-bottom:12px;color:var(--text-dim);font-size:13px;">
-      These are the messages currently being sent. Edit in the Templates tab of the
-      <a href="__SHEET_URL__#gid=0" target="_blank" style="color:#a5b4fc;text-decoration:none;">Google Sheet</a>
-      — changes apply on the next cron run.
+      Click any cell below to edit. Changes save instantly to the sheet and apply on the next 30-min cron run.
+      <strong style="color:#a5b4fc;">You must be signed in to a Google account that has access to the sheet</strong>
+      (mike@atompropertygroup.org / atompropertygroup@gmail.com / jeff@atompropertygroup.org).
+      <a class="btn btn-edit" style="float:right;" href="__TEMPLATES_EDIT_URL__" target="_blank">Open in Sheets ↗</a>
     </div>
-    <div class="template-grid">__TEMPLATES_BLOCK__</div>
+    <iframe src="__TEMPLATES_EDIT_URL__"
+            style="width:100%;height:600px;border:1px solid var(--panel-border);border-radius:12px;background:white;"
+            allow="clipboard-read; clipboard-write"></iframe>
+    <details style="margin-top:14px;">
+      <summary style="cursor:pointer;color:var(--text-dim);font-size:13px;">Show templates as plain list (read-only)</summary>
+      <div class="template-grid" style="margin-top:10px;">__TEMPLATES_BLOCK__</div>
+    </details>
   </section>
 
   <footer>Auto-refreshed every 30 minutes by the GitHub Actions cron</footer>
@@ -477,8 +495,10 @@ def main():
     leads = fetch_active()
     print(f'HTML dashboard: {len(leads)} leads')
 
-    kill_on, template_rows = read_sheet_kill_and_templates()
+    kill_on, template_rows, templates_gid = read_sheet_kill_and_templates()
     sheet_url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit' if SHEET_ID else '#'
+    templates_edit_url = (f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit?usp=sharing&widget=true&headers=false&rm=embedded#gid={templates_gid}'
+                          if SHEET_ID and templates_gid else sheet_url)
 
     by_stage   = {}
     by_state   = {}
@@ -587,6 +607,7 @@ def main():
     html = html.replace('__STATUS_BANNER__', banner)
     html = html.replace('__TEMPLATES_BLOCK__', tmpl_html)
     html = html.replace('__SHEET_URL__', sheet_url)
+    html = html.replace('__TEMPLATES_EDIT_URL__', templates_edit_url)
 
     # Render tasks table
     if open_tasks:
