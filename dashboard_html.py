@@ -122,6 +122,30 @@ def get_contact(cid):
     return r.json().get('contact', {})
 
 
+# GHL user IDs -> friendly name
+USERS = {
+    'vDKOqPSkA8nLkia5skd0': 'Jeff',
+    'Vj4WwH1ovxGN5Hv5Kq17': 'Mike',
+    'vCjuvuuQ7p7K5GUODujQ': 'Adam',
+    'duREBRmN19R12ixPfrvS': 'Wendy',
+    '0tPk7tYJTs8r5vjeuAfL': 'Muhammad',
+    '1X0bfFpMocO5hRewdjV0': 'John',
+    'YCynATh5GncHo3kcA5KZ': 'Aaron',
+    'vDYwvbLYnBziSZFoDLce': 'Jonathan',
+}
+
+
+def get_open_tasks(cid):
+    """Get all open (not completed) tasks for a contact."""
+    try:
+        r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}/tasks', headers=GHL_H)
+        if r.status_code != 200:
+            return []
+        return [t for t in r.json().get('tasks', []) if not t.get('completed')]
+    except Exception:
+        return []
+
+
 HTML_TEMPLATE = """<!doctype html>
 <html lang="en">
 <head>
@@ -338,6 +362,11 @@ footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top
   </section>
 
   <section>
+    <h2 class="section-title"><span class="dot hot"></span> Open Tasks (active leads)</h2>
+    <div class="lead-table">__TASKS_TABLE__</div>
+  </section>
+
+  <section>
     <h2 class="section-title"><span class="dot gray"></span> Active SMS Templates</h2>
     <div style="margin-bottom:12px;color:var(--text-dim);font-size:13px;">
       These are the messages currently being sent. Edit in the Templates tab of the
@@ -459,6 +488,7 @@ def main():
     replied_rows = []
     dormant_rows = []
     active_rows  = []
+    open_tasks   = []  # [{name, title, assignee, due, contact_url}]
 
     for e in leads:
         c = get_contact(e['cid'])
@@ -490,6 +520,16 @@ def main():
             dormant_rows.append(row); dormant += 1
         else:
             active_rows.append(row); active += 1
+
+        # Open tasks for this lead
+        for t in get_open_tasks(e['cid']):
+            open_tasks.append({
+                'name': row['name'],
+                'addr': row['addr'],
+                'title': t.get('title', ''),
+                'assignee': USERS.get(t.get('assignedTo', ''), 'Unassigned'),
+                'due': to_et(t.get('dueDate', '')),
+            })
 
     total = len(leads)
     rate = (replied / max(1, replied + dormant + active)) * 100
@@ -547,6 +587,22 @@ def main():
     html = html.replace('__STATUS_BANNER__', banner)
     html = html.replace('__TEMPLATES_BLOCK__', tmpl_html)
     html = html.replace('__SHEET_URL__', sheet_url)
+
+    # Render tasks table
+    if open_tasks:
+        head = '<thead><tr><th>Contact</th><th>Address</th><th>Task</th><th>Assignee</th><th>Due</th></tr></thead>'
+        body = '\n'.join(
+            f'<tr><td><strong>{escape(t["name"])}</strong></td>'
+            f'<td>{escape(t["addr"])}</td>'
+            f'<td>{escape(t["title"])}</td>'
+            f'<td><span class="tag">{escape(t["assignee"])}</span></td>'
+            f'<td>{escape(t["due"])}</td></tr>'
+            for t in open_tasks
+        )
+        tasks_table = f'<table>{head}<tbody>{body}</tbody></table>'
+    else:
+        tasks_table = '<div class="empty">No open tasks on active leads. All caught up.</div>'
+    html = html.replace('__TASKS_TABLE__', tasks_table)
 
     with open(OUT_FILE, 'w', encoding='utf-8') as f:
         f.write(html)
