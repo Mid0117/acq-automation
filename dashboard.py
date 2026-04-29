@@ -25,6 +25,9 @@ STAGE_NAMES = {
     'd43fddd8-3a17-46b2-a193-cf18619f654f': '2. LAO',
     '23a159ad-ba39-4c74-9d07-c1beb219d9f2': '3. Due Diligence',
     '43589167-14f0-4e09-ba2a-8b9bd3296a4a': '4. MAO',
+    '4aa78ab3-85dc-46d1-a683-d97b0c7a23ee': 'Follow Up 1.5mo',
+    '571c115e-2603-4f3f-8546-d716f44ba8ef': 'Follow Up 3mo',
+    'b9b560b0-30cb-47fc-a4ca-1e55ca2531e2': 'Dead Deals',
 }
 ACTIVE_STAGES = set(STAGE_NAMES.keys())
 

@@ -20,18 +20,37 @@ STATE_FILE   = 'sms_state.json'
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
 
-# Stages
+# Active deal stages (high-engagement 7-day cadence, 6 touches)
 STAGE_QUALIFIED = 'a17517be-8d1a-49fd-bd53-b9128a66e242'
 STAGE_LAO       = 'd43fddd8-3a17-46b2-a193-cf18619f654f'
 STAGE_RR        = '23a159ad-ba39-4c74-9d07-c1beb219d9f2'
 STAGE_MAO       = '43589167-14f0-4e09-ba2a-8b9bd3296a4a'
+# Re-engagement stages (slow cadence, low-pressure tone)
+STAGE_FU_15MO   = '4aa78ab3-85dc-46d1-a683-d97b0c7a23ee'  # Follow Up (1.5 month)
+STAGE_FU_3MO    = '571c115e-2603-4f3f-8546-d716f44ba8ef'  # Follow Up (3 months)
+STAGE_DEAD      = 'b9b560b0-30cb-47fc-a4ca-1e55ca2531e2'  # Dead Deals
+
 STAGE_NAMES = {
     STAGE_QUALIFIED: 'qualified',
     STAGE_LAO:       'lao',
     STAGE_RR:        'rr',
     STAGE_MAO:       'mao',
+    STAGE_FU_15MO:   'fu15mo',
+    STAGE_FU_3MO:    'fu3mo',
+    STAGE_DEAD:      'dead',
 }
 ACTIVE_STAGES = set(STAGE_NAMES.keys())
+
+# Per-stage cadence / behavior
+STAGE_CONFIG = {
+    'qualified': {'interval_days': 7,   'max_touches': 6, 'secondary_after': 3, 'dormant_wait': 3},
+    'lao':       {'interval_days': 7,   'max_touches': 6, 'secondary_after': 3, 'dormant_wait': 3},
+    'rr':        {'interval_days': 7,   'max_touches': 6, 'secondary_after': 3, 'dormant_wait': 3},
+    'mao':       {'interval_days': 7,   'max_touches': 6, 'secondary_after': 3, 'dormant_wait': 3},
+    'fu15mo':    {'interval_days': 30,  'max_touches': 3, 'secondary_after': 999, 'dormant_wait': 14},
+    'fu3mo':     {'interval_days': 60,  'max_touches': 3, 'secondary_after': 999, 'dormant_wait': 14},
+    'dead':      {'interval_days': 180, 'max_touches': 3, 'secondary_after': 999, 'dormant_wait': 30},
+}
 
 # GHL user IDs
 USER_JEFF = 'vDKOqPSkA8nLkia5skd0'
@@ -91,12 +110,23 @@ TEMPLATES = {
         "{first_name}, any final thoughts on the {address1} number? Either way works for me.",
         "{first_name} — last attempt on {address1}. Y to move forward, N to pass. No hard feelings.",
     ],
+    # Re-engagement: low-pressure, calm, "checking in" tone
+    'fu15mo': [
+        "Hey {first_name}, Jeff with APG. Wanted to circle back on {address1} — anything new on your end?",
+        "{first_name}, just checking in on {address1}. Door's still open whenever you're ready to talk.",
+        "{first_name} — last touch on {address1}. If anything's changed, just shoot me a text. Otherwise no worries.",
+    ],
+    'fu3mo': [
+        "Hey {first_name}, Jeff with APG. It's been a few months — anything change with {address1}?",
+        "{first_name}, just keeping in touch on {address1}. Always here if anything shifts.",
+        "{first_name} — quick check on {address1}. Reply if there's anything to revisit, otherwise all good.",
+    ],
+    'dead': [
+        "Hey {first_name} — Jeff with APG. It's been a while. If anything's ever changed with {address1} and you'd consider selling, just let me know. No pressure either way.",
+        "{first_name}, Jeff again. Just a quick check on {address1} — sometimes life shifts. If you're ever curious about a number, I'm here.",
+        "{first_name} — last reach-out on {address1}. If anything's in the air, you know where to find me.",
+    ],
 }
-
-INTERVAL_DAYS       = 7
-DORMANT_WAIT_DAYS   = 3
-MIN_HOUR_LOCAL      = 9   # don't send before 9 AM local
-MAX_HOUR_LOCAL      = 19  # don't send after 7 PM local
 
 
 def load_state():
@@ -130,10 +160,11 @@ def days_since(iso):
     return (now_utc() - dt).total_seconds() / 86400.0
 
 
-def from_number_for(state_code, sms_index):
-    """sms_index 0-5; 0-2 use primary, 3-5 use secondary."""
+def from_number_for(state_code, sms_index, stage_name):
+    """Pick from-number based on contact's state and where in the sequence we are."""
     s = (state_code or '').strip().upper()
-    if sms_index < 3:
+    cfg = STAGE_CONFIG.get(stage_name, STAGE_CONFIG['qualified'])
+    if sms_index < cfg['secondary_after']:
         return STATE_PRIMARY.get(s, JEFF_NJ)
     return STATE_SECONDARY.get(s, NJ_SECONDARY)
 
@@ -298,32 +329,36 @@ def process_lead(entry, contact, state):
             return 'replied'
 
     sms_count = cs.get('sms_count', 0)
+    cfg = STAGE_CONFIG[stage_name]
 
-    # All 6 sent — wait DORMANT_WAIT_DAYS, then mark dormant
-    if sms_count >= 6:
+    # All max touches sent — wait dormant_wait, then mark dormant
+    if sms_count >= cfg['max_touches']:
         d = days_since(cs.get('last_sms_at'))
-        if d is not None and d >= DORMANT_WAIT_DAYS:
+        if d is not None and d >= cfg['dormant_wait']:
             cs['dormant'] = True
             add_tag(cid, 'dormant-sms')
-            create_task(cid, USER_JEFF,
-                        f'Manual call attempt: {name} ({addr1})',
-                        f'Seller never replied to 6 SMS over 6 weeks in stage {stage_name.upper()}. Try a manual call.',
-                        due_in_days=0)
-            create_task(cid, USER_MIKE,
-                        f'REVIEW: Did Jeff call {name}?',
-                        'Verify Jeff made the manual call.',
-                        due_in_days=2)
+            # Active stages get a follow-up task; reactivation stages just get tagged dormant
+            if stage_name in ('qualified', 'lao', 'rr', 'mao'):
+                create_task(cid, USER_JEFF,
+                            f'Manual call attempt: {name} ({addr1})',
+                            f'Seller never replied to {cfg["max_touches"]} SMS in stage {stage_name.upper()}. Try a manual call.',
+                            due_in_days=0)
+                create_task(cid, USER_MIKE,
+                            f'REVIEW: Did Jeff call {name}?',
+                            'Verify Jeff made the manual call.',
+                            due_in_days=2)
             return 'dormant'
         return 'wait-dormant'
 
     # Should we send next SMS?
+    interval = cfg['interval_days']
     if cs.get('last_sms_at'):
         d = days_since(cs['last_sms_at'])
-        if d is None or d < INTERVAL_DAYS:
+        if d is None or d < interval:
             return 'wait'
     else:
         d = days_since(cs.get('stage_entered_at'))
-        if d is None or d < INTERVAL_DAYS:
+        if d is None or d < interval:
             return 'wait'
 
     # Compose & send
@@ -333,7 +368,7 @@ def process_lead(entry, contact, state):
     template = TEMPLATES[stage_name][sms_count]
     message  = template.format(first_name=first, address1=addr1)
     state_code = (contact.get('state') or '').strip().upper()
-    from_num   = from_number_for(state_code, sms_count)
+    from_num   = from_number_for(state_code, sms_count, stage_name)
 
     ok, info = send_sms(cid, message, from_num)
     if ok:
