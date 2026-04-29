@@ -497,11 +497,18 @@ def process_contact(cid, oid, google_svc):
     # Claude first; regex fallback
     data = analyze_with_claude(transcript) or extract_fields_regex(transcript)
 
-    # Apify property lookup — authoritative for sqft/year/Zestimate
+    # Apify property + comps lookup — gated on lead_temp to control cost.
+    # Cold leads skip Apify entirely. Hot/Warm leads get full property data + ARV from comps.
     addr1 = contact.get('address1','').strip()
     city  = contact.get('city','').strip()
     state = contact.get('state','').strip()
-    prop  = lookup_property(addr1, city, state) if (addr1 and city and state) else None
+    lead_temp = (data.get('lead_temp') or '').lower()
+    qualified = lead_temp in ('hot', 'warm')
+    prop = None
+    if qualified and addr1 and city and state:
+        prop = lookup_property(addr1, city, state)
+    elif not qualified:
+        print(f'  Skipping Apify: lead_temp={data.get("lead_temp")!r} (cold)')
     if prop:
         if prop.get('beds')        and not data.get('beds'):           data['beds']        = prop['beds']
         if prop.get('baths')       and not data.get('baths'):          data['baths']       = prop['baths']
