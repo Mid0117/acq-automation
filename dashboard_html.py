@@ -11,6 +11,7 @@ GHL_TOKEN    = os.environ['GHL_TOKEN']
 GHL_LOCATION = 'RCkiUmWqXX4BYQ39JXmm'
 PIPELINE_ID  = 'O8wzIa6E3SgD8HLg6gh9'
 STATE_FILE   = 'sms_state.json'
+SHEET_ID     = os.environ.get('DASHBOARD_SHEET_ID', '')
 OUT_DIR      = 'site'
 OUT_FILE     = os.path.join(OUT_DIR, 'index.html')
 
@@ -40,6 +41,51 @@ def to_et(iso):
         return dt.astimezone(ET).strftime('%b %d, %I:%M %p')
     except Exception:
         return ''
+
+
+def read_sheet_kill_and_templates():
+    """Returns (kill_on: bool, templates_rows: list of {stage, idx, msg})."""
+    if not SHEET_ID:
+        return True, []
+    token_json = os.environ.get('GOOGLE_TOKEN_JSON', '')
+    if not token_json:
+        return True, []
+    try:
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+        from googleapiclient.discovery import build
+        SCOPES = ['https://www.googleapis.com/auth/drive',
+                  'https://www.googleapis.com/auth/spreadsheets']
+        creds = Credentials.from_authorized_user_info(json.loads(token_json), SCOPES)
+        if not creds.valid and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        svc = build('sheets', 'v4', credentials=creds)
+
+        kill_on = True
+        try:
+            r = svc.spreadsheets().values().get(
+                spreadsheetId=SHEET_ID, range="Settings!B2"
+            ).execute()
+            val = (r.get('values') or [[]])[0]
+            if val and str(val[0]).strip().upper() in ('OFF', 'FALSE', 'NO', 'DISABLED'):
+                kill_on = False
+        except Exception:
+            pass
+
+        rows = []
+        try:
+            r = svc.spreadsheets().values().get(
+                spreadsheetId=SHEET_ID, range="Templates!A2:C200"
+            ).execute()
+            for row in r.get('values', []):
+                if len(row) >= 3 and row[0] and row[2]:
+                    rows.append({'stage': row[0], 'idx': row[1], 'msg': row[2]})
+        except Exception:
+            pass
+
+        return kill_on, rows
+    except Exception:
+        return True, []
 
 
 def fetch_active():
@@ -202,6 +248,35 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           color: var(--text); font-size: 14px; margin-bottom: 16px; }
 .search:focus { outline: none; border-color: var(--accent); }
 .empty { text-align: center; color: var(--text-dim); padding: 40px; }
+.status-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-radius: 12px; margin-bottom: 24px;
+  background: var(--panel); border: 1px solid var(--panel-border);
+}
+.status-banner.on  { border-color: rgba(16,185,129,0.4); }
+.status-banner.off { border-color: rgba(239,68,68,0.6); background: rgba(239,68,68,0.08); }
+.status-banner .status-text { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.status-banner .pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); animation: pulse 2s infinite; }
+.status-banner.off .pulse { background: var(--hot); box-shadow: 0 0 12px var(--hot); animation: none; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.btn { display: inline-block; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.15s; }
+.btn-kill { background: var(--hot); color: white; }
+.btn-kill:hover { background: #dc2626; }
+.btn-edit { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+.btn-edit:hover { background: rgba(99,102,241,0.3); }
+.template-grid {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 12px; padding: 4px 16px;
+}
+.template-row {
+  display: grid; grid-template-columns: 110px 40px 1fr; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--panel-border);
+  align-items: start; font-size: 13px;
+}
+.template-row:last-child { border-bottom: none; }
+.template-row .stage { color: var(--accent); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em; padding-top: 2px; }
+.template-row .num { color: var(--text-dim); text-align: center; padding-top: 2px; }
+.template-row .msg { color: var(--text); line-height: 1.5; }
 footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top: 40px; }
 </style>
 </head>
@@ -213,6 +288,8 @@ footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top
       <div class="subtitle">Last updated: __TIMESTAMP__ (Eastern Time)</div>
     </div>
   </header>
+
+  __STATUS_BANNER__
 
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Total Leads</div><div class="value">__TOTAL__</div><div class="sub">across all stages</div></div>
@@ -258,6 +335,16 @@ footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top
     <h2 class="section-title"><span class="dot green"></span> Active in Sequence</h2>
     <input type="text" class="search" id="searchActive" placeholder="Search by name, address, state...">
     <div class="lead-table">__ACTIVE_TABLE__</div>
+  </section>
+
+  <section>
+    <h2 class="section-title"><span class="dot gray"></span> Active SMS Templates</h2>
+    <div style="margin-bottom:12px;color:var(--text-dim);font-size:13px;">
+      These are the messages currently being sent. Edit in the Templates tab of the
+      <a href="__SHEET_URL__#gid=0" target="_blank" style="color:#a5b4fc;text-decoration:none;">Google Sheet</a>
+      — changes apply on the next cron run.
+    </div>
+    <div class="template-grid">__TEMPLATES_BLOCK__</div>
   </section>
 
   <footer>Auto-refreshed every 30 minutes by the GitHub Actions cron</footer>
@@ -361,6 +448,9 @@ def main():
     leads = fetch_active()
     print(f'HTML dashboard: {len(leads)} leads')
 
+    kill_on, template_rows = read_sheet_kill_and_templates()
+    sheet_url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit' if SHEET_ID else '#'
+
     by_stage   = {}
     by_state   = {}
     sms_progress = [0] * 7
@@ -408,6 +498,35 @@ def main():
     top_states = sorted(by_state.items(), key=lambda x: -x[1])[:10]
     top_numbers = sorted(by_number.items(), key=lambda x: -x[1])[:10]
 
+    # Status banner
+    if kill_on:
+        banner = (
+            '<div class="status-banner on">'
+            '<div class="status-text"><span class="pulse"></span>SMS Automation: <span style="color:var(--green)">ACTIVE</span></div>'
+            f'<a class="btn btn-kill" href="{sheet_url}#gid=0" target="_blank">EMERGENCY KILL SWITCH</a>'
+            '</div>'
+        )
+    else:
+        banner = (
+            '<div class="status-banner off">'
+            '<div class="status-text"><span class="pulse"></span>SMS Automation: <span style="color:var(--hot)">HALTED</span> — no messages will be sent</div>'
+            f'<a class="btn btn-edit" href="{sheet_url}#gid=0" target="_blank">RE-ENABLE</a>'
+            '</div>'
+        )
+
+    # Templates block
+    if template_rows:
+        tmpl_html = ''.join(
+            f'<div class="template-row">'
+            f'<div class="stage">{escape(r["stage"])}</div>'
+            f'<div class="num">#{escape(str(r["idx"]))}</div>'
+            f'<div class="msg">{escape(r["msg"])}</div>'
+            f'</div>'
+            for r in template_rows
+        )
+    else:
+        tmpl_html = '<div class="empty">Templates not yet seeded. Will populate on next cron run.</div>'
+
     html = HTML_TEMPLATE
     html = html.replace('__TIMESTAMP__', datetime.now(ET).strftime('%b %d, %Y %I:%M %p'))
     html = html.replace('__TOTAL__', str(total))
@@ -425,6 +544,9 @@ def main():
     html = html.replace('__REPLIED_TABLE__', render_table(replied_rows, 'replied'))
     html = html.replace('__DORMANT_TABLE__', render_table(dormant_rows, 'dormant'))
     html = html.replace('__ACTIVE_TABLE__', render_table(active_rows, 'active'))
+    html = html.replace('__STATUS_BANNER__', banner)
+    html = html.replace('__TEMPLATES_BLOCK__', tmpl_html)
+    html = html.replace('__SHEET_URL__', sheet_url)
 
     with open(OUT_FILE, 'w', encoding='utf-8') as f:
         f.write(html)

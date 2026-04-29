@@ -19,6 +19,7 @@ GHL_TOKEN    = os.environ['GHL_TOKEN']
 GHL_LOCATION = 'RCkiUmWqXX4BYQ39JXmm'
 PIPELINE_ID  = 'O8wzIa6E3SgD8HLg6gh9'
 STATE_FILE   = 'sms_state.json'
+SHEET_ID     = os.environ.get('DASHBOARD_SHEET_ID', '')
 
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
@@ -390,9 +391,89 @@ def in_business_hours_et():
     return 9 <= h < 20
 
 
+def read_sheet_config():
+    """Read kill switch and live templates from Google Sheet.
+    Returns (kill_switch_on: bool, templates: dict).
+    Falls back to hardcoded TEMPLATES if anything fails."""
+    if not SHEET_ID:
+        return True, TEMPLATES
+    token_json = os.environ.get('GOOGLE_TOKEN_JSON', '')
+    if not token_json:
+        return True, TEMPLATES
+    try:
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+        from googleapiclient.discovery import build
+        SCOPES = ['https://www.googleapis.com/auth/drive',
+                  'https://www.googleapis.com/auth/spreadsheets']
+        creds = Credentials.from_authorized_user_info(json.loads(token_json), SCOPES)
+        if not creds.valid and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        svc = build('sheets', 'v4', credentials=creds)
+
+        # Kill switch — Settings!B2
+        kill_on = True
+        try:
+            r = svc.spreadsheets().values().get(
+                spreadsheetId=SHEET_ID, range="Settings!B2"
+            ).execute()
+            val = (r.get('values') or [[]])[0]
+            if val and str(val[0]).strip().upper() in ('OFF', 'FALSE', 'NO', 'DISABLED'):
+                kill_on = False
+        except Exception:
+            pass
+
+        # Templates — Templates!A2:C200
+        templates = dict(TEMPLATES)
+        try:
+            r = svc.spreadsheets().values().get(
+                spreadsheetId=SHEET_ID, range="Templates!A2:C200"
+            ).execute()
+            rows = r.get('values', [])
+            built = {}
+            for row in rows:
+                if len(row) < 3:
+                    continue
+                stage = (row[0] or '').strip().lower()
+                try:
+                    idx = int(row[1]) - 1
+                except Exception:
+                    continue
+                msg = row[2]
+                if not msg or not stage:
+                    continue
+                built.setdefault(stage, [])
+                while len(built[stage]) <= idx:
+                    built[stage].append('')
+                built[stage][idx] = msg
+            # Merge: only override stages where the sheet has all required slots
+            for stage, msgs in built.items():
+                expected = len(TEMPLATES.get(stage, []))
+                if expected and len(msgs) >= expected and all(msgs[:expected]):
+                    templates[stage] = msgs[:expected]
+        except Exception:
+            pass
+
+        return kill_on, templates
+    except Exception as e:
+        print(f'  Sheet config read failed: {e}; using defaults.')
+        return True, TEMPLATES
+
+
 def main():
     et_now = datetime.now(ET)
     print(f'[{et_now.strftime("%Y-%m-%d %I:%M %p ET")}] SMS Follow-Up starting...')
+
+    # Kill switch + live templates from Google Sheet
+    kill_on, live_templates = read_sheet_config()
+    if not kill_on:
+        print('!! KILL SWITCH IS OFF — Settings!B2 in dashboard sheet says OFF. Skipping all SMS sends.')
+        print('   (Dashboard will still update.)')
+        return
+    # Replace module-level TEMPLATES with sheet-loaded versions for this run
+    global TEMPLATES
+    TEMPLATES = live_templates
+    print(f'SMS Automation: ON  |  Templates loaded for stages: {list(TEMPLATES.keys())}')
 
     if not in_business_hours_et():
         print(f'Outside business hours (9 AM - 8 PM ET); current ET hour: {et_now.hour}. Skipping sends.')
@@ -400,7 +481,7 @@ def main():
 
     state    = load_state()
     entries  = fetch_active_leads()
-    print(f'Active leads in stages 1-4: {len(entries)}')
+    print(f'Active leads in stages 1-7: {len(entries)}')
 
     counts = {}
     for e in entries:

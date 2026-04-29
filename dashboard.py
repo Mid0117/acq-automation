@@ -129,13 +129,107 @@ def ensure_tabs(svc, sheet_id):
     meta = svc['sheets'].spreadsheets().get(spreadsheetId=sheet_id).execute()
     existing = {s['properties']['title'] for s in meta.get('sheets', [])}
     reqs = []
-    for name in ('Summary', 'Leads'):
+    for name in ('Summary', 'Leads', 'Settings', 'Templates'):
         if name not in existing:
             reqs.append({'addSheet': {'properties': {'title': name}}})
     if reqs:
         svc['sheets'].spreadsheets().batchUpdate(
             spreadsheetId=sheet_id, body={'requests': reqs}
         ).execute()
+
+
+# Default templates — what gets seeded the first time Templates tab is empty.
+DEFAULT_TEMPLATES = {
+    'qualified': [
+        "Hey {first_name}, this is Jeff with APG — circling back on {address1}. Still thinking about selling, or did things shift on your end?",
+        "Hey {first_name}, checking back on {address1}. Anything you wanted to think over before we kept the conversation going?",
+        "{first_name} — last one on this. If {address1} is still something you'd sell, reply Y. If not, no problem and I'll stop reaching out.",
+        "Hey {first_name}, Jeff again from APG. Switched numbers in case the last one wasn't reaching you. You still considering selling {address1}?",
+        "{first_name}, just wanted to check one more time — any update on {address1}? Quick yes-or-no works for me.",
+        "{first_name} — final attempt. Reply Y if still on the table for {address1}, or I'll mark this closed on our end. Either way is fine.",
+    ],
+    'lao': [
+        "Hey {first_name}, Jeff at APG. Just making sure our offer on {address1} made it to you. Any thoughts?",
+        "{first_name}, did the number we sent for {address1} work for what you had in mind? Happy to hear your feedback.",
+        "{first_name} — final check on {address1}. Reply Y to revisit, N to pass. No hard feelings either way.",
+        "Hey {first_name}, switched numbers — wanted to make sure our offer on {address1} got through. Any thoughts?",
+        "{first_name}, just one more nudge on the {address1} offer. Y or N works for me.",
+        "{first_name} — last attempt. If the {address1} offer is worth revisiting, reply Y. Otherwise I'll close it on our end.",
+    ],
+    'rr': [
+        "Hey {first_name}, Jeff at APG. Wrapping up our review on {address1} this week. Anything we should know on your end?",
+        "{first_name} — any new info from your end on {address1}? Want to make sure we have the full picture.",
+        "{first_name}, let me know if you've heard from anyone else on {address1} — just keeping us aligned.",
+        "Hey {first_name}, Jeff here. Switched numbers — we're closing in on review for {address1}. Quick update?",
+        "{first_name}, anything I should know before we finalize on {address1}?",
+        "{first_name} — last check before we close out review on {address1}. All good on your end?",
+    ],
+    'mao': [
+        "Hey {first_name}, Jeff with APG. Final number on {address1} is in your court. Want to grab a quick call to walk through it?",
+        "{first_name}, anything I can answer on the {address1} offer? Happy to adjust if there's something specific.",
+        "{first_name} — last check on {address1}. Reply Y to keep moving, N to pass. All good either way.",
+        "Hey {first_name}, Jeff. Different number — wanted to make sure our final number on {address1} got to you.",
+        "{first_name}, any final thoughts on the {address1} number? Either way works for me.",
+        "{first_name} — last attempt on {address1}. Y to move forward, N to pass. No hard feelings.",
+    ],
+    'fu15mo': [
+        "Hey {first_name}, Jeff with APG. Wanted to circle back on {address1} — anything new on your end?",
+        "{first_name}, just checking in on {address1}. Door's still open whenever you're ready to talk.",
+        "{first_name} — last touch on {address1}. If anything's changed, just shoot me a text. Otherwise no worries.",
+    ],
+    'fu3mo': [
+        "Hey {first_name}, Jeff with APG. It's been a few months — anything change with {address1}?",
+        "{first_name}, just keeping in touch on {address1}. Always here if anything shifts.",
+        "{first_name} — quick check on {address1}. Reply if there's anything to revisit, otherwise all good.",
+    ],
+    'dead': [
+        "Hey {first_name} — Jeff with APG. It's been a while. If anything's ever changed with {address1} and you'd consider selling, just let me know. No pressure either way.",
+        "{first_name}, Jeff again. Just a quick check on {address1} — sometimes life shifts. If you're ever curious about a number, I'm here.",
+        "{first_name} — last reach-out on {address1}. If anything's in the air, you know where to find me.",
+    ],
+}
+
+
+def ensure_settings(svc, sheet_id):
+    """Seed Settings tab with kill switch ON if empty. Don't overwrite user changes."""
+    try:
+        r = svc['sheets'].spreadsheets().values().get(
+            spreadsheetId=sheet_id, range="Settings!A1:B5"
+        ).execute()
+        if r.get('values'):
+            return  # already populated
+    except Exception:
+        pass
+    rows = [
+        ['Setting', 'Value'],
+        ['SMS Automation', 'ON'],
+        ['', ''],
+        ['Notes', 'Set "SMS Automation" to OFF to halt all SMS sends. Other automations continue.'],
+    ]
+    svc['sheets'].spreadsheets().values().update(
+        spreadsheetId=sheet_id, range="Settings!A1",
+        valueInputOption='USER_ENTERED', body={'values': rows}
+    ).execute()
+
+
+def ensure_templates(svc, sheet_id):
+    """Seed Templates tab with defaults if empty. Don't overwrite user edits."""
+    try:
+        r = svc['sheets'].spreadsheets().values().get(
+            spreadsheetId=sheet_id, range="Templates!A1:C5"
+        ).execute()
+        if r.get('values'):
+            return  # already populated
+    except Exception:
+        pass
+    rows = [['Stage', '#', 'Message']]
+    for stage in ('qualified', 'lao', 'rr', 'mao', 'fu15mo', 'fu3mo', 'dead'):
+        for i, msg in enumerate(DEFAULT_TEMPLATES[stage], 1):
+            rows.append([stage, i, msg])
+    svc['sheets'].spreadsheets().values().update(
+        spreadsheetId=sheet_id, range="Templates!A1",
+        valueInputOption='USER_ENTERED', body={'values': rows}
+    ).execute()
 
 
 def write_tab(svc, sheet_id, tab, rows):
@@ -161,6 +255,8 @@ def main():
 
     sheet_id = ensure_sheet(svc)
     ensure_tabs(svc, sheet_id)
+    ensure_settings(svc, sheet_id)
+    ensure_templates(svc, sheet_id)
 
     leads_rows = [[
         'Name', 'Address', 'City', 'State', 'Stage',
