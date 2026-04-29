@@ -121,7 +121,7 @@ Return ONLY valid JSON — no prose, no code fences. Use null for any field not 
   "motivation": <short string e.g. "Relocating", "Inherited", "Tired landlord", "Behind on payments", "Divorce", "Downsizing"> or null,
   "reason_for_selling": <one-sentence specific reason or null>,
   "asking_price": <integer dollars or null>,
-  "estimated_arv": <integer dollars — your estimate of After Repair Value if any market context was given, otherwise null>,
+  "estimated_arv": <integer dollars — ONLY if seller or VA explicitly mentioned an after-repair value, comp price, or recently-sold neighbor — otherwise null. Do NOT guess.>,
   "deal_type": "Cash" | "Owner Finance" | "Subject-To" | "Wholesale" | "Lease Option" | "Hybrid" | "Unknown",
   "exit_strategy": "Flip" | "BRRRR" | "Wholesale" | "Buy & Hold" | "Owner Finance" | "Unknown",
   "repairs_needed": <short string listing major repairs mentioned, or null>,
@@ -288,7 +288,7 @@ def create_rehab_doc(svc, address, data, transcript):
             if ap.get('year_built'):               notes += f'Year Built:    {ap["year_built"]}\n'
             if ap.get('lot_size'):                 notes += f'Lot Size:      {ap["lot_size"]} {ap.get("lot_unit") or ""}\n'
             if ap.get('home_type'):                notes += f'Property Type: {ap["home_type"]}\n'
-            if ap.get('zestimate'):                notes += f'Zestimate:     ${int(ap["zestimate"]):,}\n'
+            if ap.get('zestimate'):                notes += f'Current Value (Zestimate): ${int(ap["zestimate"]):,}  (as-is, NOT ARV)\n'
             if ap.get('rent_zest'):                notes += f'Rent Estimate: ${int(ap["rent_zest"]):,}/mo\n'
             if ap.get('zillow_url'):               notes += f'Zillow Link:   {ap["zillow_url"]}\n'
 
@@ -402,7 +402,7 @@ def process_contact(cid, oid, google_svc):
         if prop.get('baths')       and not data.get('baths'):          data['baths']       = prop['baths']
         if prop.get('sqft'):                                            data['sqft']        = prop['sqft']
         if prop.get('home_type')   and not data.get('property_type'):  data['property_type']= prop['home_type']
-        if prop.get('zestimate'):                                       data['estimated_arv']= prop['zestimate']
+        # NOTE: Zestimate is the current as-is value, NOT ARV. ARV requires renovated comps.
         data['_apify'] = prop
 
     # Append transcript so multiple calls preserved
