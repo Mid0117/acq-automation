@@ -173,30 +173,31 @@ def from_number_for(state_code, sms_index, stage_name):
 
 
 def fetch_active_leads():
-    entries, page = [], 1
-    while True:
-        r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
-                         headers=GHL_H,
-                         params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
-                                 'limit': 100, 'page': page})
-        if r.status_code != 200:
-            break
-        data = r.json()
-        opps = data.get('opportunities', [])
-        if not opps:
-            break
-        for o in opps:
-            stage = o.get('pipelineStageId')
-            c = o.get('contact') or {}
-            if (stage in ACTIVE_STAGES
-                and 'agent' not in c.get('tags', [])
-                and o.get('contactId')):
-                entries.append({'cid': o['contactId'], 'oid': o['id'],
-                                'stage': stage, 'stage_name': STAGE_NAMES[stage]})
-        if page * 100 >= data.get('total', 0):
-            break
-        page += 1
-        time.sleep(0.2)
+    """Query each active stage server-side. GHL's pagination 'total' field is unreliable
+    (returns 0 even when there are 400+ opps), so we filter by stage at fetch time."""
+    entries = []
+    for stage_id, stage_name in STAGE_NAMES.items():
+        page = 1
+        while True:
+            r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
+                             headers=GHL_H,
+                             params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
+                                     'pipeline_stage_id': stage_id,
+                                     'limit': 100, 'page': page})
+            if r.status_code != 200:
+                break
+            opps = r.json().get('opportunities', [])
+            if not opps:
+                break
+            for o in opps:
+                c = o.get('contact') or {}
+                if 'agent' not in c.get('tags', []) and o.get('contactId'):
+                    entries.append({'cid': o['contactId'], 'oid': o['id'],
+                                    'stage': stage_id, 'stage_name': stage_name})
+            if len(opps) < 100:
+                break
+            page += 1
+            time.sleep(0.15)
     return entries
 
 

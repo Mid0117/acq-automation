@@ -43,27 +43,29 @@ def to_et(iso):
 
 
 def fetch_active():
-    out, page = [], 1
-    while True:
-        r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
-                         headers=GHL_H,
-                         params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
-                                 'limit': 100, 'page': page})
-        if r.status_code != 200:
-            break
-        d = r.json()
-        opps = d.get('opportunities', [])
-        if not opps:
-            break
-        for o in opps:
-            stage = o.get('pipelineStageId')
-            c = o.get('contact') or {}
-            if stage in STAGE_NAMES and 'agent' not in c.get('tags', []) and o.get('contactId'):
-                out.append({'cid': o['contactId'], 'oid': o['id'],
-                            'stage': STAGE_NAMES[stage], 'tags': c.get('tags', [])})
-        if page * 100 >= d.get('total', 0):
-            break
-        page += 1
+    """Query each stage server-side (GHL 'total' field is unreliable)."""
+    out = []
+    for stage_id, stage_label in STAGE_NAMES.items():
+        page = 1
+        while True:
+            r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
+                             headers=GHL_H,
+                             params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
+                                     'pipeline_stage_id': stage_id,
+                                     'limit': 100, 'page': page})
+            if r.status_code != 200:
+                break
+            opps = r.json().get('opportunities', [])
+            if not opps:
+                break
+            for o in opps:
+                c = o.get('contact') or {}
+                if 'agent' not in c.get('tags', []) and o.get('contactId'):
+                    out.append({'cid': o['contactId'], 'oid': o['id'],
+                                'stage': stage_label, 'tags': c.get('tags', [])})
+            if len(opps) < 100:
+                break
+            page += 1
     return out
 
 
