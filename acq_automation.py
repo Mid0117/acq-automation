@@ -18,6 +18,15 @@ PIPELINE_ID    = 'O8wzIa6E3SgD8HLg6gh9'
 TEMPLATE_ID    = '1xYeKGmcbxJqCykxGXo1mEHBDEPQfbEHqXuS3cKrIliM'
 PROCESSED_FILE = 'processed_contacts.json'
 
+# Only process opportunities in active deal stages (1-4). Skip Unqualified, Agents,
+# Contract Sent and beyond (already advanced), Follow Up, Dead Deals.
+ACTIVE_STAGES = {
+    'a17517be-8d1a-49fd-bd53-b9128a66e242',  # 1. Qualified Leads (Warm/Hot)
+    'd43fddd8-3a17-46b2-a193-cf18619f654f',  # 2. Prequalified Offer (LAO)
+    '23a159ad-ba39-4c74-9d07-c1beb219d9f2',  # 3. Due Diligence (RR)
+    '43589167-14f0-4e09-ba2a-8b9bd3296a4a',  # 4. Negotiate (MAO)
+}
+
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
 
@@ -438,7 +447,9 @@ def fetch_acq_entries():
         if not opps: break
         for o in opps:
             c = o.get('contact') or {}
-            if 'agent' not in c.get('tags', []) and o.get('contactId'):
+            if (o.get('pipelineStageId') in ACTIVE_STAGES
+                and 'agent' not in c.get('tags', [])
+                and o.get('contactId')):
                 entries.append({'cid': o['contactId'], 'oid': o['id']})
         if page * 100 >= data.get('total', 0): break
         page += 1
@@ -497,18 +508,12 @@ def process_contact(cid, oid, google_svc):
     # Claude first; regex fallback
     data = analyze_with_claude(transcript) or extract_fields_regex(transcript)
 
-    # Apify property + comps lookup — gated on lead_temp to control cost.
-    # Cold leads skip Apify entirely. Hot/Warm leads get full property data + ARV from comps.
+    # Apify property + comps lookup. Stage filter (only stages 1-4) already
+    # gates this — if we reached here, the lead is qualified.
     addr1 = contact.get('address1','').strip()
     city  = contact.get('city','').strip()
     state = contact.get('state','').strip()
-    lead_temp = (data.get('lead_temp') or '').lower()
-    qualified = lead_temp in ('hot', 'warm')
-    prop = None
-    if qualified and addr1 and city and state:
-        prop = lookup_property(addr1, city, state)
-    elif not qualified:
-        print(f'  Skipping Apify: lead_temp={data.get("lead_temp")!r} (cold)')
+    prop = lookup_property(addr1, city, state) if (addr1 and city and state) else None
     if prop:
         if prop.get('beds')        and not data.get('beds'):           data['beds']        = prop['beds']
         if prop.get('baths')       and not data.get('baths'):          data['baths']       = prop['baths']
