@@ -31,6 +31,8 @@ jobs:
       - name: Send SMS follow-ups
         env:
           GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          DASHBOARD_SHEET_ID: ${{ secrets.DASHBOARD_SHEET_ID }}
         run: python sms_followup.py
 
       - name: Update Google Sheet dashboard
@@ -44,6 +46,8 @@ jobs:
       - name: Generate HTML dashboard
         env:
           GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          DASHBOARD_SHEET_ID: ${{ secrets.DASHBOARD_SHEET_ID }}
         run: python dashboard_html.py
 
       - name: Deploy HTML dashboard to GitHub Pages
