@@ -11,6 +11,9 @@ For each contact in ACQ pipeline stages 1-4:
 """
 import json, os, requests, time
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
+
+ET = ZoneInfo('America/New_York')
 
 GHL_TOKEN    = os.environ['GHL_TOKEN']
 GHL_LOCATION = 'RCkiUmWqXX4BYQ39JXmm'
@@ -381,18 +384,17 @@ def process_lead(entry, contact, state):
 
 
 def in_business_hours_et():
-    """9 AM - 8 PM Eastern. Conservative SMS window."""
-    et = timezone(timedelta(hours=-5))   # EST (close enough; we don't need DST precision for this guard)
-    h = datetime.now(et).hour
+    """9 AM - 8 PM Eastern. Handles EST/EDT correctly via zoneinfo."""
+    h = datetime.now(ET).hour
     return 9 <= h < 20
 
 
 def main():
-    print(f'[{now_utc().strftime("%Y-%m-%d %H:%M:%S")}] SMS Follow-Up starting...')
+    et_now = datetime.now(ET)
+    print(f'[{et_now.strftime("%Y-%m-%d %I:%M %p ET")}] SMS Follow-Up starting...')
 
     if not in_business_hours_et():
-        et = timezone(timedelta(hours=-5))
-        print(f'Outside business hours (9 AM - 8 PM ET); current ET hour: {datetime.now(et).hour}. Skipping sends, dashboard will still update.')
+        print(f'Outside business hours (9 AM - 8 PM ET); current ET hour: {et_now.hour}. Skipping sends.')
         return
 
     state    = load_state()

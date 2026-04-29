@@ -10,6 +10,22 @@ Otherwise creates a new sheet, prints the URL, you set the env var.
 """
 import json, os, requests
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
+ET = ZoneInfo('America/New_York')
+
+
+def to_et_str(iso_or_str):
+    """Format ISO timestamp as readable ET. Empty if missing/invalid."""
+    if not iso_or_str:
+        return ''
+    try:
+        dt = datetime.fromisoformat(str(iso_or_str).replace('Z', '+00:00'))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(ET).strftime('%b %d, %Y %I:%M %p ET')
+    except Exception:
+        return str(iso_or_str)
 
 GHL_TOKEN    = os.environ['GHL_TOKEN']
 GHL_LOCATION = 'RCkiUmWqXX4BYQ39JXmm'
@@ -170,10 +186,10 @@ def main():
             c.get('state', ''),
             e['stage'],
             st.get('sms_count', 0),
-            st.get('last_sms_at', ''),
+            to_et_str(st.get('last_sms_at', '')),
             st.get('last_from_number', ''),
             'YES' if st.get('replied') else '',
-            st.get('replied_at', ''),
+            to_et_str(st.get('replied_at', '')),
             'YES' if st.get('dormant') else '',
             ', '.join(e.get('tags', [])),
             e['cid'],
@@ -190,7 +206,7 @@ def main():
 
     write_tab(svc, sheet_id, 'Leads', leads_rows)
 
-    now_str = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+    now_str = datetime.now(ET).strftime('%b %d, %Y %I:%M %p ET')
     summary = [
         ['ACQ SMS Follow-Up Dashboard'],
         [f'Snapshot: {now_str}'],
