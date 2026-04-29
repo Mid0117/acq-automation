@@ -46,6 +46,189 @@ def slack_post(blocks_or_text, fallback=''):
     except Exception as e:
         print(f'    Slack post failed: {e}')
 
+
+def opp_name_format(contact):
+    """Standard opportunity name: 'Name - Address - Phone'."""
+    name  = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip() or '(no name)'
+    addr  = (contact.get('address1') or contact.get('city') or '(no address)').strip()
+    phone = (contact.get('phone') or '(no phone)').strip()
+    return f'{name} - {addr} - {phone}'
+
+
+def set_opp_name(oid, contact):
+    """Update the opportunity's display name to 'Name - Address - Phone'."""
+    try:
+        requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
+                     headers=GHL_H, json={'name': opp_name_format(contact)}, timeout=15)
+    except Exception as e:
+        print(f'    Set opp name failed: {e}')
+
+
+def has_open_task(cid, title_prefix, assigned_to=None):
+    """True if contact already has an open (incomplete) task whose title starts with prefix."""
+    try:
+        r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}/tasks',
+                         headers=GHL_H, timeout=15)
+        if r.status_code != 200:
+            return False
+        for t in r.json().get('tasks', []):
+            if t.get('completed'):
+                continue
+            if assigned_to and t.get('assignedTo') != assigned_to:
+                continue
+            if (t.get('title') or '').startswith(title_prefix):
+                return True
+    except Exception:
+        pass
+    return False
+
+
+def create_task_dedup(cid, user_id, title, body, due_in_hours=4):
+    """Create a GHL task only if a similar open task doesn't already exist for this assignee."""
+    if has_open_task(cid, title.split(':', 1)[0], assigned_to=user_id):
+        return False
+    from datetime import timezone as _tz
+    due = (datetime.now(_tz.utc) + timedelta(hours=due_in_hours)).isoformat()
+    try:
+        r = requests.post(f'https://services.leadconnectorhq.com/contacts/{cid}/tasks',
+                          headers=GHL_H,
+                          json={'title': title, 'body': body, 'dueDate': due,
+                                'completed': False, 'assignedTo': user_id},
+                          timeout=15)
+        return r.status_code in (200, 201)
+    except Exception as e:
+        print(f'    Task create failed: {e}')
+        return False
+
+
+def upsert_summary_note(cid, body, marker='APG Lead Summary'):
+    """Upsert a single note matching the marker. If found, update; else create."""
+    try:
+        r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}/notes',
+                         headers=GHL_H, timeout=15)
+        if r.status_code == 200:
+            for n in r.json().get('notes', []):
+                if (n.get('body') or '').startswith(marker):
+                    nid = n.get('id')
+                    if nid:
+                        requests.put(
+                            f'https://services.leadconnectorhq.com/contacts/{cid}/notes/{nid}',
+                            headers=GHL_H, json={'body': body}, timeout=15)
+                        return 'updated'
+        requests.post(f'https://services.leadconnectorhq.com/contacts/{cid}/notes',
+                      headers=GHL_H, json={'body': body, 'userId': USER_MIKE}, timeout=15)
+        return 'created'
+    except Exception as e:
+        print(f'    Note upsert failed: {e}')
+        return 'failed'
+
+
+def build_summary_note(contact, opp, data, comps_data=None, rehab_url=''):
+    """Build a single comprehensive summary note for the contact (all left-side data + analysis)."""
+    cf  = {f['id']: (f.get('value') or '') for f in (contact.get('customFields') or [])}
+    of  = {f['id']: (f.get('fieldValue') or '') for f in (opp.get('customFields') or [])}
+
+    def pick(*ids):
+        for src in (data or {}, cf, of):
+            pass  # placeholder — we use data + cf + of below directly
+        return ''
+
+    addr1 = (contact.get('address1') or '').strip()
+    city  = (contact.get('city') or '').strip()
+    state = (contact.get('state') or '').strip()
+    zipc  = (contact.get('postalCode') or '').strip().split('-')[0]
+
+    beds  = (data.get('beds') if data else None)  or cf.get(CF_BED) or of.get(OF_BED) or '?'
+    baths = (data.get('baths') if data else None) or cf.get(CF_BATH) or of.get(OF_BATH) or '?'
+    sqft  = (data.get('sqft') if data else None)  or cf.get(CF_SQFT) or of.get(OF_SQFT) or '?'
+    ptype = (data.get('property_type') if data else None) or cf.get(CF_PROP_TYPE) or of.get(OF_PROP_TYPE) or '?'
+    cond  = (data.get('condition') if data else None) or cf.get(CF_CONDITION) or '?'
+    yr    = ''
+    apify = (data or {}).get('_apify') or {}
+    if apify.get('year_built'): yr = apify['year_built']
+
+    asking = (data or {}).get('asking_price') or cf.get(CF_ASK_PRICE) or '?'
+    arv    = (data or {}).get('estimated_arv') or cf.get(CF_ARV) or '?'
+    arv70  = ''
+    try:
+        if arv != '?': arv70 = int(int(arv) * 0.7)
+    except Exception: pass
+    repairs = (data or {}).get('repairs_needed') or cf.get(CF_REPAIRS) or ''
+    deal_t  = (data or {}).get('deal_type') or cf.get(CF_DEAL_TYPE) or ''
+    motiv   = (data or {}).get('motivation') or cf.get(CF_MOTIVATION) or ''
+    timeln  = (data or {}).get('timeline') or cf.get(CF_TIMELINE) or ''
+    reason  = (data or {}).get('reason_for_selling') or cf.get(CF_REASON_SELL) or ''
+    temp    = (data or {}).get('lead_temp') or ''
+
+    ts = datetime.now().strftime('%b %d, %Y %I:%M %p')
+
+    def fmt_money(v):
+        try: return f'${int(v):,}'
+        except Exception: return str(v)
+
+    lines = [
+        'APG Lead Summary',
+        '=' * 40,
+        f'Updated: {ts}',
+        '',
+        '--- Property ---',
+        f'Address: {addr1}, {city} {state} {zipc}',
+        f'Beds / Baths: {beds} / {baths}',
+        f'Sqft: {sqft}',
+    ]
+    if yr:    lines.append(f'Year Built: {yr}')
+    lines.append(f'Type: {ptype}')
+    lines.append(f'Condition: {cond}')
+
+    lines.append('')
+    lines.append('--- Financials ---')
+    lines.append(f'Asking Price: {fmt_money(asking) if asking != "?" else "?"}')
+    lines.append(f'ARV (Claude+comps): {fmt_money(arv) if arv != "?" else "(pending)"}')
+    if arv70: lines.append(f'70% ARV (MAO): {fmt_money(arv70)}')
+    if repairs: lines.append(f'Repairs Needed: {repairs}')
+
+    lines.append('')
+    lines.append('--- Deal Context ---')
+    if deal_t:  lines.append(f'Deal Type: {deal_t}')
+    if motiv:   lines.append(f'Motivation: {motiv}')
+    if timeln:  lines.append(f'Timeline: {timeln}')
+    if reason:  lines.append(f'Reason: {reason}')
+    if temp:    lines.append(f'Lead Temp: {temp}')
+
+    if comps_data and comps_data.get('selected_comps'):
+        lines.append('')
+        lines.append('--- Comps Used (Claude-selected) ---')
+        for c in comps_data['selected_comps'][:5]:
+            sp = c.get('sold_price') or 0
+            lines.append(f'  • {c.get("address","?")} | {c.get("beds","?")}bd/{c.get("baths","?")}ba | '
+                         f'{c.get("sqft","?")}sqft | Sold {fmt_money(sp)} | ${c.get("price_per_sqft","?")}/sqft')
+
+    if data and data.get('call_rating'):
+        lines.append('')
+        lines.append('--- Last Call Analysis (Claude) ---')
+        lines.append(f'Rating: {data["call_rating"]}/10')
+        if data.get('va_notes_summary'):
+            lines.append(f'Summary: {data["va_notes_summary"]}')
+        if data.get('could_improve'):
+            lines.append('')
+            lines.append('What we could improve:')
+            for it in data['could_improve']:
+                lines.append(f'  • {it}')
+        if data.get('action_items'):
+            lines.append('')
+            lines.append('Action items:')
+            for it in data['action_items']:
+                lines.append(f'  • {it}')
+        if data.get('red_flags'):
+            lines.append('')
+            lines.append(f'Red flags: {", ".join(data["red_flags"])}')
+
+    if rehab_url:
+        lines.append('')
+        lines.append(f'Rehab Report: {rehab_url}')
+
+    return '\n'.join(lines)
+
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
 
@@ -675,46 +858,20 @@ def process_contact(cid, oid, google_svc):
                               json={'pipelineStageId': STAGE_LAO})
             if mv.status_code == 200:
                 print(f'  ➜ Auto-moved to LAO (Hot lead)')
-                # Notify the team via GHL tasks
+                set_opp_name(oid, contact)
                 lead_name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip() or '(no name)'
                 addr = contact.get('address1','') or contact.get('city','') or '(no address)'
-                # Build a rich task body with what Claude extracted
-                body_lines = [
-                    f'🔥 HOT lead from call analysis. Auto-moved Qualified → LAO.',
-                    '',
-                    f'Address: {addr}, {contact.get("city","")} {contact.get("state","")}',
-                ]
-                if data.get('asking_price'):    body_lines.append(f'Asking: ${int(data["asking_price"]):,}')
-                if data.get('estimated_arv'):   body_lines.append(f'ARV (Claude): ${int(data["estimated_arv"]):,}')
-                if data.get('deal_type'):       body_lines.append(f'Deal type: {data["deal_type"]}')
-                if data.get('motivation'):      body_lines.append(f'Motivation: {data["motivation"]}')
-                if data.get('timeline'):        body_lines.append(f'Timeline: {data["timeline"]}')
-                if data.get('condition'):       body_lines.append(f'Condition: {data["condition"]}')
-                if data.get('next_steps'):
-                    body_lines.append('')
-                    body_lines.append(f'Next steps from call: {data["next_steps"]}')
-                body_lines.append('')
-                body_lines.append('Action: present LAO offer ASAP.')
-                task_body = '\n'.join(body_lines)
-                # Create one task per team member
-                from datetime import timezone as _tz
-                due = datetime.now(_tz.utc).isoformat()
-                for uid, who in [(USER_JEFF, 'Jeff'), (USER_ADAM, 'Adam'), (USER_MIKE, 'Mike')]:
-                    try:
-                        requests.post(
-                            f'https://services.leadconnectorhq.com/contacts/{cid}/tasks',
-                            headers=GHL_H,
-                            json={
-                                'title': f'🔥 HOT → LAO: {lead_name} ({addr})',
-                                'body':  task_body,
-                                'dueDate': due,
-                                'completed': False,
-                                'assignedTo': uid,
-                            }, timeout=15
-                        )
-                    except Exception as e:
-                        print(f'    Task for {who} failed: {e}')
-                print(f'  ➜ Notification tasks created for Jeff + Adam + Mike')
+                # Simple, direct body for Jeff. Mike + Adam see the same task. All info is in the contact's note.
+                jeff_title = f'🔥 HOT → LAO: {lead_name} ({addr})'
+                jeff_body  = f'Hot lead promoted from Qualified to LAO. Call them and present the LAO offer. Full details are in the contact notes section.'
+                created_any = False
+                for uid in (USER_JEFF, USER_ADAM, USER_MIKE):
+                    if create_task_dedup(cid, uid, jeff_title, jeff_body, due_in_hours=4):
+                        created_any = True
+                if created_any:
+                    print(f'  ➜ Tasks created for Jeff + Adam + Mike')
+                else:
+                    print(f'  ➜ Tasks already existed (no duplicates created)')
                 # Slack ping (only if SLACK_WEBHOOK_URL is set)
                 slack_blocks = [
                     {'type':'header', 'text':{'type':'plain_text','text':f'🔥 Hot Lead → LAO: {lead_name}'}},
@@ -723,36 +880,28 @@ def process_contact(cid, oid, google_svc):
                 ]
                 slack_post(slack_blocks, fallback=f'🔥 Hot Lead {lead_name} moved to LAO')
 
-    # Write a "Claude Call Rating + Action Items" note on the contact
-    if data.get('call_rating') or data.get('could_improve') or data.get('action_items'):
-        note_lines = ['Claude Call Rating + Action Items', '=' * 38]
-        if data.get('call_rating') is not None:
-            note_lines.append(f'Rating: {data["call_rating"]}/10')
-        if data.get('lead_temp'):
-            note_lines.append(f'Lead Temperature: {data["lead_temp"]}')
-        note_lines.append('')
-        if data.get('could_improve'):
-            note_lines.append('What could have been done better:')
-            for item in data['could_improve']:
-                note_lines.append(f'  • {item}')
-            note_lines.append('')
-        if data.get('action_items'):
-            note_lines.append('Action items:')
-            for item in data['action_items']:
-                note_lines.append(f'  • {item}')
-            note_lines.append('')
-        if data.get('next_steps'):
-            note_lines.append(f'Next steps from call: {data["next_steps"]}')
-        if data.get('red_flags'):
-            note_lines.append('')
-            note_lines.append(f'Red flags: {", ".join(data["red_flags"])}')
-        note_body = '\n'.join(note_lines)
-        try:
-            requests.post(f'https://services.leadconnectorhq.com/contacts/{cid}/notes',
-                          headers=GHL_H, json={'body': note_body, 'userId': USER_MIKE},
-                          timeout=15)
-        except Exception as e:
-            print(f'    Note write failed: {e}')
+    # Comprehensive "APG Lead Summary" note (left-side data + analysis + comps).
+    # Single upsert — no duplicate notes accumulating.
+    try:
+        ro_final = requests.get(f'https://services.leadconnectorhq.com/opportunities/{oid}', headers=GHL_H, timeout=15)
+        opp_for_note = ro_final.json().get('opportunity', {}) if ro_final.status_code == 200 else {}
+    except Exception:
+        opp_for_note = {}
+    rehab_url_for_note = ''
+    for f in opp_for_note.get('customFields', []):
+        if f.get('id') == OF_REHAB:
+            rehab_url_for_note = f.get('fieldValue') or ''
+            break
+    try:
+        rc_final = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H, timeout=15)
+        contact_for_note = rc_final.json().get('contact', contact) if rc_final.status_code == 200 else contact
+    except Exception:
+        contact_for_note = contact
+    summary = build_summary_note(contact_for_note, opp_for_note, data,
+                                 comps_data=data.get('_comps'), rehab_url=rehab_url_for_note)
+    upsert_summary_note(cid, summary)
+    # Set the standard opp name format every time we process a lead
+    set_opp_name(oid, contact_for_note)
 
     name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip()
     print(f'  OK: {name} | {data.get("beds")}/{data.get("baths")} | {data.get("deal_type")} | {data.get("lead_temp")} | rating={data.get("call_rating")}')
