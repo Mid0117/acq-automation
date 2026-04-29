@@ -243,6 +243,96 @@ def lookup_property(addr1, city, state):
         return None
 
 
+def fetch_sold_comps(city, state, zipcode, max_items=30):
+    """Pull recently-sold listings near the property. Apify returns SOLD when given a /sold/ URL as a search query."""
+    if not (APIFY_TOKEN and city and state):
+        return []
+    c = city.replace(' ', '-').strip().lower()
+    s = state.strip().lower()
+    z = (zipcode or '').strip()
+    url = f'https://www.zillow.com/{c}-{s}-{z}/sold/' if z else f'https://www.zillow.com/{c}-{s}/sold/'
+    try:
+        r = requests.post(
+            f'https://api.apify.com/v2/acts/quiet_bark~zillow-scraper/run-sync-get-dataset-items?token={APIFY_TOKEN}',
+            json={'mode': 'SEARCH', 'searchQueries': [url], 'maxItems': max_items},
+            timeout=240
+        )
+        if r.status_code not in (200, 201):
+            return []
+        items = r.json() or []
+        comps = []
+        for it in items:
+            if it.get('statusType') != 'SOLD':
+                continue
+            comps.append({
+                'address': it.get('address') or '',
+                'beds':    it.get('beds'),
+                'baths':   it.get('baths'),
+                'sqft':    it.get('area'),
+                'price':   it.get('unformattedPrice'),
+                'zpid':    it.get('zpid'),
+                'url':     it.get('detailUrl') or '',
+            })
+        return comps[:max_items]
+    except Exception as e:
+        print(f'  Comps fetch error: {e}')
+        return []
+
+
+COMPS_SYSTEM = """You are a real estate appraiser computing ARV (After Repair Value) from sold comparables.
+
+Given the subject property and a list of nearby SOLD properties, you must:
+1. Pick the 5 most comparable properties (similar size ±25%, similar beds ±1, same property type if possible).
+2. Compute median price-per-sqft of selected comps.
+3. ARV = median $/sqft × subject sqft.
+4. Discard outliers (huge/tiny size mismatches, condos vs SFH mismatches, etc).
+
+Return ONLY valid JSON:
+{
+  "arv": <integer dollars>,
+  "rationale": "<one short sentence on how comps were chosen>",
+  "selected_comps": [
+    {"address":"...","beds":N,"baths":N,"sqft":N,"sold_price":N,"price_per_sqft":N,"url":"..."},
+    ...
+  ]
+}
+
+If fewer than 3 valid comps exist, set arv to null."""
+
+
+def estimate_arv_from_comps(subject, comps):
+    if not (ANTHROPIC_KEY and comps and subject.get('sqft')):
+        return None
+    user_msg = f"""SUBJECT PROPERTY:
+Address: {subject.get('address','')}
+Beds: {subject.get('beds')} | Baths: {subject.get('baths')} | Sqft: {subject.get('sqft')}
+Property Type: {subject.get('home_type','')}
+Year Built: {subject.get('year_built','')}
+
+NEARBY SOLD PROPERTIES (candidates):
+{json.dumps(comps, indent=2)}"""
+    body = {
+        'model': 'claude-sonnet-4-5', 'max_tokens': 2000,
+        'system': COMPS_SYSTEM,
+        'messages': [{'role':'user','content':user_msg}],
+    }
+    headers = {'x-api-key': ANTHROPIC_KEY, 'anthropic-version':'2023-06-01', 'content-type':'application/json'}
+    try:
+        r = requests.post('https://api.anthropic.com/v1/messages', headers=headers, json=body, timeout=90)
+        if r.status_code != 200:
+            print(f'  Comps Claude {r.status_code}: {r.text[:200]}')
+            return None
+        text = r.json()['content'][0]['text'].strip()
+        if text.startswith('```'):
+            text = text.split('```',2)[1]
+            if text.startswith('json'): text = text[4:]
+            text = text.strip()
+        return json.loads(text)
+    except Exception as e:
+        print(f'  Comps analysis failed: {e}')
+        return None
+
+
 # ── Deepgram ─────────────────────────────────────────────────────────────────
 def transcribe(audio_bytes):
     r = requests.post(
@@ -291,6 +381,21 @@ def create_rehab_doc(svc, address, data, transcript):
             if ap.get('zestimate'):                notes += f'Current Value (Zestimate): ${int(ap["zestimate"]):,}  (as-is, NOT ARV)\n'
             if ap.get('rent_zest'):                notes += f'Rent Estimate: ${int(ap["rent_zest"]):,}/mo\n'
             if ap.get('zillow_url'):               notes += f'Zillow Link:   {ap["zillow_url"]}\n'
+
+        # COMPS USING CLAUDE
+        comps = data.get('_comps') or {}
+        if comps.get('selected_comps'):
+            notes += f'\n\n─────────────────────────────\nCOMPS USING CLAUDE\n─────────────────────────────\n'
+            if comps.get('arv'):
+                notes += f'Estimated ARV: ${int(comps["arv"]):,}\n'
+                notes += f'70% ARV (MAO): ${int(int(comps["arv"]) * 0.7):,}\n'
+            if comps.get('rationale'):
+                notes += f'Rationale: {comps["rationale"]}\n'
+            notes += '\nSelected Comparables:\n'
+            for c in comps['selected_comps']:
+                notes += f'  • {c.get("address","?")}\n'
+                notes += f'    {c.get("beds","?")}bd / {c.get("baths","?")}ba | {c.get("sqft","?")} sqft | Sold ${int(c.get("sold_price",0)):,} | ${c.get("price_per_sqft","?")}/sqft\n'
+                if c.get('url'): notes += f'    {c["url"]}\n'
 
         notes += f'\n\n─────────────────────────────\nCall Briefing  ({datetime.now().strftime("%Y-%m-%d")})\n─────────────────────────────\n'
         if data.get('va_notes_summary'):
@@ -402,8 +507,24 @@ def process_contact(cid, oid, google_svc):
         if prop.get('baths')       and not data.get('baths'):          data['baths']       = prop['baths']
         if prop.get('sqft'):                                            data['sqft']        = prop['sqft']
         if prop.get('home_type')   and not data.get('property_type'):  data['property_type']= prop['home_type']
-        # NOTE: Zestimate is the current as-is value, NOT ARV. ARV requires renovated comps.
         data['_apify'] = prop
+
+        # Real ARV from sold comps + Claude
+        zipc = (contact.get('postalCode') or '').strip()
+        comps = fetch_sold_comps(city, state, zipc, max_items=30)
+        if comps and prop.get('sqft'):
+            comps_result = estimate_arv_from_comps({
+                'address':    f"{addr1}, {city}, {state}",
+                'beds':       data.get('beds'),
+                'baths':      data.get('baths'),
+                'sqft':       prop.get('sqft'),
+                'home_type':  prop.get('home_type'),
+                'year_built': prop.get('year_built'),
+            }, comps)
+            if comps_result:
+                if comps_result.get('arv'):
+                    data['estimated_arv'] = comps_result['arv']
+                data['_comps'] = comps_result
 
     # Append transcript so multiple calls preserved
     existing_tx = cfields.get(CF_AI_TX, '')
