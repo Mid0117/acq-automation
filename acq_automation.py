@@ -26,6 +26,11 @@ STAGE_RR        = '23a159ad-ba39-4c74-9d07-c1beb219d9f2'  # 3. Due Diligence (RR
 STAGE_MAO       = '43589167-14f0-4e09-ba2a-8b9bd3296a4a'  # 4. Negotiate (MAO)
 ACTIVE_STAGES = {STAGE_QUALIFIED, STAGE_LAO, STAGE_RR, STAGE_MAO}
 
+# GHL user IDs for task assignment
+USER_JEFF = 'vDKOqPSkA8nLkia5skd0'
+USER_MIKE = 'Vj4WwH1ovxGN5Hv5Kq17'
+USER_ADAM = 'vCjuvuuQ7p7K5GUODujQ'
+
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
 
@@ -652,6 +657,43 @@ def process_contact(cid, oid, google_svc):
                               json={'pipelineStageId': STAGE_LAO})
             if mv.status_code == 200:
                 print(f'  ➜ Auto-moved to LAO (Hot lead)')
+                # Notify the team via GHL tasks
+                lead_name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip() or '(no name)'
+                addr = contact.get('address1','') or contact.get('city','') or '(no address)'
+                # Build a rich task body with what Claude extracted
+                body_lines = [
+                    f'🔥 HOT lead from call analysis. Auto-moved Qualified → LAO.',
+                    '',
+                    f'Address: {addr}, {contact.get("city","")} {contact.get("state","")}',
+                ]
+                if data.get('asking_price'):    body_lines.append(f'Asking: ${int(data["asking_price"]):,}')
+                if data.get('estimated_arv'):   body_lines.append(f'ARV (Claude): ${int(data["estimated_arv"]):,}')
+                if data.get('deal_type'):       body_lines.append(f'Deal type: {data["deal_type"]}')
+                if data.get('motivation'):      body_lines.append(f'Motivation: {data["motivation"]}')
+                if data.get('timeline'):        body_lines.append(f'Timeline: {data["timeline"]}')
+                if data.get('condition'):       body_lines.append(f'Condition: {data["condition"]}')
+                if data.get('next_steps'):
+                    body_lines.append('')
+                    body_lines.append(f'Next steps from call: {data["next_steps"]}')
+                body_lines.append('')
+                body_lines.append('Action: present LAO offer ASAP.')
+                task_body = '\n'.join(body_lines)
+                # Create one task per team member
+                for uid, who in [(USER_JEFF, 'Jeff'), (USER_ADAM, 'Adam'), (USER_MIKE, 'Mike')]:
+                    try:
+                        requests.post(
+                            f'https://services.leadconnectorhq.com/contacts/{cid}/tasks',
+                            headers=GHL_H,
+                            json={
+                                'title': f'🔥 HOT → LAO: {lead_name} ({addr})',
+                                'body':  task_body,
+                                'dueDate': datetime.utcnow().isoformat() + 'Z',
+                                'assignedTo': uid,
+                            }, timeout=15
+                        )
+                    except Exception as e:
+                        print(f'    Task for {who} failed: {e}')
+                print(f'  ➜ Notification tasks created for Jeff + Adam + Mike')
 
     name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip()
     print(f'  OK: {name} | {data.get("beds")}/{data.get("baths")} | {data.get("deal_type")} | {data.get("lead_temp")}')
