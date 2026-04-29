@@ -6,7 +6,7 @@ Scheduled every 15 min via GitHub Actions cron.
 """
 import json, os, re, time, requests, warnings
 from urllib.parse import urlparse
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 warnings.filterwarnings('ignore')
 
 GHL_TOKEN      = os.environ['GHL_TOKEN']

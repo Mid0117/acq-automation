@@ -473,6 +473,93 @@ def read_sheet_config():
         return True, TEMPLATES
 
 
+def process_call_needed_cadence(state):
+    """For contacts tagged 'from-call-needed', create a Jeff+Mike task pair every 48h
+    until they reply OR 6 days have elapsed. After 6 days, remove the tag so the
+    standard SMS sequence takes over. Dedups against existing open tasks."""
+    # Search GHL by tag
+    page = 1
+    processed = 0
+    transitioned = 0
+    while True:
+        r = requests.get('https://services.leadconnectorhq.com/contacts/search',
+                         headers=GHL_H,
+                         json={'locationId': GHL_LOCATION,
+                               'query': '',
+                               'pageLimit': 100,
+                               'page': page,
+                               'filters': [{'field': 'tags', 'operator': 'contains', 'value': 'from-call-needed'}]},
+                         timeout=20)
+        # Some GHL versions need GET — fall back if POST is rejected
+        if r.status_code in (404, 405):
+            r = requests.get(f'https://services.leadconnectorhq.com/contacts/?locationId={GHL_LOCATION}&query=',
+                             headers=GHL_H, timeout=20)
+        if r.status_code != 200:
+            break
+        contacts = r.json().get('contacts', []) or []
+        if not contacts:
+            break
+        for c in contacts:
+            tags = c.get('tags', []) or []
+            if 'from-call-needed' not in tags:
+                continue
+            cid = c.get('id')
+            if not cid: continue
+            cs = state.setdefault(cid, {})
+
+            # Has the seller replied? (any inbound message in last 6 days)
+            anchor = cs.get('cn_started') or cs.get('stage_entered_at') or now_utc().isoformat()
+            replied, _ = has_inbound_since(cid, anchor)
+            if replied:
+                # Stop the cadence — standard reply handler in main loop will process tasks
+                requests.delete(f'https://services.leadconnectorhq.com/contacts/{cid}/tags',
+                                headers=GHL_H, json={'tags': ['from-call-needed']})
+                cs['cn_done'] = True
+                continue
+
+            # Init cadence start tracker
+            if 'cn_started' not in cs:
+                cs['cn_started'] = now_utc().isoformat()
+                cs['cn_attempts'] = 0
+                cs['cn_last_at'] = None
+
+            elapsed = days_since(cs['cn_started']) or 0
+            if elapsed >= 6:
+                # Transition to standard SMS sequence
+                requests.delete(f'https://services.leadconnectorhq.com/contacts/{cid}/tags',
+                                headers=GHL_H, json={'tags': ['from-call-needed']})
+                cs['cn_done'] = True
+                transitioned += 1
+                continue
+
+            # Time for the next task pair? Every 48h.
+            last = cs.get('cn_last_at')
+            if last:
+                d = days_since(last) or 0
+                if d < 2.0:
+                    continue
+
+            name  = f"{c.get('firstName','')} {c.get('lastName','')}".strip() or '(no name)'
+            addr  = (c.get('address1') or c.get('city') or '').strip()
+            jeff_title = f'CALL: {name} ({addr})'
+            jeff_body  = 'Lead has not been reached yet. Try again.'
+            mike_title = f'REVIEW: Did Jeff call {name}? ({addr})'
+            mike_body  = 'Verify Jeff attempted the call. Mark complete after confirming.'
+
+            j_made = create_task(cid, USER_JEFF, jeff_title, jeff_body, due_in_days=0)
+            m_made = create_task(cid, USER_MIKE, mike_title, mike_body, due_in_days=1)
+            if j_made or m_made:
+                cs['cn_attempts'] = (cs.get('cn_attempts') or 0) + 1
+                cs['cn_last_at'] = now_utc().isoformat()
+                processed += 1
+                slack_post(f'📞 Manual call retry queued: *{name}* ({addr}) — attempt {cs["cn_attempts"]}/3')
+        if len(contacts) < 100:
+            break
+        page += 1
+        time.sleep(0.2)
+    return processed, transitioned
+
+
 def main():
     et_now = datetime.now(ET)
     print(f'[{et_now.strftime("%Y-%m-%d %I:%M %p ET")}] SMS Follow-Up starting...')
@@ -504,6 +591,11 @@ def main():
         result = process_lead(e, contact, state)
         counts[result] = counts.get(result, 0) + 1
         time.sleep(0.3)
+
+    # Every-other-day call-needed cadence (separate path from SMS sequence)
+    cn_processed, cn_transitioned = process_call_needed_cadence(state)
+    if cn_processed or cn_transitioned:
+        print(f'Call-needed cadence: {cn_processed} retry tasks created, {cn_transitioned} graduated to SMS')
 
     save_state(state)
     print('\nSummary:', json.dumps(counts, indent=2))
