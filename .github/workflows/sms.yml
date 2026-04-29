@@ -33,6 +33,7 @@ jobs:
           GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           DASHBOARD_SHEET_ID: ${{ secrets.DASHBOARD_SHEET_ID }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: python sms_followup.py
 
       - name: Update Google Sheet dashboard

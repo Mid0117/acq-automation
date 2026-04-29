@@ -20,6 +20,7 @@ GHL_LOCATION = 'RCkiUmWqXX4BYQ39JXmm'
 PIPELINE_ID  = 'O8wzIa6E3SgD8HLg6gh9'
 STATE_FILE   = 'sms_state.json'
 SHEET_ID     = os.environ.get('DASHBOARD_SHEET_ID', '')
+SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK_URL', '')
 
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
@@ -262,12 +263,22 @@ def add_tag(contact_id, tag):
         print(f'  tag add failed: {e}')
 
 
+def slack_post(text):
+    if not SLACK_WEBHOOK:
+        return
+    try:
+        requests.post(SLACK_WEBHOOK, json={'text': text}, timeout=10)
+    except Exception:
+        pass
+
+
 def create_task(contact_id, user_id, title, body, due_in_days=0):
     due = (now_utc() + timedelta(days=due_in_days)).isoformat()
     try:
         r = requests.post(f'https://services.leadconnectorhq.com/contacts/{contact_id}/tasks',
                           headers=GHL_H,
-                          json={'title': title, 'body': body, 'dueDate': due, 'assignedTo': user_id})
+                          json={'title': title, 'body': body, 'dueDate': due,
+                                'completed': False, 'assignedTo': user_id})
         return r.status_code in (200, 201)
     except Exception as e:
         print(f'  task create failed: {e}')
@@ -331,6 +342,7 @@ def process_lead(entry, contact, state):
                         f'REVIEW: Did Jeff call {name} back?',
                         'Verify Jeff completed the callback.',
                         due_in_days=1)
+            slack_post(f'💬 *{name}* replied to {stage_name.upper()} follow-up — {addr1}. Jeff has callback task; Mike has review.')
             return 'replied'
 
     sms_count = cs.get('sms_count', 0)
@@ -352,6 +364,7 @@ def process_lead(entry, contact, state):
                             f'REVIEW: Did Jeff call {name}?',
                             'Verify Jeff made the manual call.',
                             due_in_days=2)
+                slack_post(f'📞 *{name}* went dormant in {stage_name.upper()} — no replies after {cfg["max_touches"]} SMS. Jeff to call manually. {addr1}')
             return 'dormant'
         return 'wait-dormant'
 

@@ -13,6 +13,7 @@ GHL_TOKEN      = os.environ['GHL_TOKEN']
 DG_KEY         = os.environ['DG_KEY']
 ANTHROPIC_KEY  = os.environ.get('ANTHROPIC_API_KEY', '')
 APIFY_TOKEN    = os.environ.get('APIFY_TOKEN', '')
+SLACK_WEBHOOK  = os.environ.get('SLACK_WEBHOOK_URL', '')
 GHL_LOCATION   = 'RCkiUmWqXX4BYQ39JXmm'
 PIPELINE_ID    = 'O8wzIa6E3SgD8HLg6gh9'
 TEMPLATE_ID    = '1xYeKGmcbxJqCykxGXo1mEHBDEPQfbEHqXuS3cKrIliM'
@@ -30,6 +31,20 @@ ACTIVE_STAGES = {STAGE_QUALIFIED, STAGE_LAO, STAGE_RR, STAGE_MAO}
 USER_JEFF = 'vDKOqPSkA8nLkia5skd0'
 USER_MIKE = 'Vj4WwH1ovxGN5Hv5Kq17'
 USER_ADAM = 'vCjuvuuQ7p7K5GUODujQ'
+
+
+def slack_post(blocks_or_text, fallback=''):
+    """Post to APG Slack via incoming webhook. Silent no-op if SLACK_WEBHOOK is unset."""
+    if not SLACK_WEBHOOK:
+        return
+    try:
+        if isinstance(blocks_or_text, str):
+            payload = {'text': blocks_or_text}
+        else:
+            payload = {'text': fallback or 'APG Automation', 'blocks': blocks_or_text}
+        requests.post(SLACK_WEBHOOK, json=payload, timeout=10)
+    except Exception as e:
+        print(f'    Slack post failed: {e}')
 
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
@@ -141,7 +156,10 @@ Return ONLY valid JSON — no prose, no code fences. Use null for any field not 
   "lead_temp": "Hot" | "Warm" | "Cold",
   "va_notes_summary": <3-4 sentence professional briefing — what the seller said, condition, motivation, timeline, asking price, and how the call ended>,
   "red_flags": <array of short strings — title issues, occupancy, unrealistic price, missed payments, etc., or empty array>,
-  "next_steps": <one sentence describing what was agreed at end of call, or null>
+  "next_steps": <one sentence describing what was agreed at end of call, or null>,
+  "call_rating": <integer 1-10 — how effective the call was: did the VA build rapport, ask qualifying questions, extract usable data, set clear next steps>,
+  "could_improve": <array of 2-4 short strings — what the VA could have done better. Be specific and constructive. e.g. "Did not ask seller's bottom-line price", "Skipped occupancy/tenant question", "Should have set firm callback time">,
+  "action_items": <array of 2-5 short strings — concrete next steps the team should take to advance this deal>
 }"""
 
 
@@ -679,6 +697,8 @@ def process_contact(cid, oid, google_svc):
                 body_lines.append('Action: present LAO offer ASAP.')
                 task_body = '\n'.join(body_lines)
                 # Create one task per team member
+                from datetime import timezone as _tz
+                due = datetime.now(_tz.utc).isoformat()
                 for uid, who in [(USER_JEFF, 'Jeff'), (USER_ADAM, 'Adam'), (USER_MIKE, 'Mike')]:
                     try:
                         requests.post(
@@ -687,16 +707,55 @@ def process_contact(cid, oid, google_svc):
                             json={
                                 'title': f'🔥 HOT → LAO: {lead_name} ({addr})',
                                 'body':  task_body,
-                                'dueDate': datetime.utcnow().isoformat() + 'Z',
+                                'dueDate': due,
+                                'completed': False,
                                 'assignedTo': uid,
                             }, timeout=15
                         )
                     except Exception as e:
                         print(f'    Task for {who} failed: {e}')
                 print(f'  ➜ Notification tasks created for Jeff + Adam + Mike')
+                # Slack ping (only if SLACK_WEBHOOK_URL is set)
+                slack_blocks = [
+                    {'type':'header', 'text':{'type':'plain_text','text':f'🔥 Hot Lead → LAO: {lead_name}'}},
+                    {'type':'section','text':{'type':'mrkdwn','text':task_body.replace('\n','\n')}},
+                    {'type':'context','elements':[{'type':'mrkdwn','text':f'_Auto-moved from Qualified. Tasks created for Jeff, Adam, Mike._'}]},
+                ]
+                slack_post(slack_blocks, fallback=f'🔥 Hot Lead {lead_name} moved to LAO')
+
+    # Write a "Claude Call Rating + Action Items" note on the contact
+    if data.get('call_rating') or data.get('could_improve') or data.get('action_items'):
+        note_lines = ['Claude Call Rating + Action Items', '=' * 38]
+        if data.get('call_rating') is not None:
+            note_lines.append(f'Rating: {data["call_rating"]}/10')
+        if data.get('lead_temp'):
+            note_lines.append(f'Lead Temperature: {data["lead_temp"]}')
+        note_lines.append('')
+        if data.get('could_improve'):
+            note_lines.append('What could have been done better:')
+            for item in data['could_improve']:
+                note_lines.append(f'  • {item}')
+            note_lines.append('')
+        if data.get('action_items'):
+            note_lines.append('Action items:')
+            for item in data['action_items']:
+                note_lines.append(f'  • {item}')
+            note_lines.append('')
+        if data.get('next_steps'):
+            note_lines.append(f'Next steps from call: {data["next_steps"]}')
+        if data.get('red_flags'):
+            note_lines.append('')
+            note_lines.append(f'Red flags: {", ".join(data["red_flags"])}')
+        note_body = '\n'.join(note_lines)
+        try:
+            requests.post(f'https://services.leadconnectorhq.com/contacts/{cid}/notes',
+                          headers=GHL_H, json={'body': note_body, 'userId': USER_MIKE},
+                          timeout=15)
+        except Exception as e:
+            print(f'    Note write failed: {e}')
 
     name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip()
-    print(f'  OK: {name} | {data.get("beds")}/{data.get("baths")} | {data.get("deal_type")} | {data.get("lead_temp")}')
+    print(f'  OK: {name} | {data.get("beds")}/{data.get("baths")} | {data.get("deal_type")} | {data.get("lead_temp")} | rating={data.get("call_rating")}')
     return 'ok'
 
 
