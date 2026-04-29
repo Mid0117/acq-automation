@@ -20,12 +20,11 @@ PROCESSED_FILE = 'processed_contacts.json'
 
 # Only process opportunities in active deal stages (1-4). Skip Unqualified, Agents,
 # Contract Sent and beyond (already advanced), Follow Up, Dead Deals.
-ACTIVE_STAGES = {
-    'a17517be-8d1a-49fd-bd53-b9128a66e242',  # 1. Qualified Leads (Warm/Hot)
-    'd43fddd8-3a17-46b2-a193-cf18619f654f',  # 2. Prequalified Offer (LAO)
-    '23a159ad-ba39-4c74-9d07-c1beb219d9f2',  # 3. Due Diligence (RR)
-    '43589167-14f0-4e09-ba2a-8b9bd3296a4a',  # 4. Negotiate (MAO)
-}
+STAGE_QUALIFIED = 'a17517be-8d1a-49fd-bd53-b9128a66e242'  # 1. Qualified Leads (Warm/Hot)
+STAGE_LAO       = 'd43fddd8-3a17-46b2-a193-cf18619f654f'  # 2. Prequalified Offer (LAO)
+STAGE_RR        = '23a159ad-ba39-4c74-9d07-c1beb219d9f2'  # 3. Due Diligence (RR)
+STAGE_MAO       = '43589167-14f0-4e09-ba2a-8b9bd3296a4a'  # 4. Negotiate (MAO)
+ACTIVE_STAGES = {STAGE_QUALIFIED, STAGE_LAO, STAGE_RR, STAGE_MAO}
 
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
@@ -611,6 +610,19 @@ def process_contact(cid, oid, google_svc):
             requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
                          headers=GHL_H, json={'customFields': [{'id': OF_REHAB, 'field_value': doc_url}]})
             print(f'  Rehab: {doc_url}')
+
+    # Auto-stage move: HOT lead in stage 1 -> stage 2 (LAO) so the team can present an offer.
+    # Only Hot triggers; Warm/Cold stay in stage 1.
+    rr2 = requests.get(f'https://services.leadconnectorhq.com/opportunities/{oid}', headers=GHL_H)
+    if rr2.status_code == 200:
+        opp = rr2.json().get('opportunity', {})
+        current_stage = opp.get('pipelineStageId', '')
+        if (data.get('lead_temp','').lower() == 'hot' and current_stage == STAGE_QUALIFIED):
+            mv = requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
+                              headers=GHL_H,
+                              json={'pipelineStageId': STAGE_LAO})
+            if mv.status_code == 200:
+                print(f'  ➜ Auto-moved to LAO (Hot lead)')
 
     name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip()
     print(f'  OK: {name} | {data.get("beds")}/{data.get("baths")} | {data.get("deal_type")} | {data.get("lead_temp")}')
