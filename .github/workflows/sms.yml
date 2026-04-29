@@ -1,0 +1,39 @@
+name: ACQ SMS Follow-Up + Dashboard
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # every 30 min
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache SMS state
+        uses: actions/cache@v4
+        with:
+          path: sms_state.json
+          key: sms-state-${{ github.ref }}
+          restore-keys: sms-state-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Send SMS follow-ups
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+        run: python sms_followup.py
+
+      - name: Update dashboard
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          DASHBOARD_SHEET_ID: ${{ secrets.DASHBOARD_SHEET_ID }}
+        run: python dashboard.py
