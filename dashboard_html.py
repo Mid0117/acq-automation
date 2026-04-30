@@ -74,9 +74,16 @@ def collect_run_status():
                 seen = {}
                 for run in r.json().get('workflow_runs', []):
                     name = run.get('name', '')
-                    if name in seen:
-                        continue
                     if run.get('event') not in ('schedule', 'workflow_dispatch'):
+                        continue
+                    # Skip in-progress / queued runs — we only want the last
+                    # COMPLETED run per workflow. The dashboard render itself
+                    # runs inside one of these workflows, so its current run
+                    # always has status='in_progress' / conclusion=null at this
+                    # moment in time and we'd flag it as failed otherwise.
+                    if run.get('status') != 'completed':
+                        continue
+                    if name in seen:
                         continue
                     success = run.get('conclusion') == 'success'
                     seen[name] = {
