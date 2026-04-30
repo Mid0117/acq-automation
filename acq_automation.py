@@ -927,6 +927,118 @@ def process_contact(cid, oid, google_svc):
     return 'ok'
 
 
+def backfill_property_data(cid, oid, contact, cfields, opp_cf):
+    """Enrich property + financial data for a stage 1-4 lead that doesn't have ARV
+    yet — even if there's no call recording. Skips if ARV already present, no
+    address, or Apify is over budget. Refreshes the APG Lead Summary note on
+    success.
+    """
+    if cfields.get(CF_ARV):
+        return 'has_arv'
+
+    addr1 = (contact.get('address1') or '').strip()
+    city  = (contact.get('city') or '').strip()
+    state = (contact.get('state') or '').strip()
+    zipc  = (contact.get('postalCode') or '').strip()
+    if not (addr1 and city and state):
+        return 'no_addr'
+
+    if not apify_has_budget():
+        return 'no_budget'
+
+    name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip()
+    print(f'  Backfill: {name} | {addr1}, {city} {state}')
+
+    prop = lookup_property(addr1, city, state)
+    if not prop:
+        return 'no_prop'
+
+    # Build a `data` dict matching the shape build_summary_note + the field
+    # writer below expect.
+    data = {
+        'beds':           prop.get('beds'),
+        'baths':          prop.get('baths'),
+        'sqft':           prop.get('sqft'),
+        'property_type':  prop.get('home_type'),
+        '_apify':         prop,
+    }
+
+    comps = fetch_sold_comps(city, state, zipc, max_items=30)
+    if comps and prop.get('sqft'):
+        comps_result = estimate_arv_from_comps({
+            'address':    f'{addr1}, {city}, {state}',
+            'beds':       data.get('beds'),
+            'baths':      data.get('baths'),
+            'sqft':       prop.get('sqft'),
+            'home_type':  prop.get('home_type'),
+            'year_built': prop.get('year_built'),
+        }, comps)
+        if comps_result and comps_result.get('arv'):
+            data['estimated_arv'] = comps_result['arv']
+            data['_comps']        = comps_result
+
+    if not data.get('estimated_arv'):
+        # Property data alone is still useful — write what we have.
+        cu = {}
+        if data.get('beds') and not cfields.get(CF_BED):     cu[CF_BED] = str(data['beds'])
+        if data.get('baths') and not cfields.get(CF_BATH):   cu[CF_BATH] = str(data['baths'])
+        if data.get('sqft'):                                  cu[CF_SQFT] = str(data['sqft'])
+        if data.get('property_type') and not cfields.get(CF_PROP_TYPE):
+            cu[CF_PROP_TYPE] = str(data['property_type'])
+        if prop.get('zillow_url') and not cfields.get(CF_ZILLOW):
+            cu[CF_ZILLOW] = prop['zillow_url']
+        if cu:
+            requests.put(f'https://services.leadconnectorhq.com/contacts/{cid}',
+                         headers=GHL_H,
+                         json={'customFields': [{'id': k, 'field_value': v} for k, v in cu.items()]})
+        return 'partial'
+
+    # Full enrichment write
+    cu = {
+        CF_ARV:    str(int(data['estimated_arv'])),
+        CF_70_ARV: str(int(int(data['estimated_arv']) * 0.7)),
+    }
+    if data.get('beds') and not cfields.get(CF_BED):       cu[CF_BED]  = str(data['beds'])
+    if data.get('baths') and not cfields.get(CF_BATH):     cu[CF_BATH] = str(data['baths'])
+    if data.get('sqft'):                                    cu[CF_SQFT] = str(data['sqft'])
+    if data.get('property_type') and not cfields.get(CF_PROP_TYPE):
+        cu[CF_PROP_TYPE] = str(data['property_type'])
+    if prop.get('zillow_url') and not cfields.get(CF_ZILLOW):
+        cu[CF_ZILLOW] = prop['zillow_url']
+
+    ou = {}
+    if data.get('beds'):          ou[OF_BED]       = str(data['beds'])
+    if data.get('baths'):         ou[OF_BATH]      = str(data['baths'])
+    if data.get('sqft'):          ou[OF_SQFT]      = str(data['sqft'])
+    if data.get('property_type'): ou[OF_PROP_TYPE] = str(data['property_type'])
+
+    requests.put(f'https://services.leadconnectorhq.com/contacts/{cid}',
+                 headers=GHL_H,
+                 json={'customFields': [{'id': k, 'field_value': v} for k, v in cu.items()]})
+    time.sleep(0.1)
+    if ou:
+        requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
+                     headers=GHL_H,
+                     json={'customFields': [{'id': k, 'field_value': v} for k, v in ou.items()]})
+        time.sleep(0.1)
+
+    # Refresh APG Lead Summary note so the dashboard sees the new ARV
+    contact_for_note = dict(contact)
+    contact_for_note['customFields'] = [
+        {'id': k, 'value': v} for k, v in {**cfields, **cu}.items()
+    ]
+    opp_for_note = {'customFields': [{'id': k, 'fieldValue': v}
+                                     for k, v in {**opp_cf, **ou}.items()]}
+    rehab_url_for_note = opp_cf.get(OF_REHAB, '')
+    summary = build_summary_note(contact_for_note, opp_for_note, data,
+                                 comps_data=data.get('_comps'),
+                                 rehab_url=rehab_url_for_note)
+    upsert_summary_note(cid, summary)
+
+    print(f'    → ARV ${int(data["estimated_arv"]):,} | MAO ${int(int(data["estimated_arv"])*0.7):,}')
+    return 'ok'
+
+
 def main():
     try:
         ok, fail, skipped, synced = _main_inner()
@@ -999,6 +1111,50 @@ def _main_inner():
 
     save_processed(processed)
     print(f'\nDone: {ok} new transcripts | {synced} field-synced | {skipped} skipped | {fail} errors')
+
+    # ── Backfill phase ──────────────────────────────────────────────────────
+    # For every stage 1-4 lead missing CF_ARV, run Apify property + comps lookup
+    # and Claude ARV estimation. Cap per cron tick so a single run can't drain
+    # Apify; budget guard inside lookup_property/fetch_sold_comps stops cleanly
+    # when monthly cap is hit.
+    BACKFILL_CAP = int(os.environ.get('BACKFILL_CAP_PER_RUN', '15'))
+    bf_ok = bf_partial = bf_skip = bf_nobudget = 0
+    bf_attempts = 0
+    print(f'\n[Backfill] scanning for stage 1-4 leads missing ARV (cap={BACKFILL_CAP}/run)...')
+
+    for e in entries:
+        if bf_attempts >= BACKFILL_CAP:
+            break
+        cid, oid = e['cid'], e['oid']
+        try:
+            r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
+            if r.status_code != 200:
+                continue
+            contact = r.json().get('contact', {})
+            cfields = {f['id']: (f.get('value') or '') for f in contact.get('customFields', [])}
+            if cfields.get(CF_ARV):
+                bf_skip += 1
+                continue
+            opp_cf = get_opp_fields(oid)
+            bf_attempts += 1
+            r = backfill_property_data(cid, oid, contact, cfields, opp_cf)
+            if r == 'ok':
+                bf_ok += 1
+            elif r == 'partial':
+                bf_partial += 1
+            elif r == 'no_budget':
+                bf_nobudget += 1
+                print('  → Apify budget hit. Stopping backfill until next month / topup.')
+                break
+            time.sleep(0.5)
+        except Exception as exc:
+            print(f'  Backfill error for {cid[:6]}: {exc}')
+            continue
+
+    print(f'[Backfill] {bf_ok} full ARV | {bf_partial} property-only | '
+          f'{bf_skip} already-had-ARV | attempts={bf_attempts}'
+          + (f' | budget-stopped' if bf_nobudget else ''))
+
     return ok, fail, skipped, synced
 
 
