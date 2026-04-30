@@ -99,16 +99,24 @@ def list_channel_ids():
 
 
 def fetch_messages(channel_id, oldest_ts):
-    """Pull messages newer than oldest_ts (Slack timestamp string)."""
+    """Pull messages newer than oldest_ts (Slack timestamp string).
+
+    Slack's May 2025 change: non-Marketplace apps get capped at limit=15 and
+    severely throttled on conversations.history. We use limit=15 + sleep
+    between calls. A single channel may take a while during backfill but
+    the cron only runs the delta each hour going forward.
+    """
     msgs, cursor = [], ''
+    pages = 0
     while True:
-        params = {'channel': channel_id, 'limit': 200}
+        params = {'channel': channel_id, 'limit': 15}
         if oldest_ts:
             params['oldest'] = oldest_ts
         if cursor:
             params['cursor'] = cursor
         j = slack_call('conversations.history', params=params)
-        if not j: break
+        if not j:
+            break
         for m in j.get('messages', []):
             if m.get('subtype') in ('channel_join', 'channel_leave', 'bot_message'):
                 continue
@@ -117,7 +125,13 @@ def fetch_messages(channel_id, oldest_ts):
             msgs.append({'ts': m['ts'], 'user': m.get('user', ''),
                          'text': m['text']})
         cursor = (j.get('response_metadata') or {}).get('next_cursor', '')
+        pages += 1
         if not cursor:
+            break
+        # Throttle — Slack limits to ~1 req/min on non-Marketplace apps
+        time.sleep(2)
+        # Safety cap so a single channel can't run the cron over budget
+        if pages >= 200:
             break
     return msgs
 
