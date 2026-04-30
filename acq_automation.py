@@ -9,6 +9,25 @@ from urllib.parse import urlparse
 from datetime import datetime, timedelta, timezone
 warnings.filterwarnings('ignore')
 
+# Default 30s timeout for every bare requests.* call in this module — patches
+# Session.request which all of requests.{get,post,put,delete} flow through.
+_orig_session_request = requests.Session.request
+def _request_with_default_timeout(self, method, url, **kwargs):
+    kwargs.setdefault('timeout', 30)
+    return _orig_session_request(self, method, url, **kwargs)
+requests.Session.request = _request_with_default_timeout
+
+
+def _write_status(success, summary='', error=''):
+    try:
+        with open('last_run_acq.json', 'w') as f:
+            json.dump({'success': success,
+                       'timestamp': datetime.now(timezone.utc).isoformat(),
+                       'summary': summary,
+                       'error': error[:500]}, f, indent=2)
+    except Exception:
+        pass
+
 GHL_TOKEN      = os.environ['GHL_TOKEN']
 DG_KEY         = os.environ['DG_KEY']
 ANTHROPIC_KEY  = os.environ.get('ANTHROPIC_API_KEY', '')
@@ -909,6 +928,18 @@ def process_contact(cid, oid, google_svc):
 
 
 def main():
+    try:
+        ok, fail, skipped, synced = _main_inner()
+        _write_status(True, f'ok={ok} synced={synced} skipped={skipped} fail={fail}')
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f'!! ACQ run failed: {e}\n{tb}')
+        _write_status(False, '', f'{e}: {tb[-300:]}')
+        raise
+
+
+def _main_inner():
     print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] ACQ Automation starting...')
     print(f'Claude: {"ready" if ANTHROPIC_KEY else "NOT configured (will fall back to regex)"}')
 
@@ -968,6 +999,7 @@ def main():
 
     save_processed(processed)
     print(f'\nDone: {ok} new transcripts | {synced} field-synced | {skipped} skipped | {fail} errors')
+    return ok, fail, skipped, synced
 
 
 if __name__ == '__main__':

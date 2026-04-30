@@ -9,21 +9,44 @@ For each contact in ACQ pipeline stages 1-4:
 - Polls for replies; on reply: stops sequence, tags, creates Jeff task + Mike review task
 - After 6 SMS no reply: marks dormant, creates manual-call task
 """
-import json, os, requests, time
+import json, os, re, requests, time
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 ET = ZoneInfo('America/New_York')
 
-GHL_TOKEN    = os.environ['GHL_TOKEN']
-GHL_LOCATION = 'RCkiUmWqXX4BYQ39JXmm'
-PIPELINE_ID  = 'O8wzIa6E3SgD8HLg6gh9'
-STATE_FILE   = 'sms_state.json'
-SHEET_ID     = os.environ.get('DASHBOARD_SHEET_ID', '')
+GHL_TOKEN     = os.environ['GHL_TOKEN']
+ANTHROPIC_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+GHL_LOCATION  = 'RCkiUmWqXX4BYQ39JXmm'
+PIPELINE_ID   = 'O8wzIa6E3SgD8HLg6gh9'
+STATE_FILE    = 'sms_state.json'
+CONTACTS_CACHE = 'contacts_cache.json'
+STATUS_FILE   = 'last_run_sms.json'
+SHEET_ID      = os.environ.get('DASHBOARD_SHEET_ID', '')
 SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK_URL', '')
 
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
+
+# Network defaults — every request gets a timeout + one retry on transient errors
+HTTP_TIMEOUT = 30
+
+
+def http(method, url, **kw):
+    """Wrapped requests with timeout + one retry on connection/5xx errors."""
+    kw.setdefault('timeout', HTTP_TIMEOUT)
+    for attempt in range(2):
+        try:
+            r = requests.request(method, url, **kw)
+            if r.status_code >= 500 and attempt == 0:
+                time.sleep(1.0)
+                continue
+            return r
+        except (requests.Timeout, requests.ConnectionError):
+            if attempt == 0:
+                time.sleep(1.0)
+                continue
+            raise
 
 # Active deal stages (high-engagement 7-day cadence, 6 touches)
 STAGE_QUALIFIED = 'a17517be-8d1a-49fd-bd53-b9128a66e242'
@@ -181,11 +204,11 @@ def fetch_active_leads():
     for stage_id, stage_name in STAGE_NAMES.items():
         page = 1
         while True:
-            r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
-                             headers=GHL_H,
-                             params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
-                                     'pipeline_stage_id': stage_id,
-                                     'limit': 100, 'page': page})
+            r = http('GET', 'https://services.leadconnectorhq.com/opportunities/search',
+                     headers=GHL_H,
+                     params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
+                             'pipeline_stage_id': stage_id,
+                             'limit': 100, 'page': page})
             if r.status_code != 200:
                 break
             opps = r.json().get('opportunities', [])
@@ -204,29 +227,33 @@ def fetch_active_leads():
 
 
 def get_contact(cid):
-    r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
+    r = http('GET', f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
     if r.status_code != 200:
         return None
     return r.json().get('contact')
 
 
 def has_inbound_since(contact_id, after_iso):
-    """Look for any inbound message from contact after the given timestamp."""
+    """Look for any inbound message from contact after the given timestamp.
+
+    Returns (replied: bool, when_iso: str|None, text: str|None) so the caller
+    can classify the reply (negative/positive/wrong-number) before flagging Jeff.
+    """
     after = parse_iso(after_iso)
     if not after:
-        return False, None
-    r = requests.get('https://services.leadconnectorhq.com/conversations/search',
-                     headers=GHL_H,
-                     params={'locationId': GHL_LOCATION, 'contactId': contact_id, 'limit': 5})
+        return False, None, None
+    r = http('GET', 'https://services.leadconnectorhq.com/conversations/search',
+             headers=GHL_H,
+             params={'locationId': GHL_LOCATION, 'contactId': contact_id, 'limit': 5})
     if r.status_code != 200:
-        return False, None
+        return False, None, None
     convs = r.json().get('conversations', [])
     for conv in convs:
         cid = conv.get('id')
         if not cid:
             continue
-        rm = requests.get(f'https://services.leadconnectorhq.com/conversations/{cid}/messages',
-                          headers=GHL_H, params={'limit': 50})
+        rm = http('GET', f'https://services.leadconnectorhq.com/conversations/{cid}/messages',
+                  headers=GHL_H, params={'limit': 50})
         if rm.status_code != 200:
             continue
         msgs = (rm.json().get('messages') or {}).get('messages', [])
@@ -234,8 +261,94 @@ def has_inbound_since(contact_id, after_iso):
             if m.get('direction') == 'inbound':
                 msg_dt = parse_iso(m.get('dateAdded', ''))
                 if msg_dt and msg_dt > after:
-                    return True, msg_dt.isoformat()
-    return False, None
+                    return True, msg_dt.isoformat(), (m.get('body') or m.get('message') or '').strip()
+    return False, None, None
+
+
+# ── Reply classifier ─────────────────────────────────────────────────────────
+# Hard-stop keywords trigger DND immediately without an LLM call (cheap + fast).
+HARD_STOP_RE = re.compile(
+    r'\b(stop|stopall|unsubscribe|cancel|end|quit|remove\s*me|opt\s*out|leave\s*me\s*alone)\b',
+    re.IGNORECASE)
+WRONG_NUMBER_RE = re.compile(
+    r'\b(wrong\s*number|not\s*me|no\s*such\s*person|never\s*owned|don.?t\s*own)\b',
+    re.IGNORECASE)
+HARD_NEG_RE = re.compile(
+    r'(f[\*u]+ck|piss\s*off|go\s*to\s*hell|don.?t\s*(text|message|contact|call)\s*me|'
+    r'do\s*not\s*(text|message|contact|call)\s*me|harass|sue\s*you|lawyer|attorney|tcpa)',
+    re.IGNORECASE)
+
+
+CLASSIFY_SYSTEM = """You classify a one-line SMS reply from a homeowner to a real estate investor's outreach.
+
+Return ONLY one of these tokens, nothing else:
+- NEGATIVE   — they're declining, not interested, annoyed, but not legally hostile (e.g. "no thanks", "not selling", "leave me alone")
+- WRONG      — wrong number / not the owner / never owned this property
+- POSITIVE   — interested, wants to talk, asks about offer, gives info
+- NEUTRAL    — ambiguous, asking who you are, requesting more info before deciding
+- HOSTILE    — threatens legal action, profanity directed at sender, demands stop
+
+Be strict on POSITIVE — only if there's clear interest. Default ambiguity to NEUTRAL."""
+
+
+def classify_reply(text):
+    """Returns one of: HARD_STOP, WRONG, HOSTILE, NEGATIVE, POSITIVE, NEUTRAL.
+    Free regex check first; falls back to Claude only when ambiguous."""
+    if not text:
+        return 'NEUTRAL'
+    if HARD_STOP_RE.search(text):
+        return 'HARD_STOP'
+    if HARD_NEG_RE.search(text):
+        return 'HOSTILE'
+    if WRONG_NUMBER_RE.search(text):
+        return 'WRONG'
+    if not ANTHROPIC_KEY:
+        # No LLM — be conservative: treat as POSITIVE so Jeff sees it
+        return 'POSITIVE'
+    try:
+        r = http('POST', 'https://api.anthropic.com/v1/messages',
+                 headers={'x-api-key': ANTHROPIC_KEY,
+                          'anthropic-version': '2023-06-01',
+                          'content-type': 'application/json'},
+                 json={'model': 'claude-haiku-4-5-20251001',
+                       'max_tokens': 8,
+                       'system': CLASSIFY_SYSTEM,
+                       'messages': [{'role': 'user', 'content': text[:500]}]},
+                 timeout=20)
+        if r.status_code != 200:
+            return 'POSITIVE'  # fail-safe to flag for human
+        token = r.json()['content'][0]['text'].strip().upper().split()[0]
+        if token in ('NEGATIVE', 'WRONG', 'POSITIVE', 'NEUTRAL', 'HOSTILE'):
+            return token
+        return 'POSITIVE'
+    except Exception:
+        return 'POSITIVE'
+
+
+def set_dnd(contact_id, reason):
+    """Set GHL DND flags so we never SMS this contact again."""
+    payload = {
+        'dnd': True,
+        'dndSettings': {
+            'SMS':   {'status': 'active', 'message': f'auto: {reason}', 'code': 'opt_out'},
+            'Call':  {'status': 'active', 'message': f'auto: {reason}', 'code': 'opt_out'},
+            'Email': {'status': 'active', 'message': f'auto: {reason}', 'code': 'opt_out'},
+        },
+    }
+    try:
+        http('PUT', f'https://services.leadconnectorhq.com/contacts/{contact_id}',
+             headers=GHL_H, json=payload)
+    except Exception as e:
+        print(f'  set_dnd failed: {e}')
+
+
+# Append TCPA opt-out language on touches 1, 4, and 6 (every 3rd touch) so we
+# stay compliant without making every message look like spam.
+def with_tcpa(message, touch_index_zero_based, max_touches):
+    one_based = touch_index_zero_based + 1
+    if one_based == 1 or one_based == 4 or one_based == max_touches:
+        return f'{message}\n\nReply STOP to opt out.'
+    return message
 
 
 def send_sms(contact_id, message, from_number):
@@ -245,8 +358,8 @@ def send_sms(contact_id, message, from_number):
         'message': message,
         'fromNumber': from_number,
     }
-    r = requests.post('https://services.leadconnectorhq.com/conversations/messages',
-                      headers=GHL_H, json=body)
+    r = http('POST', 'https://services.leadconnectorhq.com/conversations/messages',
+             headers=GHL_H, json=body)
     if r.status_code in (200, 201):
         try:
             return True, r.json().get('messageId', '')
@@ -257,8 +370,8 @@ def send_sms(contact_id, message, from_number):
 
 def add_tag(contact_id, tag):
     try:
-        requests.post(f'https://services.leadconnectorhq.com/contacts/{contact_id}/tags',
-                      headers=GHL_H, json={'tags': [tag]})
+        http('POST', f'https://services.leadconnectorhq.com/contacts/{contact_id}/tags',
+             headers=GHL_H, json={'tags': [tag]})
     except Exception as e:
         print(f'  tag add failed: {e}')
 
@@ -275,10 +388,10 @@ def slack_post(text):
 def create_task(contact_id, user_id, title, body, due_in_days=0):
     due = (now_utc() + timedelta(days=due_in_days)).isoformat()
     try:
-        r = requests.post(f'https://services.leadconnectorhq.com/contacts/{contact_id}/tasks',
-                          headers=GHL_H,
-                          json={'title': title, 'body': body, 'dueDate': due,
-                                'completed': False, 'assignedTo': user_id})
+        r = http('POST', f'https://services.leadconnectorhq.com/contacts/{contact_id}/tasks',
+                 headers=GHL_H,
+                 json={'title': title, 'body': body, 'dueDate': due,
+                       'completed': False, 'assignedTo': user_id})
         return r.status_code in (200, 201)
     except Exception as e:
         print(f'  task create failed: {e}')
@@ -328,22 +441,48 @@ def process_lead(entry, contact, state):
     # Reply detection — only if at least one SMS sent
     if cs.get('sms_count', 0) > 0:
         anchor = cs.get('last_sms_at') or cs.get('stage_entered_at')
-        replied, when = has_inbound_since(cid, anchor)
+        replied, when, reply_text = has_inbound_since(cid, anchor)
         if replied:
-            cs['replied']    = True
-            cs['replied_at'] = when
-            tag = f'replied-stage-{stage_name}'
-            add_tag(cid, tag)
+            cs['replied']      = True
+            cs['replied_at']   = when
+            cs['reply_text']   = (reply_text or '')[:500]
+            verdict = classify_reply(reply_text or '')
+            cs['reply_class']  = verdict
+
+            if verdict in ('HARD_STOP', 'HOSTILE'):
+                # Legal-protection path: stop forever, no Jeff task, no Mike review
+                set_dnd(cid, verdict.lower())
+                add_tag(cid, 'dnd-opt-out')
+                add_tag(cid, f'replied-{verdict.lower()}-{stage_name}')
+                slack_post(f'🚫 *{name}* opted out ({verdict}) — DND set, no callback. {addr1}')
+                return f'replied-{verdict.lower()}'
+
+            if verdict == 'WRONG':
+                set_dnd(cid, 'wrong-number')
+                add_tag(cid, 'wrong-number')
+                add_tag(cid, f'replied-wrong-{stage_name}')
+                slack_post(f'☎️ *{name}* — wrong number, DND set. {addr1}')
+                return 'replied-wrong'
+
+            if verdict == 'NEGATIVE':
+                # Polite no — don't waste Jeff's time, but no DND (still allowed to outreach later)
+                add_tag(cid, 'not-interested')
+                add_tag(cid, f'replied-negative-{stage_name}')
+                slack_post(f'👎 *{name}* — declined politely, no callback task. {addr1}')
+                return 'replied-negative'
+
+            # POSITIVE or NEUTRAL → real lead, Jeff handles
+            add_tag(cid, f'replied-stage-{stage_name}')
             create_task(cid, USER_JEFF,
                         f'Call back: {name} ({addr1})',
-                        f'Seller replied to follow-up SMS in stage {stage_name.upper()}. Call back today.',
+                        f'Seller replied to {stage_name.upper()} SMS. Reply: "{(reply_text or "")[:200]}". Call back today.',
                         due_in_days=0)
             create_task(cid, USER_MIKE,
                         f'REVIEW: Did Jeff call {name} back?',
-                        'Verify Jeff completed the callback.',
+                        f'Verify Jeff completed the callback. Reply text: "{(reply_text or "")[:200]}"',
                         due_in_days=1)
-            slack_post(f'💬 *{name}* replied to {stage_name.upper()} follow-up — {addr1}. Jeff has callback task; Mike has review.')
-            return 'replied'
+            slack_post(f'💬 *{name}* replied ({verdict}) to {stage_name.upper()} — {addr1}. Jeff has callback task.')
+            return f'replied-{verdict.lower()}'
 
     sms_count = cs.get('sms_count', 0)
     cfg = STAGE_CONFIG[stage_name]
@@ -385,6 +524,8 @@ def process_lead(entry, contact, state):
     first = (contact.get('firstName') or 'there').strip() or 'there'
     template = TEMPLATES[stage_name][sms_count]
     message  = template.format(first_name=first, address1=addr1)
+    # TCPA: append "Reply STOP to opt out." on touches 1, 4, and the final touch
+    message  = with_tcpa(message, sms_count, cfg['max_touches'])
     state_code = (contact.get('state') or '').strip().upper()
     from_num   = from_number_for(state_code, sms_count, stage_name)
 
@@ -482,18 +623,17 @@ def process_call_needed_cadence(state):
     processed = 0
     transitioned = 0
     while True:
-        r = requests.get('https://services.leadconnectorhq.com/contacts/search',
-                         headers=GHL_H,
-                         json={'locationId': GHL_LOCATION,
-                               'query': '',
-                               'pageLimit': 100,
-                               'page': page,
-                               'filters': [{'field': 'tags', 'operator': 'contains', 'value': 'from-call-needed'}]},
-                         timeout=20)
+        r = http('GET', 'https://services.leadconnectorhq.com/contacts/search',
+                 headers=GHL_H,
+                 json={'locationId': GHL_LOCATION,
+                       'query': '',
+                       'pageLimit': 100,
+                       'page': page,
+                       'filters': [{'field': 'tags', 'operator': 'contains', 'value': 'from-call-needed'}]})
         # Some GHL versions need GET — fall back if POST is rejected
         if r.status_code in (404, 405):
-            r = requests.get(f'https://services.leadconnectorhq.com/contacts/?locationId={GHL_LOCATION}&query=',
-                             headers=GHL_H, timeout=20)
+            r = http('GET', f'https://services.leadconnectorhq.com/contacts/?locationId={GHL_LOCATION}&query=',
+                     headers=GHL_H)
         if r.status_code != 200:
             break
         contacts = r.json().get('contacts', []) or []
@@ -509,11 +649,11 @@ def process_call_needed_cadence(state):
 
             # Has the seller replied? (any inbound message in last 6 days)
             anchor = cs.get('cn_started') or cs.get('stage_entered_at') or now_utc().isoformat()
-            replied, _ = has_inbound_since(cid, anchor)
+            replied, _, _ = has_inbound_since(cid, anchor)
             if replied:
                 # Stop the cadence — standard reply handler in main loop will process tasks
-                requests.delete(f'https://services.leadconnectorhq.com/contacts/{cid}/tags',
-                                headers=GHL_H, json={'tags': ['from-call-needed']})
+                http('DELETE', f'https://services.leadconnectorhq.com/contacts/{cid}/tags',
+                     headers=GHL_H, json={'tags': ['from-call-needed']})
                 cs['cn_done'] = True
                 continue
 
@@ -526,8 +666,8 @@ def process_call_needed_cadence(state):
             elapsed = days_since(cs['cn_started']) or 0
             if elapsed >= 6:
                 # Transition to standard SMS sequence
-                requests.delete(f'https://services.leadconnectorhq.com/contacts/{cid}/tags',
-                                headers=GHL_H, json={'tags': ['from-call-needed']})
+                http('DELETE', f'https://services.leadconnectorhq.com/contacts/{cid}/tags',
+                     headers=GHL_H, json={'tags': ['from-call-needed']})
                 cs['cn_done'] = True
                 transitioned += 1
                 continue
@@ -560,45 +700,78 @@ def process_call_needed_cadence(state):
     return processed, transitioned
 
 
+def write_status(success, summary='', error=''):
+    """Write last-run status so dashboards can surface failures."""
+    try:
+        with open(STATUS_FILE, 'w') as f:
+            json.dump({
+                'success':   success,
+                'timestamp': now_utc().isoformat(),
+                'summary':   summary,
+                'error':     error[:500],
+            }, f, indent=2)
+    except Exception:
+        pass
+
+
 def main():
     et_now = datetime.now(ET)
     print(f'[{et_now.strftime("%Y-%m-%d %I:%M %p ET")}] SMS Follow-Up starting...')
-
-    # Kill switch + live templates from Google Sheet
-    kill_on, live_templates = read_sheet_config()
-    if not kill_on:
-        print('!! KILL SWITCH IS OFF — Settings!B2 in dashboard sheet says OFF. Skipping all SMS sends.')
-        print('   (Dashboard will still update.)')
-        return
-    # Replace module-level TEMPLATES with sheet-loaded versions for this run
-    global TEMPLATES
-    TEMPLATES = live_templates
-    print(f'SMS Automation: ON  |  Templates loaded for stages: {list(TEMPLATES.keys())}')
-
-    if not in_business_hours_et():
-        print(f'Outside business hours (9 AM - 8 PM ET); current ET hour: {et_now.hour}. Skipping sends.')
-        return
-
-    state    = load_state()
-    entries  = fetch_active_leads()
-    print(f'Active leads in stages 1-7: {len(entries)}')
-
     counts = {}
-    for e in entries:
-        contact = get_contact(e['cid'])
-        if not contact:
-            continue
-        result = process_lead(e, contact, state)
-        counts[result] = counts.get(result, 0) + 1
-        time.sleep(0.3)
 
-    # Every-other-day call-needed cadence (separate path from SMS sequence)
-    cn_processed, cn_transitioned = process_call_needed_cadence(state)
-    if cn_processed or cn_transitioned:
-        print(f'Call-needed cadence: {cn_processed} retry tasks created, {cn_transitioned} graduated to SMS')
+    try:
+        # Kill switch + live templates from Google Sheet
+        kill_on, live_templates = read_sheet_config()
+        if not kill_on:
+            print('!! KILL SWITCH IS OFF — Settings!B2 in dashboard sheet says OFF. Skipping all SMS sends.')
+            print('   (Dashboard will still update.)')
+            write_status(True, 'kill-switch off; no sends')
+            return
+        global TEMPLATES
+        TEMPLATES = live_templates
+        print(f'SMS Automation: ON  |  Templates loaded for stages: {list(TEMPLATES.keys())}')
 
-    save_state(state)
-    print('\nSummary:', json.dumps(counts, indent=2))
+        if not in_business_hours_et():
+            print(f'Outside business hours (9 AM - 8 PM ET); current ET hour: {et_now.hour}. Skipping sends.')
+            write_status(True, f'outside business hours (hour={et_now.hour} ET)')
+            return
+
+        state    = load_state()
+        entries  = fetch_active_leads()
+        print(f'Active leads in stages 1-7: {len(entries)}')
+
+        # Build/refresh shared contacts cache for the dashboards (avoids each one
+        # re-fetching every contact).
+        contacts_cache = {}
+        for e in entries:
+            contact = get_contact(e['cid'])
+            if not contact:
+                continue
+            contacts_cache[e['cid']] = contact
+            result = process_lead(e, contact, state)
+            counts[result] = counts.get(result, 0) + 1
+            time.sleep(0.3)
+
+        try:
+            with open(CONTACTS_CACHE, 'w') as f:
+                json.dump({'fetched_at': now_utc().isoformat(),
+                           'contacts': contacts_cache}, f)
+        except Exception as e:
+            print(f'  contacts cache write failed: {e}')
+
+        cn_processed, cn_transitioned = process_call_needed_cadence(state)
+        if cn_processed or cn_transitioned:
+            print(f'Call-needed cadence: {cn_processed} retry tasks created, {cn_transitioned} graduated to SMS')
+
+        save_state(state)
+        print('\nSummary:', json.dumps(counts, indent=2))
+        write_status(True, json.dumps(counts))
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f'\n!! SMS run failed: {e}\n{tb}')
+        write_status(False, json.dumps(counts), f'{e}: {tb[-300:]}')
+        raise
 
 
 if __name__ == '__main__':

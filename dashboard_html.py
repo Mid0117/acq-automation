@@ -2,23 +2,104 @@
 Generate a beautiful HTML dashboard from sms_state.json + GHL data.
 Output: site/index.html — pushed to gh-pages branch by the workflow.
 """
-import json, os, requests
+import json, os, time, requests
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from html import escape
 
-GHL_TOKEN    = os.environ['GHL_TOKEN']
-GHL_LOCATION = 'RCkiUmWqXX4BYQ39JXmm'
-PIPELINE_ID  = 'O8wzIa6E3SgD8HLg6gh9'
-STATE_FILE   = 'sms_state.json'
-SHEET_ID     = os.environ.get('DASHBOARD_SHEET_ID', '')
-OUT_DIR      = 'site'
-OUT_FILE     = os.path.join(OUT_DIR, 'index.html')
+GHL_TOKEN      = os.environ['GHL_TOKEN']
+GHL_LOCATION   = 'RCkiUmWqXX4BYQ39JXmm'
+PIPELINE_ID    = 'O8wzIa6E3SgD8HLg6gh9'
+STATE_FILE     = 'sms_state.json'
+CONTACTS_CACHE = 'contacts_cache.json'
+SHEET_ID       = os.environ.get('DASHBOARD_SHEET_ID', '')
+OUT_DIR        = 'site'
+OUT_FILE       = os.path.join(OUT_DIR, 'index.html')
 
 ET = ZoneInfo('America/New_York')
 
 GHL_H = {'Authorization': f'Bearer {GHL_TOKEN}',
          'Content-Type': 'application/json', 'Version': '2021-07-28'}
+
+HTTP_TIMEOUT = 30
+
+
+def http(method, url, **kw):
+    kw.setdefault('timeout', HTTP_TIMEOUT)
+    for attempt in range(2):
+        try:
+            r = requests.request(method, url, **kw)
+            if r.status_code >= 500 and attempt == 0:
+                time.sleep(1.0); continue
+            return r
+        except (requests.Timeout, requests.ConnectionError):
+            if attempt == 0:
+                time.sleep(1.0); continue
+            raise
+
+
+def load_contacts_cache():
+    """Loaded by sms_followup.py earlier in the workflow. Falls back to {} so
+    we can still degrade to per-contact GETs."""
+    if not os.path.exists(CONTACTS_CACHE):
+        return {}
+    try:
+        d = json.load(open(CONTACTS_CACHE))
+        return d.get('contacts', {}) or {}
+    except Exception:
+        return {}
+
+
+def collect_run_status():
+    """Returns last-run status for each cron workflow.
+
+    Two sources:
+    - GitHub Actions API → cross-workflow visibility (catches sms/acq/slack equally
+      since they run in separate workflows)
+    - Local last_run_*.json → catches script-level failures inside this workflow
+      that didn't fail the whole job (e.g., partial errors).
+    """
+    out = []
+    # 1. GitHub Actions API — most authoritative for "did the cron run + succeed"
+    gh_token = os.environ.get('GITHUB_TOKEN', '')
+    repo     = os.environ.get('GITHUB_REPOSITORY', 'Mid0117/acq-automation')
+    if gh_token:
+        try:
+            r = http('GET', f'https://api.github.com/repos/{repo}/actions/runs',
+                     headers={'Authorization': f'Bearer {gh_token}',
+                              'Accept': 'application/vnd.github+json',
+                              'X-GitHub-Api-Version': '2022-11-28'},
+                     params={'per_page': 30})
+            if r.status_code == 200:
+                seen = {}
+                for run in r.json().get('workflow_runs', []):
+                    name = run.get('name', '')
+                    if name in seen:
+                        continue
+                    if run.get('event') not in ('schedule', 'workflow_dispatch'):
+                        continue
+                    success = run.get('conclusion') == 'success'
+                    seen[name] = {
+                        'success':   success,
+                        'timestamp': run.get('updated_at') or run.get('created_at') or '',
+                        'summary':   run.get('conclusion') or run.get('status') or '',
+                        'error':     '' if success else f"{run.get('conclusion','')} — see logs",
+                        'url':       run.get('html_url', ''),
+                    }
+                for name, st in seen.items():
+                    out.append((name, st))
+        except Exception as e:
+            print(f'  GitHub status fetch failed: {e}')
+    # 2. Local status files (within this workflow run — script-level granularity)
+    for fname in sorted(os.listdir('.')):
+        if fname.startswith('last_run_') and fname.endswith('.json'):
+            try:
+                out.append((fname[len('last_run_'):-len('.json')] + ' (script)',
+                            json.load(open(fname))))
+            except Exception:
+                pass
+    out.sort(key=lambda x: (1 if x[1].get('success') else 0, x[0]))
+    return out
 
 STAGE_NAMES = {
     'a17517be-8d1a-49fd-bd53-b9128a66e242': '1. Qualified',
@@ -105,11 +186,11 @@ def fetch_active():
     for stage_id, stage_label in STAGE_NAMES.items():
         page = 1
         while True:
-            r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
-                             headers=GHL_H,
-                             params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
-                                     'pipeline_stage_id': stage_id,
-                                     'limit': 100, 'page': page})
+            r = http('GET', 'https://services.leadconnectorhq.com/opportunities/search',
+                     headers=GHL_H,
+                     params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
+                             'pipeline_stage_id': stage_id,
+                             'limit': 100, 'page': page})
             if r.status_code != 200:
                 break
             opps = r.json().get('opportunities', [])
@@ -126,8 +207,15 @@ def fetch_active():
     return out
 
 
+# Cache filled by load_contacts_cache(); we look there before hitting GHL.
+_CONTACTS_LOOKUP = {}
+
+
 def get_contact(cid):
-    r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
+    cached = _CONTACTS_LOOKUP.get(cid)
+    if cached:
+        return cached
+    r = http('GET', f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
     if r.status_code != 200:
         return {}
     return r.json().get('contact', {})
@@ -149,7 +237,7 @@ USERS = {
 def get_open_tasks(cid):
     """Get all open (not completed) tasks for a contact."""
     try:
-        r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}/tasks', headers=GHL_H)
+        r = http('GET', f'https://services.leadconnectorhq.com/contacts/{cid}/tasks', headers=GHL_H)
         if r.status_code != 200:
             return []
         return [t for t in r.json().get('tasks', []) if not t.get('completed')]
@@ -312,6 +400,30 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .template-row .stage { color: var(--accent); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em; padding-top: 2px; }
 .template-row .num { color: var(--text-dim); text-align: center; padding-top: 2px; }
 .template-row .msg { color: var(--text); line-height: 1.5; }
+.status-banner.failure {
+  background: rgba(239,68,68,0.10);
+  border: 1px solid rgba(239,68,68,0.40);
+  color: #fff;
+}
+.status-banner.failure .status-text { color: #fecaca; }
+.run-grid {
+  display: flex; flex-direction: column; gap: 6px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  font-size: 13px;
+}
+.run-grid-collapsed summary {
+  cursor: pointer; padding: 10px 16px; color: var(--text-dim);
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 12px; font-size: 13px; margin-bottom: 16px;
+}
+.run-row { display: grid; grid-template-columns: 80px 140px 160px 1fr; gap: 12px; align-items: center; }
+.run-row .run-name { color: var(--text); font-weight: 500; }
+.run-row .run-ts { color: var(--text-dim); font-size: 12px; }
+.run-row .run-detail { color: var(--text-dim); font-family: monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top: 40px; }
 </style>
 </head>
@@ -489,9 +601,38 @@ def render_table(rows, kind):
     return f'<table{table_id}>{head}<tbody>{body}</tbody></table>'
 
 
+def write_status(success, summary='', error=''):
+    try:
+        with open('last_run_html.json', 'w') as f:
+            json.dump({'success': success,
+                       'timestamp': datetime.now(timezone.utc).isoformat(),
+                       'summary': summary,
+                       'error': error[:500]}, f, indent=2)
+    except Exception:
+        pass
+
+
 def main():
+    try:
+        _main_inner()
+        write_status(True, 'html dashboard rendered')
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f'!! html dashboard failed: {e}\n{tb}')
+        write_status(False, '', f'{e}: {tb[-300:]}')
+        raise
+
+
+def _main_inner():
     os.makedirs(OUT_DIR, exist_ok=True)
     sms_state = json.load(open(STATE_FILE)) if os.path.exists(STATE_FILE) else {}
+    # Hydrate contacts from sms_followup's cache → avoids per-lead GETs
+    global _CONTACTS_LOOKUP
+    _CONTACTS_LOOKUP = load_contacts_cache()
+    if _CONTACTS_LOOKUP:
+        print(f'Contacts cache: {len(_CONTACTS_LOOKUP)} entries (skipping per-lead GETs)')
+    run_status = collect_run_status()
     leads = fetch_active()
     print(f'HTML dashboard: {len(leads)} leads')
 
@@ -558,7 +699,7 @@ def main():
     top_states = sorted(by_state.items(), key=lambda x: -x[1])[:10]
     top_numbers = sorted(by_number.items(), key=lambda x: -x[1])[:10]
 
-    # Status banner
+    # Status banner — kill switch + workflow-failure visibility
     if kill_on:
         banner = (
             '<div class="status-banner on">'
@@ -573,6 +714,40 @@ def main():
             f'<a class="btn btn-edit" href="{sheet_url}#gid=0" target="_blank">RE-ENABLE</a>'
             '</div>'
         )
+
+    # Workflow failure visibility — prepend a red banner if any cron's last run failed.
+    # Always show a small block listing each cron's status so silent staleness is obvious.
+    if run_status:
+        failed = [(n, s) for n, s in run_status if not s.get('success')]
+        ok     = [(n, s) for n, s in run_status if s.get('success')]
+        rows = ''
+        for name, st in run_status:
+            ts = to_et(st.get('timestamp'))
+            tone = 'green' if st.get('success') else 'hot'
+            label = 'OK' if st.get('success') else 'FAILED'
+            detail = escape((st.get('error') or st.get('summary') or '')[:200])
+            rows += (
+                f'<div class="run-row">'
+                f'<span class="tag {tone}">{label}</span>'
+                f'<span class="run-name">{escape(name)}</span>'
+                f'<span class="run-ts">{escape(ts)}</span>'
+                f'<span class="run-detail">{detail}</span>'
+                f'</div>'
+            )
+        if failed:
+            failure_banner = (
+                '<div class="status-banner failure">'
+                f'<div class="status-text">⚠ <strong>{len(failed)} cron job(s) failed on their last run</strong> — automation is partially down.</div>'
+                '<a class="btn btn-edit" href="https://github.com/Mid0117/acq-automation/actions" target="_blank">VIEW LOGS</a>'
+                '</div>'
+                f'<div class="run-grid">{rows}</div>'
+            )
+        else:
+            failure_banner = (
+                f'<details class="run-grid-collapsed"><summary>All {len(ok)} cron jobs OK on last run — click for timestamps</summary>'
+                f'<div class="run-grid">{rows}</div></details>'
+            )
+        banner = failure_banner + banner
 
     # Templates block
     if template_rows:

@@ -8,11 +8,51 @@ Two tabs:
 If env var DASHBOARD_SHEET_ID is set, writes to that sheet.
 Otherwise creates a new sheet, prints the URL, you set the env var.
 """
-import json, os, requests
+import json, os, time, requests
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 ET = ZoneInfo('America/New_York')
+
+HTTP_TIMEOUT = 30
+
+
+def http(method, url, **kw):
+    kw.setdefault('timeout', HTTP_TIMEOUT)
+    for attempt in range(2):
+        try:
+            r = requests.request(method, url, **kw)
+            if r.status_code >= 500 and attempt == 0:
+                time.sleep(1.0); continue
+            return r
+        except (requests.Timeout, requests.ConnectionError):
+            if attempt == 0:
+                time.sleep(1.0); continue
+            raise
+
+
+def now_utc():
+    return datetime.now(timezone.utc)
+
+
+def write_status(success, summary='', error=''):
+    try:
+        with open('last_run_dashboard.json', 'w') as f:
+            json.dump({'success': success,
+                       'timestamp': now_utc().isoformat(),
+                       'summary': summary,
+                       'error': error[:500]}, f, indent=2)
+    except Exception:
+        pass
+
+
+def load_contacts_cache():
+    if not os.path.exists('contacts_cache.json'):
+        return {}
+    try:
+        return (json.load(open('contacts_cache.json')) or {}).get('contacts', {}) or {}
+    except Exception:
+        return {}
 
 
 def to_et_str(iso_or_str):
@@ -72,11 +112,11 @@ def fetch_active_leads():
     for stage_id, stage_label in STAGE_NAMES.items():
         page = 1
         while True:
-            r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
-                             headers=GHL_H,
-                             params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
-                                     'pipeline_stage_id': stage_id,
-                                     'limit': 100, 'page': page})
+            r = http('GET', 'https://services.leadconnectorhq.com/opportunities/search',
+                     headers=GHL_H,
+                     params={'location_id': GHL_LOCATION, 'pipeline_id': PIPELINE_ID,
+                             'pipeline_stage_id': stage_id,
+                             'limit': 100, 'page': page})
             if r.status_code != 200:
                 break
             opps = r.json().get('opportunities', [])
@@ -94,8 +134,14 @@ def fetch_active_leads():
     return entries
 
 
+_CONTACTS_LOOKUP = {}
+
+
 def get_contact(cid):
-    r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
+    cached = _CONTACTS_LOOKUP.get(cid)
+    if cached:
+        return cached
+    r = http('GET', f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
     if r.status_code != 200:
         return {}
     return r.json().get('contact', {})
@@ -244,10 +290,28 @@ def write_tab(svc, sheet_id, tab, rows):
 
 
 def main():
+    try:
+        _main_inner()
+        write_status(True, 'dashboard updated')
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f'!! dashboard run failed: {e}\n{tb}')
+        write_status(False, '', f'{e}: {tb[-300:]}')
+        raise
+
+
+def _main_inner():
     svc = get_google_services()
     if not svc:
         print('Google not configured; skipping dashboard.')
         return
+
+    # Hydrate contacts cache from sms_followup → no per-lead GHL GETs
+    global _CONTACTS_LOOKUP
+    _CONTACTS_LOOKUP = load_contacts_cache()
+    if _CONTACTS_LOOKUP:
+        print(f'Contacts cache: {len(_CONTACTS_LOOKUP)} entries (skipping per-lead GETs)')
 
     sms_state = json.load(open(STATE_FILE)) if os.path.exists(STATE_FILE) else {}
     leads     = fetch_active_leads()

@@ -14,6 +14,24 @@ State file: slack_state.json — tracks last processed message ts per channel.
 import os, json, re, requests, time
 from datetime import datetime, timezone
 
+# Default 30s timeout for any bare requests.* call that didn't specify one.
+_orig_session_request = requests.Session.request
+def _request_with_default_timeout(self, method, url, **kwargs):
+    kwargs.setdefault('timeout', 30)
+    return _orig_session_request(self, method, url, **kwargs)
+requests.Session.request = _request_with_default_timeout
+
+
+def _write_status(success, summary='', error=''):
+    try:
+        with open('last_run_slack.json', 'w') as f:
+            json.dump({'success': success,
+                       'timestamp': datetime.now(timezone.utc).isoformat(),
+                       'summary': summary,
+                       'error': error[:500]}, f, indent=2)
+    except Exception:
+        pass
+
 GHL_TOKEN     = os.environ['GHL_TOKEN']
 ANTHROPIC_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 SLACK_TOKEN   = os.environ.get('SLACK_BOT_TOKEN', '')
@@ -268,7 +286,9 @@ Return JSON per system instructions."""
                'content-type':'application/json'}
     try:
         r = requests.post('https://api.anthropic.com/v1/messages', headers=headers, json=body, timeout=60)
-        if r.status_code != 200: return None
+        if r.status_code != 200:
+            print(f'  ⚠ Claude API {r.status_code}: {r.text[:300]}')
+            return None
         text = r.json()['content'][0]['text'].strip()
         if text.startswith('```'):
             text = text.split('```',2)[1]
@@ -276,7 +296,7 @@ Return JSON per system instructions."""
             text = text.strip()
         return json.loads(text)
     except Exception as e:
-        print(f'  Claude error: {e}')
+        print(f'  ⚠ Claude exception: {e}')
         return None
 
 
@@ -317,12 +337,24 @@ def fmt_slack_ts(ts):
 
 
 def main():
+    try:
+        summary = _main_inner()
+        _write_status(True, summary or '')
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f'!! Slack scrape failed: {e}\n{tb}')
+        _write_status(False, '', f'{e}: {tb[-300:]}')
+        raise
+
+
+def _main_inner():
     if not SLACK_TOKEN:
         print('SLACK_BOT_TOKEN not set — exiting.')
-        return
+        return 'SLACK_BOT_TOKEN missing'
     if not ANTHROPIC_KEY:
         print('ANTHROPIC_API_KEY not set — exiting.')
-        return
+        return 'ANTHROPIC_API_KEY missing'
 
     state = load_state()
     print('Resolving channel IDs...')
@@ -386,7 +418,9 @@ def main():
         state[ch_name] = latest_ts
 
     save_state(state)
-    print(f'\nDONE — scanned {scanned} messages | {matches} matched leads | {updates_made} field updates')
+    msg = f'scanned {scanned} | matched {matches} | updates {updates_made}'
+    print(f'\nDONE — {msg}')
+    return msg
 
 
 if __name__ == '__main__':

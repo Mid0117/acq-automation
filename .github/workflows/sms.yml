@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write    # needed to push to gh-pages branch
+  contents: write    # push to gh-pages branch
+  actions:  read     # query other workflow runs for the failure banner
 
 jobs:
   run:
@@ -18,10 +19,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Cache SMS state
+      - name: Cache SMS state + last-run statuses
         uses: actions/cache@v4
         with:
-          path: sms_state.json
+          path: |
+            sms_state.json
+            last_run_sms.json
+            last_run_dashboard.json
+            last_run_html.json
+            last_run_acq.json
+            last_run_slack.json
           key: sms-state-${{ github.ref }}
           restore-keys: sms-state-
 
@@ -31,6 +38,7 @@ jobs:
       - name: Send SMS follow-ups
         env:
           GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           DASHBOARD_SHEET_ID: ${{ secrets.DASHBOARD_SHEET_ID }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -49,6 +57,8 @@ jobs:
           GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           DASHBOARD_SHEET_ID: ${{ secrets.DASHBOARD_SHEET_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: python dashboard_html.py
 
       - name: Deploy HTML dashboard to GitHub Pages
