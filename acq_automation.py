@@ -512,8 +512,20 @@ def lookup_property(addr1, city, state):
         return None
 
 
-def fetch_sold_comps(city, state, zipcode, max_items=30):
-    """Pull recently-sold listings near the property. Apify returns SOLD when given a /sold/ URL as a search query."""
+# In-process cache: leads in the same city/zip share one comps fetch per cron run.
+# Keyed by (city_lower, state_lower, zip5). Built fresh each cron tick.
+_COMPS_CACHE = {}
+
+
+def fetch_sold_comps(city, state, zipcode, max_items=10):
+    """Pull recently-sold listings near the property.
+
+    Default max_items lowered from 30 → 10. Claude only picks the top 5 comps
+    anyway, so 10 gives plenty of headroom while cutting Apify cost ~3×.
+
+    Caches by (city, state, ZIP) for the run, so a cluster of leads in the
+    same ZIP only triggers one Apify call instead of N.
+    """
     if not (APIFY_TOKEN and city and state):
         return []
     if not apify_has_budget():
@@ -521,6 +533,11 @@ def fetch_sold_comps(city, state, zipcode, max_items=30):
     c = city.replace(' ', '-').strip().lower()
     s = state.strip().lower()
     z = (zipcode or '').strip().split('-')[0]  # ZIP+4 -> 5-digit
+
+    cache_key = (c, s, z)
+    if cache_key in _COMPS_CACHE:
+        return _COMPS_CACHE[cache_key]
+
     url = f'https://www.zillow.com/{c}-{s}-{z}/sold/' if z else f'https://www.zillow.com/{c}-{s}/sold/'
     try:
         r = requests.post(
@@ -529,6 +546,7 @@ def fetch_sold_comps(city, state, zipcode, max_items=30):
             timeout=240
         )
         if r.status_code not in (200, 201):
+            _COMPS_CACHE[cache_key] = []
             return []
         items = r.json() or []
         comps = []
@@ -544,9 +562,14 @@ def fetch_sold_comps(city, state, zipcode, max_items=30):
                 'zpid':    it.get('zpid'),
                 'url':     it.get('detailUrl') or '',
             })
-        return comps[:max_items]
+        comps = comps[:max_items]
+        _COMPS_CACHE[cache_key] = comps
+        if comps:
+            print(f'  Comps fetched ({len(comps)}) for {z or c}-{s} | cached for run')
+        return comps
     except Exception as e:
         print(f'  Comps fetch error: {e}')
+        _COMPS_CACHE[cache_key] = []
         return []
 
 
@@ -786,7 +809,7 @@ def process_contact(cid, oid, google_svc):
 
         # Real ARV from sold comps + Claude
         zipc = (contact.get('postalCode') or '').strip()
-        comps = fetch_sold_comps(city, state, zipc, max_items=30)
+        comps = fetch_sold_comps(city, state, zipc)
         if comps and prop.get('sqft'):
             comps_result = estimate_arv_from_comps({
                 'address':    f"{addr1}, {city}, {state}",
@@ -1007,7 +1030,7 @@ def backfill_property_data(cid, oid, contact, cfields, opp_cf):
         '_apify':         prop,
     }
 
-    comps = fetch_sold_comps(city, state, zipc, max_items=30)
+    comps = fetch_sold_comps(city, state, zipc)
     if comps and prop.get('sqft'):
         comps_result = estimate_arv_from_comps({
             'address':    f'{addr1}, {city}, {state}',
@@ -1020,6 +1043,18 @@ def backfill_property_data(cid, oid, contact, cfields, opp_cf):
         if comps_result and comps_result.get('arv'):
             data['estimated_arv'] = comps_result['arv']
             data['_comps']        = comps_result
+
+    # Fallback: Zillow Zestimate as a rough ARV when comps don't yield one.
+    # Free — already came back from the property detail call. Zestimate is
+    # the as-is value (not after-repair), so this is conservative for fixers
+    # and accurate-ish for properties in OK condition. Beats no number at all.
+    if not data.get('estimated_arv') and prop.get('zestimate'):
+        try:
+            data['estimated_arv'] = int(prop['zestimate'])
+            data['_arv_source']   = 'zestimate-fallback'
+            print(f'    → Using Zestimate fallback: ${int(prop["zestimate"]):,}')
+        except Exception:
+            pass
 
     if not data.get('estimated_arv'):
         # Property data alone is still useful — write what we have.
