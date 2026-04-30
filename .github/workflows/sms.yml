@@ -27,6 +27,7 @@ jobs:
             last_run_sms.json
             last_run_dashboard.json
             last_run_html.json
+            last_run_deals.json
             last_run_acq.json
             last_run_slack.json
           key: sms-state-${{ github.ref }}
@@ -60,6 +61,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python dashboard_html.py
+
+      - name: Generate Deals dashboard
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+        run: python deals_dashboard.py
 
       - name: Deploy HTML dashboard to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

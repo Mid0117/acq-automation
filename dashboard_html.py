@@ -407,6 +407,17 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .template-row .stage { color: var(--accent); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em; padding-top: 2px; }
 .template-row .num { color: var(--text-dim); text-align: center; padding-top: 2px; }
 .template-row .msg { color: var(--text); line-height: 1.5; }
+.nav { display: flex; gap: 8px; margin-bottom: 24px; }
+.nav a {
+  padding: 10px 18px; border-radius: 10px; background: var(--panel);
+  border: 1px solid var(--panel-border); color: var(--text-dim);
+  font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s;
+}
+.nav a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.nav a.active {
+  color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: transparent;
+}
 .status-banner.failure {
   background: rgba(239,68,68,0.10);
   border: 1px solid rgba(239,68,68,0.40);
@@ -442,6 +453,11 @@ footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top
       <div class="subtitle">Last updated: __TIMESTAMP__ (Eastern Time)</div>
     </div>
   </header>
+
+  <div class="nav">
+    <a href="index.html" class="active">Follow-Ups</a>
+    <a href="deals.html">Deals</a>
+  </div>
 
   __STATUS_BANNER__
 
