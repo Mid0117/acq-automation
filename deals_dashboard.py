@@ -75,6 +75,7 @@ CF_REPAIRS     = 'dbYoYFVTiCbqoJxC9HkR'
 CF_ARV         = 'nCWzIGfZHki0dv84gUem'
 CF_70_ARV      = 'R7QUzOdOnJXgoGRPwxdF'
 CF_ZILLOW      = '48pr9cc9hDFas111fDpF'
+CF_ASSIGN_FEE  = '4IJPj2UebvkrYJ0rK06l'
 
 # Opportunity custom fields
 OF_REHAB       = 'cPCQEuwOJNMtoWR8CrLR'
@@ -381,10 +382,14 @@ h1 {
   margin-bottom: 14px; padding: 12px;
   background: rgba(0,0,0,0.2); border-radius: 10px;
 }
+.fin-grid.four { grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; }
 .fin-grid .fin .lab {
   font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;
 }
 .fin-grid .fin .val { font-size: 16px; font-weight: 700; }
+.fin-grid.four .fin .val { font-size: 15px; }
+.fin-grid .fin .val.positive { color: var(--green); }
+.fin-grid .fin .val.negative { color: var(--hot); }
 .fin-grid .fin.spread .val.positive { color: var(--green); }
 .fin-grid .fin.spread .val.negative { color: var(--hot); }
 
@@ -441,7 +446,7 @@ footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top
 
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Total Deals</div><div class="value">__TOTAL__</div><div class="sub">stages 1-4 (active)</div></div>
-    <div class="kpi green"><div class="label">Total ARV Value</div><div class="value">__ARV_TOTAL__</div><div class="sub">sum of estimated ARV</div></div>
+    <div class="kpi green"><div class="label">Total Assignment Fee</div><div class="value">__ASSIGN_FEE_TOTAL__</div><div class="sub">across __WITH_FEE__ deals with fee set</div></div>
     <div class="kpi"><div class="label">Avg Call Rating</div><div class="value">__AVG_RATING__/10</div><div class="sub">across __RATED__ rated calls</div></div>
     <div class="kpi warm"><div class="label">With ARV calculated</div><div class="value">__WITH_ARV__</div><div class="sub">/ __TOTAL__ deals</div></div>
     <div class="kpi hot"><div class="label">Hot Leads</div><div class="value">__HOT__</div><div class="sub">flagged by call AI</div></div>
@@ -556,6 +561,11 @@ def render_card(d):
     repairs = cf.get(CF_REPAIRS) or ''
     rehab_url = of.get(OF_REHAB) or ''
     zillow = cf.get(CF_ZILLOW) or ''
+    assign_fee_raw = cf.get(CF_ASSIGN_FEE) or ''
+    try:
+        assign_fee_v = int(float(assign_fee_raw)) if assign_fee_raw else None
+    except Exception:
+        assign_fee_v = None
 
     note = d.get('note') or {}
     rating = note.get('rating')
@@ -623,16 +633,16 @@ def render_card(d):
     if spec_pieces:
         pieces.append(f'<div class="specs">{"".join(spec_pieces)}</div>')
 
-    # Financials
-    pieces.append('<div class="fin-grid">')
+    # Financials — 4 tiles: Asking / ARV / 70% MAO / Assignment Fee
+    pieces.append('<div class="fin-grid four">')
     pieces.append(f'<div class="fin"><div class="lab">Asking</div><div class="val">{fmt_money(asking_v) if asking_v else "—"}</div></div>')
     pieces.append(f'<div class="fin"><div class="lab">ARV</div><div class="val">{fmt_money(arv_v) if arv_v else "—"}</div></div>')
-    if spread_v is not None:
-        sign = '+' if spread_v >= 0 else ''
-        pieces.append(f'<div class="fin spread"><div class="lab">70% spread</div>'
-                      f'<div class="val {spread_class}">{sign}{fmt_money(spread_v)}</div></div>')
-    else:
-        pieces.append(f'<div class="fin"><div class="lab">70% MAO</div><div class="val">{fmt_money(arv70_v) if arv70_v else "—"}</div></div>')
+    pieces.append(f'<div class="fin"><div class="lab">70% MAO</div><div class="val">{fmt_money(arv70_v) if arv70_v else "—"}</div></div>')
+    fee_class = 'val'
+    if assign_fee_v is not None:
+        fee_class = 'val positive'
+    pieces.append(f'<div class="fin"><div class="lab">Assign Fee</div>'
+                  f'<div class="{fee_class}">{fmt_money(assign_fee_v) if assign_fee_v else "—"}</div></div>')
     pieces.append('</div>')
 
     # Call rating + summary
@@ -699,17 +709,23 @@ def _main_inner():
         time.sleep(0.1)
 
     # Aggregates
-    arv_total = 0
+    assign_fee_total = 0
+    with_fee = 0
     rated = []
     hot = 0
     with_arv = 0
     for d in enriched:
         cf = {f['id']: (f.get('value') or '') for f in (d['contact'].get('customFields') or [])}
         try:
-            v = int(cf.get(CF_ARV) or 0)
-            if v > 0:
-                arv_total += v
+            if int(cf.get(CF_ARV) or 0) > 0:
                 with_arv += 1
+        except Exception:
+            pass
+        try:
+            fee = int(float(cf.get(CF_ASSIGN_FEE) or 0))
+            if fee > 0:
+                assign_fee_total += fee
+                with_fee += 1
         except Exception:
             pass
         if d['note'].get('rating') is not None:
@@ -744,7 +760,8 @@ def _main_inner():
     html = HTML
     html = html.replace('__TIMESTAMP__', datetime.now(ET).strftime('%b %d, %Y %I:%M %p ET'))
     html = html.replace('__TOTAL__', str(len(enriched)))
-    html = html.replace('__ARV_TOTAL__', fmt_money(arv_total) if arv_total else '—')
+    html = html.replace('__ASSIGN_FEE_TOTAL__', fmt_money(assign_fee_total) if assign_fee_total else '—')
+    html = html.replace('__WITH_FEE__', str(with_fee))
     html = html.replace('__AVG_RATING__', f'{avg_rating:.1f}' if rated else '—')
     html = html.replace('__RATED__', str(len(rated)))
     html = html.replace('__WITH_ARV__', str(with_arv))
