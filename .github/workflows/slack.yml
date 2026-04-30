@@ -1,0 +1,36 @@
+name: APG Slack Scraper
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # every hour
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache Slack state
+        uses: actions/cache@v4
+        with:
+          path: slack_state.json
+          key: slack-state-${{ github.ref }}
+          restore-keys: slack-state-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Scan Slack for lead mentions
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: python slack_scraper.py
