@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>APG ACQ — How the Automation Works</title>
+<style>
+:root {
+  --bg: #0b0d12;
+  --panel: rgba(255,255,255,0.04);
+  --panel-border: rgba(255,255,255,0.08);
+  --text: #e6e8ee;
+  --text-dim: #8b93a7;
+  --accent: #6366f1;
+  --accent2: #06b6d4;
+  --hot: #ef4444;
+  --warm: #f59e0b;
+  --green: #10b981;
+  --gray: #475569;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(1200px 800px at 20% -10%, rgba(99,102,241,.15), transparent 60%),
+              radial-gradient(1000px 600px at 100% 100%, rgba(6,182,212,.12), transparent 60%),
+              var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+header { margin-bottom: 24px; }
+h1 {
+  font-size: 32px; font-weight: 700; letter-spacing: -0.02em;
+  margin: 0; background: linear-gradient(90deg, #fff, #94a3b8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.subtitle { color: var(--text-dim); font-size: 14px; margin-top: 8px; }
+
+.nav { display: flex; gap: 8px; margin-bottom: 32px; }
+.nav a {
+  padding: 10px 18px; border-radius: 10px; background: var(--panel);
+  border: 1px solid var(--panel-border); color: var(--text-dim);
+  font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s;
+}
+.nav a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.nav a.active {
+  color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: transparent;
+}
+
+section { margin-bottom: 40px; }
+h2 {
+  font-size: 22px; font-weight: 600; margin: 0 0 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+h2 .badge {
+  font-size: 11px; padding: 4px 10px; border-radius: 999px;
+  background: rgba(99,102,241,0.15); color: #a5b4fc;
+  font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+}
+h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; }
+p { color: var(--text); margin: 0 0 12px; }
+p.dim { color: var(--text-dim); }
+
+.card {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 16px; padding: 24px; margin-bottom: 16px;
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), transparent 60%);
+  pointer-events: none;
+}
+.card.accent {
+  border: 1px solid rgba(99,102,241,0.30);
+  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(6,182,212,0.04));
+}
+
+.cron-card {
+  display: grid; grid-template-columns: 200px 1fr; gap: 24px;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 16px; padding: 22px; margin-bottom: 16px;
+}
+@media (max-width: 700px) { .cron-card { grid-template-columns: 1fr; gap: 12px; } }
+.cron-card .meta .name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.cron-card .meta .freq {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  background: rgba(16,185,129,0.15); color: var(--green);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cron-card .meta .file {
+  font-family: ui-monospace, "SF Mono", monospace; font-size: 11px;
+  color: var(--text-dim); margin-top: 8px;
+}
+.cron-card ul { margin: 0; padding-left: 20px; }
+.cron-card li { color: var(--text); margin-bottom: 6px; }
+.cron-card li strong { color: var(--accent2); font-weight: 600; }
+
+.compare {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  margin-bottom: 12px;
+}
+@media (max-width: 700px) { .compare { grid-template-columns: 1fr; } }
+.compare .col {
+  padding: 16px; border-radius: 12px;
+}
+.compare .before {
+  background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2);
+}
+.compare .after {
+  background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2);
+}
+.compare .label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  font-weight: 700; margin-bottom: 8px;
+}
+.compare .before .label { color: var(--hot); }
+.compare .after .label { color: var(--green); }
+
+table {
+  width: 100%; border-collapse: collapse; font-size: 14px;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 12px; overflow: hidden;
+}
+th { text-align: left; padding: 12px 16px;
+     background: rgba(255,255,255,0.03);
+     color: var(--text-dim); font-size: 12px;
+     text-transform: uppercase; letter-spacing: 0.06em;
+     font-weight: 600; }
+td { padding: 12px 16px; border-top: 1px solid var(--panel-border); }
+td.num { font-variant-numeric: tabular-nums; text-align: right; font-weight: 600; }
+tr.total td { font-weight: 700; background: rgba(99,102,241,0.06); border-top: 1px solid rgba(99,102,241,0.3); }
+
+.kpi-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+.kpi-row .kpi {
+  padding: 16px; background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 12px;
+}
+.kpi-row .kpi .lab { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.kpi-row .kpi .v { font-size: 22px; font-weight: 700; }
+.kpi-row .kpi.green .v { color: var(--green); }
+.kpi-row .kpi.warm  .v { color: var(--warm); }
+.kpi-row .kpi.hot   .v { color: var(--hot); }
+
+.tag {
+  display: inline-block; padding: 3px 8px; font-size: 11px;
+  border-radius: 6px; background: rgba(255,255,255,0.06);
+  color: var(--text-dim); margin-right: 4px; margin-bottom: 4px;
+}
+.tag.green { background: rgba(16,185,129,0.15); color: var(--green); }
+.tag.hot   { background: rgba(239,68,68,0.15); color: var(--hot); }
+.tag.warm  { background: rgba(245,158,11,0.15); color: var(--warm); }
+.tag.cyan  { background: rgba(6,182,212,0.15); color: var(--accent2); }
+
+.roadmap {
+  display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+.roadmap .item {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 12px; padding: 18px;
+}
+.roadmap .item h4 {
+  margin: 0 0 6px; font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.roadmap .item p { font-size: 13px; color: var(--text-dim); margin: 0; }
+.priority {
+  font-size: 10px; padding: 2px 8px; border-radius: 4px;
+  font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.priority.high   { background: rgba(239,68,68,0.15); color: var(--hot); }
+.priority.medium { background: rgba(245,158,11,0.15); color: var(--warm); }
+.priority.future { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+
+footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--panel-border); }
+a { color: var(--accent2); }
+a:hover { color: #fff; }
+code {
+  font-family: ui-monospace, "SF Mono", monospace; font-size: 12px;
+  background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;
+  color: var(--accent2);
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>APG ACQ — How the Automation Works</h1>
+    <div class="subtitle">A practical breakdown: what runs, what it costs, what it saves you, and where to take it next.</div>
+  </header>
+
+  <div class="nav">
+    <a href="index.html">Follow-Ups</a>
+    <a href="deals.html">Deals</a>
+    <a href="about.html" class="active">About</a>
+  </div>
+
+  <!-- ─────────────────────── OVERVIEW ─────────────────────── -->
+  <section>
+    <div class="card accent">
+      <h2 style="margin-top:0">The 30-Second Version</h2>
+      <p>Three crons run on Microsoft's servers (free, public repo). Together they handle every step that used to need a human: transcribing calls, scoring leads, building rehab reports, sending follow-up SMS, classifying replies, advancing stages, and pricing properties. Two live dashboards show you what's happening and what needs human attention.</p>
+      <p style="margin-bottom:0"><strong>Net result:</strong> Jeff calls people who actually want to talk. Mike reviews instead of doing data entry. Cold leads stop clogging the qualified queue. ARV gets calculated automatically. You get notified only when a human decision is required.</p>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── THE 3 WORKERS ─────────────────────── -->
+  <section>
+    <h2>The Three Workers <span class="badge">running 24/7</span></h2>
+
+    <div class="cron-card">
+      <div class="meta">
+        <div class="name">📞 Call Recording Pipeline</div>
+        <div class="freq">Every 15 min</div>
+        <div class="file">acq_automation.py</div>
+      </div>
+      <div>
+        <ul>
+          <li><strong>Finds new call recordings</strong> in stages 1-4 of the ACQ pipeline.</li>
+          <li>Sends audio to <strong>Deepgram</strong> → transcript.</li>
+          <li>Sends transcript to <strong>Claude</strong> → extracts beds/baths/sqft, condition, asking price, motivation, timeline, deal type, lead temp (Hot/Warm/Nurture/Cold), call rating /10, action items, red flags.</li>
+          <li>Calls <strong>Apify Zillow</strong> → property details + sold comps in the same ZIP.</li>
+          <li>Sends comps to <strong>Claude</strong> → ARV estimate. Falls back to Zestimate if comps thin.</li>
+          <li>Writes everything back to GHL: contact custom fields, opportunity custom fields, "APG Lead Summary" note (single upserted note — no duplicates), Rehab Report Google Doc.</li>
+          <li><strong>Auto-routes Stage 1 leads:</strong> Hot → LAO + tasks for Jeff/Adam/Mike. Warm stays. Nurture/Cold → Unqualified. Lead Type field set on every move.</li>
+          <li><strong>Backfill phase:</strong> any Stage 1-4 lead missing ARV gets Apify-enriched (capped 15/run, ZIP-cached so clusters share one fetch).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cron-card">
+      <div class="meta">
+        <div class="name">💬 SMS + Dashboards</div>
+        <div class="freq">Every 30 min</div>
+        <div class="file">sms_followup.py + dashboard.py + dashboard_html.py + deals_dashboard.py</div>
+      </div>
+      <div>
+        <ul>
+          <li><strong>Reads kill switch + live templates</strong> from Google Sheet (Settings tab + Templates tab — edit copy without a code push).</li>
+          <li>For every active lead in stages 1-4 + Follow Up 1.5mo / 3mo / Dead Deals: sends next SMS in sequence based on per-stage cadence.</li>
+          <li><strong>From-number routing by state:</strong> AL/GA/IN/OH/PA/SC/TN/WI each have a primary number; touches 4-6 swap to a secondary so you don't look like one spammer.</li>
+          <li><strong>TCPA compliance:</strong> "Reply STOP to opt out." appended on touches 1, 4, and the final touch.</li>
+          <li><strong>Reply detection + classification:</strong> when an inbound SMS arrives, Claude classifies it: STOP / hostile / wrong number / not interested / positive / neutral. Negative replies set GHL DND silently — no Jeff task. Positive/neutral creates the callback pack.</li>
+          <li><strong>Dormant detection:</strong> after 6 unanswered SMS, mark dormant + manual-call task for Jeff + review task for Mike.</li>
+          <li><strong>Refreshes 3 dashboards:</strong> Google Sheet (raw data), Follow-Ups HTML (action queue), Deals HTML (deal cards with ARV / call rating / assignment fee).</li>
+          <li><strong>Deploys</strong> the HTML pages to GitHub Pages.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cron-card">
+      <div class="meta">
+        <div class="name">📡 Slack Scraper</div>
+        <div class="freq">Every 60 min</div>
+        <div class="file">slack_scraper.py</div>
+      </div>
+      <div>
+        <ul>
+          <li>Pulls new messages from <code>#base0-hot-warm-nurture-fu</code>, <code>#base1-sms-leadgen</code>, <code>#base4-dispo</code>, <code>#construction-services</code>.</li>
+          <li>Local keyword/phone matching against the contact index (no LLM call until there's a candidate).</li>
+          <li>For matched candidates: <strong>Claude extracts info</strong> — match confidence, summary, optional field updates (asking price, timeline, motivation, reason for selling).</li>
+          <li>Adds an audit-trail "Slack mention" note to the GHL contact. Auto-applies field updates only at HIGH confidence.</li>
+          <li>Respects Slack's May 2025 rate limits (limit=15, sleep between pages).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── WHAT IT SAVES ─────────────────────── -->
+  <section>
+    <h2>What This Saves You <span class="badge">vs doing it manually</span></h2>
+
+    <div class="kpi-row">
+      <div class="kpi green"><div class="lab">Hours/week saved</div><div class="v">~25-40h</div></div>
+      <div class="kpi"><div class="lab">Calls auto-analyzed</div><div class="v">100%</div></div>
+      <div class="kpi warm"><div class="lab">Cold leads filtered</div><div class="v">Auto</div></div>
+      <div class="kpi"><div class="lab">Reply latency</div><div class="v">≤30 min</div></div>
+    </div>
+
+    <div class="compare">
+      <div class="col before">
+        <div class="label">Before — manual</div>
+        <p>Jeff or Mike listens to every call, types notes by hand. Maybe 1-2 leads/day actually get analyzed. The rest sit untranscribed.</p>
+      </div>
+      <div class="col after">
+        <div class="label">After — automated</div>
+        <p>Every recording transcribed within 15 min. Beds/baths/sqft, motivation, lead temp, call rating, action items — all written to GHL custom fields automatically.</p>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="col before">
+        <div class="label">Before</div>
+        <p>SMS follow-ups sent manually, missed days, copy-paste typos, no record of which from-number was used. Replies trickle in and Jeff scrambles.</p>
+      </div>
+      <div class="col after">
+        <div class="label">After</div>
+        <p>Every active lead gets the right SMS at the right time on the right state-routed number. Replies are classified — Jeff only sees real prospects. STOPs auto-DND. Wrong numbers auto-DND.</p>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="col before">
+        <div class="label">Before</div>
+        <p>Cold and Nurture leads pile up in the Qualified queue, making it impossible to see what's actually a hot prospect. Jeff wastes calls on dead air.</p>
+      </div>
+      <div class="col after">
+        <div class="label">After</div>
+        <p>After every call, AI auto-routes the lead: Hot → LAO with tasks, Warm stays, Nurture/Cold → Unqualified silently. Stage 1 stays clean.</p>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="col before">
+        <div class="label">Before</div>
+        <p>ARV calculated by hand on Zillow. 15-30 min per property. Often skipped. No comps record.</p>
+      </div>
+      <div class="col after">
+        <div class="label">After</div>
+        <p>Every Stage 1-4 lead gets ARV auto-calculated from sold comps + Claude appraiser logic. ZIP-cached so clusters share fetches. Falls back to Zestimate if comps thin.</p>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="col before">
+        <div class="label">Before</div>
+        <p>Slack chatter about leads gets lost. Someone mentions a price on Tuesday and by Friday no one remembers which deal it was.</p>
+      </div>
+      <div class="col after">
+        <div class="label">After</div>
+        <p>Slack scraper monitors 4 channels every hour. Mentions tied to leads get appended as notes in GHL with full audit trail. High-confidence info auto-updates fields.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── COSTS ─────────────────────── -->
+  <section>
+    <h2>Monthly Costs <span class="badge">all-in</span></h2>
+
+    <table>
+      <thead><tr><th>Service</th><th>What it does</th><th class="num">Cost / mo</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Apify <span class="tag warm">capped</span></td>
+          <td>Zillow property data + sold comps</td>
+          <td class="num">$50</td>
+        </tr>
+        <tr>
+          <td>Anthropic Claude</td>
+          <td>Call analysis · ARV estimation · reply classification · Slack mention extraction</td>
+          <td class="num">$10–25</td>
+        </tr>
+        <tr>
+          <td>Deepgram</td>
+          <td>Call audio → transcript</td>
+          <td class="num">$5–15</td>
+        </tr>
+        <tr>
+          <td>GitHub Actions</td>
+          <td>Runs all 3 crons (free for public repo)</td>
+          <td class="num">$0</td>
+        </tr>
+        <tr>
+          <td>Google Sheets / Drive</td>
+          <td>Live dashboard sheet + Rehab Report docs</td>
+          <td class="num">$0</td>
+        </tr>
+        <tr>
+          <td>GHL API</td>
+          <td>Already in your subscription</td>
+          <td class="num">$0</td>
+        </tr>
+        <tr>
+          <td>Slack</td>
+          <td>Bot token + channel reads</td>
+          <td class="num">$0</td>
+        </tr>
+        <tr class="total">
+          <td>Total</td>
+          <td>Realistic monthly</td>
+          <td class="num">$65–90</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin-top:0">Cost guardrails baked in</h3>
+      <p class="dim">The Apify budget guard checks remaining monthly limit before every call. Once you're $1 from the cap, all enrichment stops cleanly — no surprise overruns. Claude usage is per-event so it scales linearly with call volume; if calls double, Claude cost doubles, predictably. Deepgram is pay-as-you-go so it tracks call minutes 1:1.</p>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── ROADMAP ─────────────────────── -->
+  <section>
+    <h2>What to Add Next <span class="badge">prioritized</span></h2>
+
+    <div class="roadmap">
+
+      <div class="item">
+        <h4>Real-time reply detection <span class="priority high">High</span></h4>
+        <p>Today: replies are detected on the next 30-min cron tick. Switch to a GHL webhook for sub-second detection. Means Jeff can call back while the seller is still thinking about it. Hosting: Cloudflare Workers free tier.</p>
+      </div>
+
+      <div class="item">
+        <h4>A/B template testing <span class="priority high">High</span></h4>
+        <p>Tag every send with which template variant fired. Track reply rate per variant in the dashboard. After ~200 sends per variant you'll know which copy converts. Foundation for ML-driven copy optimization later.</p>
+      </div>
+
+      <div class="item">
+        <h4>Calendly auto-booking <span class="priority high">High</span></h4>
+        <p>When a positive reply comes in, parse the seller's stated availability (Claude already does this). Send back a Calendly link pre-filtered to matching slots. Saves Jeff an entire round-trip of "what time works for you?"</p>
+      </div>
+
+      <div class="item">
+        <h4>Predictive lead scoring <span class="priority medium">Medium</span></h4>
+        <p>Train on closed deals: which property + motivation + timeline combos actually close. Score every new lead 0-100 before the first call. Jeff prioritizes by score. Becomes possible once we have ~50 closed deals as training data.</p>
+      </div>
+
+      <div class="item">
+        <h4>Dispo auto-matching <span class="priority medium">Medium</span></h4>
+        <p>When a deal hits Contract stage, match the property against your cash buyer pipeline (price range, area, type) and auto-draft an introduction email + dispatch list. Closes the loop into the dispo workflow.</p>
+      </div>
+
+      <div class="item">
+        <h4>Cold lead reactivation <span class="priority medium">Medium</span></h4>
+        <p>Properties that went Dead 6+ months ago — life events change. Re-touch sequence with property-specific Zestimate updates ("market's up 8% in your area, want a new number?"). Currently stage exists but no automation drives it.</p>
+      </div>
+
+      <div class="item">
+        <h4>Auto rehab scope from photos <span class="priority medium">Medium</span></h4>
+        <p>Pull listing photos via Apify, send to Claude vision → automatic repair scope per room. Replaces ~30 min of manual estimator time per property.</p>
+      </div>
+
+      <div class="item">
+        <h4>Multi-language SMS <span class="priority future">Future</span></h4>
+        <p>Detect seller's preferred language from inbound replies. Maintain Spanish + Portuguese template tracks. Opens markets where current outreach is invisible.</p>
+      </div>
+
+      <div class="item">
+        <h4>Voice AI cold caller <span class="priority future">Future</span></h4>
+        <p>For Stage 0 / "Call Needed" leads with no recording yet — AI voice agent makes the first qualifying call, transcript flows into the same pipeline. Only escalates to Jeff if Hot. Currently the most expensive bottleneck (Jeff time) has no automation.</p>
+      </div>
+
+      <div class="item">
+        <h4>Cash buyer dashboard <span class="priority future">Future</span></h4>
+        <p>Mirror the ACQ deals dashboard but for the Cash Buyer pipeline (OH/PA/NJ/AL). Track buyer engagement, last contact, capacity per buyer.</p>
+      </div>
+
+      <div class="item">
+        <h4>Spend analytics page <span class="priority future">Future</span></h4>
+        <p>Break down Apify + Claude + Deepgram spend by lead. Calculate cost-per-closed-deal. Helps decide which lead sources are actually profitable.</p>
+      </div>
+
+      <div class="item">
+        <h4>Construction services pipeline <span class="priority future">Future</span></h4>
+        <p>Same call → transcript → analyze flow but for the Construction Services pipeline. Different prompt, different fields, different routing — but identical infrastructure.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─────────────────────── BOTTOM ─────────────────────── -->
+  <section>
+    <div class="card">
+      <h3 style="margin-top:0">Where the code lives</h3>
+      <p class="dim">All scripts and workflows are in the public repo at <a href="https://github.com/Mid0117/acq-automation" target="_blank">github.com/Mid0117/acq-automation</a>. Every cron run is logged at <a href="https://github.com/Mid0117/acq-automation/actions" target="_blank">github.com/Mid0117/acq-automation/actions</a>. Secrets (API tokens) are encrypted by GitHub and never appear in code.</p>
+      <p class="dim" style="margin-bottom:0">Dashboards: <a href="index.html">Follow-Ups</a> · <a href="deals.html">Deals</a></p>
+    </div>
+  </section>
+
+  <footer>
+    APG Acquisition Automation · Built on GitHub Actions + GHL + Claude + Apify + Deepgram
+  </footer>
+</div>
+</body>
+</html>

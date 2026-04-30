@@ -457,6 +457,7 @@ footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top
   <div class="nav">
     <a href="index.html" class="active">Follow-Ups</a>
     <a href="deals.html">Deals</a>
+    <a href="about.html">About</a>
   </div>
 
   __STATUS_BANNER__
