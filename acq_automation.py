@@ -357,14 +357,22 @@ Return ONLY valid JSON — no prose, no code fences. Use null for any field not 
   "deal_type": "Cash" | "Owner Finance" | "Subject-To" | "Wholesale" | "Lease Option" | "Hybrid" | "Unknown",
   "exit_strategy": "Flip" | "BRRRR" | "Wholesale" | "Buy & Hold" | "Owner Finance" | "Unknown",
   "repairs_needed": <short string listing major repairs mentioned, or null>,
-  "lead_temp": "Hot" | "Warm" | "Cold",
+  "lead_temp": "Hot" | "Warm" | "Nurture" | "Cold",
   "va_notes_summary": <3-4 sentence professional briefing — what the seller said, condition, motivation, timeline, asking price, and how the call ended>,
   "red_flags": <array of short strings — title issues, occupancy, unrealistic price, missed payments, etc., or empty array>,
   "next_steps": <one sentence describing what was agreed at end of call, or null>,
   "call_rating": <integer 1-10 — how effective the call was: did the VA build rapport, ask qualifying questions, extract usable data, set clear next steps>,
   "could_improve": <array of 2-4 short strings — what the VA could have done better. Be specific and constructive. e.g. "Did not ask seller's bottom-line price", "Skipped occupancy/tenant question", "Should have set firm callback time">,
   "action_items": <array of 2-5 short strings — concrete next steps the team should take to advance this deal>
-}"""
+}
+
+LEAD_TEMP DEFINITIONS — pick exactly one:
+  Hot     = motivated AND ready to engage on a number now (open to offers in days, clear pain point)
+  Warm    = motivated but needs more conversation; follow-up call or offer next, not ready to commit yet
+  Nurture = not ready now but plausibly a deal in 3-6 months (life event pending, decision deferred, polite "maybe later")
+  Cold    = no real motivation or unwilling to sell on any number that would work — close to dead.
+
+Be honest. Don't inflate Warm to Hot just because the seller was friendly. The cost of misclassifying Cold as Warm is hours of wasted Jeff calls."""
 
 
 def analyze_with_claude(transcript):
@@ -868,31 +876,39 @@ def process_contact(cid, oid, google_svc):
             print(f'  Rehab: {doc_url}')
 
     # Auto-stage move from Stage 1 (Qualified) based on Claude's lead_temp:
-    #   hot   → Stage 2 (LAO)            + Lead Type "Hot Lead"     + Jeff/Adam/Mike tasks
-    #   warm  → Stage 0 (Unqualified)    + Lead Type "Nurture Lead" + no tasks
-    #   cold  → Stage 0 (Unqualified)    + Lead Type "Cold Lead"    + no tasks
-    # Only triggers when currently in Stage 1; never reverses leads in 2-4 (real deals).
+    #   hot     → Stage 2 (LAO)         + Lead Type "Hot Lead"     + Jeff/Adam/Mike tasks
+    #   warm    → stays in Stage 1      + Lead Type "Warm Lead"    + no tasks (still qualified)
+    #   nurture → Stage 0 (Unqualified) + Lead Type "Nurture Lead" + no tasks
+    #   cold    → Stage 0 (Unqualified) + Lead Type "Cold Lead"    + no tasks
+    # Only triggers when currently in Stage 1; never reverses leads already in 2-4 (real deals).
     rr2 = requests.get(f'https://services.leadconnectorhq.com/opportunities/{oid}', headers=GHL_H)
     if rr2.status_code == 200:
         opp = rr2.json().get('opportunity', {})
         current_stage = opp.get('pipelineStageId', '')
         temp = (data.get('lead_temp', '') or '').lower()
 
-        # Routing table: temp → (target_stage_id, lead_type_label, label_for_log)
+        # Routing table: temp → (target_stage_id, lead_type_label, target_label, notify)
         routing = {
-            'hot':  (STAGE_LAO,         'Hot Lead',     'LAO',         True),
-            'warm': (STAGE_UNQUALIFIED, 'Nurture Lead', 'Unqualified', False),
-            'cold': (STAGE_UNQUALIFIED, 'Cold Lead',    'Unqualified', False),
+            'hot':     (STAGE_LAO,         'Hot Lead',     'LAO',         True),
+            'warm':    (STAGE_QUALIFIED,   'Warm Lead',    'Qualified',   False),
+            'nurture': (STAGE_UNQUALIFIED, 'Nurture Lead', 'Unqualified', False),
+            'cold':    (STAGE_UNQUALIFIED, 'Cold Lead',    'Unqualified', False),
         }
 
         if current_stage == STAGE_QUALIFIED and temp in routing:
             target_stage, lead_type_label, target_label, notify = routing[temp]
-            mv = requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
-                              headers=GHL_H,
-                              json={'pipelineStageId': target_stage})
-            stage_moved = (mv.status_code == 200)
-            if stage_moved:
-                print(f'  ➜ Auto-moved to {target_label} ({temp.title()} lead)')
+            stage_moved = False
+            if target_stage == current_stage:
+                # Same-stage routing (warm) — no PUT needed
+                stage_moved = True
+                print(f'  ➜ Stays in {target_label} ({temp.title()} lead)')
+            else:
+                mv = requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
+                                  headers=GHL_H,
+                                  json={'pipelineStageId': target_stage})
+                stage_moved = (mv.status_code == 200)
+                if stage_moved:
+                    print(f'  ➜ Auto-moved to {target_label} ({temp.title()} lead)')
 
             # Always set Lead Type — even if the move failed we still mark the type.
             try:
