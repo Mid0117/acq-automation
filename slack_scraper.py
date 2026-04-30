@@ -137,15 +137,20 @@ def fetch_messages(channel_id, oldest_ts):
 
 
 def fetch_active_contacts():
-    """Build a flat list of contacts across all our pipelines, with matching keys."""
-    contacts = {}  # cid -> minimal contact info
+    """Lightweight index — just cid + display name + phone from the opportunity
+    search response. No per-contact GET (which times out at scale). We enrich
+    only the candidates that actually matched a Slack message."""
+    contacts = {}
     for pipe in PIPELINES:
         page = 1
         while True:
-            r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
-                             headers=GHL_H,
-                             params={'location_id': LOC, 'pipeline_id': pipe,
-                                     'limit': 100, 'page': page})
+            try:
+                r = requests.get('https://services.leadconnectorhq.com/opportunities/search',
+                                 headers=GHL_H,
+                                 params={'location_id': LOC, 'pipeline_id': pipe,
+                                         'limit': 100, 'page': page}, timeout=30)
+            except requests.exceptions.Timeout:
+                break
             if r.status_code != 200: break
             opps = r.json().get('opportunities', [])
             if not opps: break
@@ -154,51 +159,60 @@ def fetch_active_contacts():
                 c   = o.get('contact') or {}
                 if not cid or cid in contacts:
                     continue
+                full = (c.get('name') or '').strip()
+                parts = full.split(' ', 1)
                 contacts[cid] = {
-                    'cid':   cid,
-                    'name':  (c.get('name') or '').strip(),
-                    'phone': re.sub(r'\D','', c.get('phone','') or ''),
+                    'cid':       cid,
+                    'name':      full,
+                    'firstName': parts[0] if parts else '',
+                    'lastName':  parts[1] if len(parts) > 1 else '',
+                    'phone':     re.sub(r'\D','', c.get('phone','') or ''),
                 }
             if len(opps) < 100: break
             page += 1
             time.sleep(0.1)
-
-    # Enrich with address from the contacts API in batches
-    for cid, c in list(contacts.items()):
-        rc = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H, timeout=15)
-        if rc.status_code == 200:
-            cc = rc.json().get('contact', {})
-            c['firstName'] = cc.get('firstName','')
-            c['lastName']  = cc.get('lastName','')
-            c['address1']  = cc.get('address1','')
-            c['city']      = cc.get('city','')
-            c['state']     = cc.get('state','')
-            c['phone']     = re.sub(r'\D','', cc.get('phone','') or c['phone'])
-        time.sleep(0.05)
     return list(contacts.values())
 
 
+def enrich_contact(c):
+    """Fetch full contact details only when needed (after a candidate match)."""
+    cid = c['cid']
+    for attempt in range(2):
+        try:
+            r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}',
+                             headers=GHL_H, timeout=20)
+            if r.status_code == 200:
+                cc = r.json().get('contact', {})
+                c['firstName'] = cc.get('firstName','') or c.get('firstName','')
+                c['lastName']  = cc.get('lastName','')  or c.get('lastName','')
+                c['address1']  = cc.get('address1','')
+                c['city']      = cc.get('city','')
+                c['state']     = cc.get('state','')
+                c['phone']     = re.sub(r'\D','', cc.get('phone','') or '') or c['phone']
+            return c
+        except requests.exceptions.RequestException:
+            if attempt == 0:
+                time.sleep(1)
+                continue
+    return c
+
+
 def candidates_for_message(text, contacts):
-    """Local keyword match — return contact dicts that the message text plausibly references."""
+    """Local keyword match using the lightweight index. Address checks happen
+    after enrichment in the calling code, only on hits."""
     t = text.lower()
     digits = re.sub(r'\D','', text)
     cands = []
     for c in contacts:
         first = (c.get('firstName') or '').lower()
         last  = (c.get('lastName') or '').lower()
-        addr  = (c.get('address1') or '').lower()
+        full  = (c.get('name') or '').lower()
         phone = (c.get('phone') or '')
         score = 0
+        if full and len(full) >= 5 and full in t: score += 3
         if first and len(first) >= 3 and first in t: score += 1
         if last  and len(last)  >= 3 and last  in t: score += 1
-        # First+last as full string is strongest
         if first and last and f'{first} {last}' in t: score += 2
-        # Address: street-name (drop the leading number) or full
-        if addr and len(addr) >= 5 and addr in t: score += 3
-        elif addr:
-            street = re.sub(r'^\d+\s+','', addr)
-            if street and len(street) >= 5 and street in t: score += 2
-        # Phone digits
         if phone and len(phone) >= 7 and phone[-7:] in digits: score += 3
         if score >= 2:
             cands.append((score, c))
@@ -344,7 +358,9 @@ def main():
             if not cands:
                 if float(m['ts']) > float(latest_ts): latest_ts = m['ts']
                 continue
-            result = analyze_with_claude(m['text'], m.get('user',''), ch_name, cands)
+            # Enrich candidates with full contact details (only here — not for all 2400)
+            enriched = [enrich_contact(dict(c)) for c in cands]
+            result = analyze_with_claude(m['text'], m.get('user',''), ch_name, enriched)
             if result and result.get('match_cid') and result.get('match_confidence') in ('high','medium'):
                 cid = result['match_cid']
                 summary = result.get('summary','')
