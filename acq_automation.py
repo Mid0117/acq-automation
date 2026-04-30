@@ -40,6 +40,7 @@ PROCESSED_FILE = 'processed_contacts.json'
 
 # Only process opportunities in active deal stages (1-4). Skip Unqualified, Agents,
 # Contract Sent and beyond (already advanced), Follow Up, Dead Deals.
+STAGE_UNQUALIFIED = 'c1d23905-7096-439c-9a31-f8db5b2b53d0'  # 0. Unqualified Leads
 STAGE_QUALIFIED = 'a17517be-8d1a-49fd-bd53-b9128a66e242'  # 1. Qualified Leads (Warm/Hot)
 STAGE_LAO       = 'd43fddd8-3a17-46b2-a193-cf18619f654f'  # 2. Prequalified Offer (LAO)
 STAGE_RR        = '23a159ad-ba39-4c74-9d07-c1beb219d9f2'  # 3. Due Diligence (RR)
@@ -269,6 +270,7 @@ CF_REPAIRS       = 'dbYoYFVTiCbqoJxC9HkR'
 CF_ARV           = 'nCWzIGfZHki0dv84gUem'
 CF_70_ARV        = 'R7QUzOdOnJXgoGRPwxdF'
 CF_ZILLOW        = '48pr9cc9hDFas111fDpF'
+CF_LEAD_TYPE     = 'nqErDKRO1IdhmmoDos15'  # multi-select: Hot/Warm/Nurture/Cold Lead, etc.
 
 # Opportunity custom fields
 OF_BED        = 'NdjIxlmD8KGBJH7xQ0rv'
@@ -865,24 +867,51 @@ def process_contact(cid, oid, google_svc):
                          headers=GHL_H, json={'customFields': [{'id': OF_REHAB, 'field_value': doc_url}]})
             print(f'  Rehab: {doc_url}')
 
-    # Auto-stage move: HOT lead in stage 1 -> stage 2 (LAO) so the team can present an offer.
-    # Only Hot triggers; Warm/Cold stay in stage 1.
+    # Auto-stage move from Stage 1 (Qualified) based on Claude's lead_temp:
+    #   hot   → Stage 2 (LAO)            + Lead Type "Hot Lead"     + Jeff/Adam/Mike tasks
+    #   warm  → Stage 0 (Unqualified)    + Lead Type "Nurture Lead" + no tasks
+    #   cold  → Stage 0 (Unqualified)    + Lead Type "Cold Lead"    + no tasks
+    # Only triggers when currently in Stage 1; never reverses leads in 2-4 (real deals).
     rr2 = requests.get(f'https://services.leadconnectorhq.com/opportunities/{oid}', headers=GHL_H)
     if rr2.status_code == 200:
         opp = rr2.json().get('opportunity', {})
         current_stage = opp.get('pipelineStageId', '')
-        if (data.get('lead_temp','').lower() == 'hot' and current_stage == STAGE_QUALIFIED):
+        temp = (data.get('lead_temp', '') or '').lower()
+
+        # Routing table: temp → (target_stage_id, lead_type_label, label_for_log)
+        routing = {
+            'hot':  (STAGE_LAO,         'Hot Lead',     'LAO',         True),
+            'warm': (STAGE_UNQUALIFIED, 'Nurture Lead', 'Unqualified', False),
+            'cold': (STAGE_UNQUALIFIED, 'Cold Lead',    'Unqualified', False),
+        }
+
+        if current_stage == STAGE_QUALIFIED and temp in routing:
+            target_stage, lead_type_label, target_label, notify = routing[temp]
             mv = requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
                               headers=GHL_H,
-                              json={'pipelineStageId': STAGE_LAO})
-            if mv.status_code == 200:
-                print(f'  ➜ Auto-moved to LAO (Hot lead)')
+                              json={'pipelineStageId': target_stage})
+            stage_moved = (mv.status_code == 200)
+            if stage_moved:
+                print(f'  ➜ Auto-moved to {target_label} ({temp.title()} lead)')
+
+            # Always set Lead Type — even if the move failed we still mark the type.
+            try:
+                requests.put(f'https://services.leadconnectorhq.com/contacts/{cid}',
+                             headers=GHL_H,
+                             json={'customFields': [{'id': CF_LEAD_TYPE,
+                                                     'field_value': [lead_type_label]}]})
+                print(f'  ➜ Lead Type set: {lead_type_label}')
+            except Exception as e:
+                print(f'  Lead Type write failed: {e}')
+
+            if stage_moved and notify:
+                # Hot path only: standardize opp name + create the urgent task pack.
                 set_opp_name(oid, contact)
                 lead_name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip() or '(no name)'
                 addr = contact.get('address1','') or contact.get('city','') or '(no address)'
-                # Simple, direct body for Jeff. Mike + Adam see the same task. All info is in the contact's note.
                 jeff_title = f'🔥 HOT → LAO: {lead_name} ({addr})'
-                jeff_body  = f'Hot lead promoted from Qualified to LAO. Call them and present the LAO offer. Full details are in the contact notes section.'
+                jeff_body  = ('Hot lead promoted from Qualified to LAO. Call them and present the LAO offer. '
+                              'Full details are in the contact notes section.')
                 created_any = False
                 for uid in (USER_JEFF, USER_ADAM, USER_MIKE):
                     if create_task_dedup(cid, uid, jeff_title, jeff_body, due_in_hours=4):
@@ -891,11 +920,10 @@ def process_contact(cid, oid, google_svc):
                     print(f'  ➜ Tasks created for Jeff + Adam + Mike')
                 else:
                     print(f'  ➜ Tasks already existed (no duplicates created)')
-                # Slack ping (only if SLACK_WEBHOOK_URL is set)
                 slack_blocks = [
-                    {'type':'header', 'text':{'type':'plain_text','text':f'🔥 Hot Lead → LAO: {lead_name}'}},
-                    {'type':'section','text':{'type':'mrkdwn','text':task_body.replace('\n','\n')}},
-                    {'type':'context','elements':[{'type':'mrkdwn','text':f'_Auto-moved from Qualified. Tasks created for Jeff, Adam, Mike._'}]},
+                    {'type':'header','text':{'type':'plain_text','text':f'🔥 Hot Lead → LAO: {lead_name}'}},
+                    {'type':'section','text':{'type':'mrkdwn','text':jeff_body}},
+                    {'type':'context','elements':[{'type':'mrkdwn','text':'_Auto-moved from Qualified. Tasks created for Jeff, Adam, Mike._'}]},
                 ]
                 slack_post(slack_blocks, fallback=f'🔥 Hot Lead {lead_name} moved to LAO')
 
