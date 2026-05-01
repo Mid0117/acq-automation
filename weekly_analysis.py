@@ -171,7 +171,25 @@ def fetch_summary_note(cid):
     return {}
 
 
+SLACK_USERS_CACHE_FILE = 'slack_users.json'
+
+# Two header formats supported:
+# 1. NEW format (after the user-ID resolution fix): 'by Real Name (UID)'
+# 2. OLD format: 'by <@U05XYZABC>'  — resolved at parse time via cache
+SLACK_NOTE_HEAD_NEW_RE  = re.compile(r'#(\S+)\s+by\s+(.+?)\s+—\s+(.+?)(?:\n|$)')
 SLACK_NOTE_HEAD_RE      = re.compile(r'#(\S+)\s+by\s+<@([^>]+)>\s+—\s+(.+?)(?:\n|$)')
+
+
+def _load_slack_users_cache():
+    if not os.path.exists(SLACK_USERS_CACHE_FILE):
+        return {}
+    try:
+        return json.load(open(SLACK_USERS_CACHE_FILE)) or {}
+    except Exception:
+        return {}
+
+
+_SLACK_USERS = _load_slack_users_cache()
 SLACK_PERMALINK_RE      = re.compile(r'Slack:\s*(https?://\S+)')
 SLACK_CONFIDENCE_RE     = re.compile(r'Confidence:\s*(high|medium|low)', re.IGNORECASE)
 SLACK_SUGGESTED_RE      = re.compile(r'Suggested:\s*(.+?)(?:\n|$)', re.IGNORECASE)
@@ -186,11 +204,20 @@ def parse_slack_note(body):
     out = {'channel': '', 'user': '', 'ts_text': '',
            'permalink': '', 'original': '', 'summary': '',
            'confidence': '', 'suggested': {}, 'auto_applied': {}}
-    m = SLACK_NOTE_HEAD_RE.search(body)
-    if m:
+    # Try NEW format first: 'by Real Name (UID) — ts'
+    m = SLACK_NOTE_HEAD_NEW_RE.search(body)
+    if m and '<@' not in m.group(2):
         out['channel'] = m.group(1)
         out['user']    = m.group(2)
         out['ts_text'] = m.group(3).strip()
+    else:
+        # Fall back to OLD format with raw <@USERID> + resolve via cache
+        m = SLACK_NOTE_HEAD_RE.search(body)
+        if m:
+            out['channel'] = m.group(1)
+            uid = m.group(2)
+            out['user']    = _SLACK_USERS.get(uid, uid)
+            out['ts_text'] = m.group(3).strip()
     m = SLACK_PERMALINK_RE.search(body)
     if m: out['permalink'] = m.group(1).strip()
     m = SLACK_CONFIDENCE_RE.search(body)
@@ -212,6 +239,11 @@ def parse_slack_note(body):
             if '=' in pair:
                 k, v = pair.split('=', 1)
                 out['auto_applied'][k.strip()] = v.strip()
+    # If a note was auto-applied previously (older runs) and has no
+    # Suggested: line, surface those values as 'suggested' anyway so the
+    # dashboard shows the Apply button. Lets the team re-apply / verify.
+    if not out['suggested'] and out['auto_applied']:
+        out['suggested'] = dict(out['auto_applied'])
     return out
 
 

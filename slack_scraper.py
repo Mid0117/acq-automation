@@ -116,6 +116,49 @@ def list_channel_ids():
     return ids
 
 
+# ── Slack user-name resolution + cache ─────────────────────────────────────
+USERS_CACHE_FILE = 'slack_users.json'
+
+
+def load_users_cache():
+    if not os.path.exists(USERS_CACHE_FILE):
+        return {}
+    try:
+        return json.load(open(USERS_CACHE_FILE)) or {}
+    except Exception:
+        return {}
+
+
+def save_users_cache(cache):
+    try:
+        with open(USERS_CACHE_FILE, 'w') as f:
+            json.dump(cache, f, indent=2, sort_keys=True)
+    except Exception:
+        pass
+
+
+def resolve_user(user_id, cache):
+    """Return a human-readable name for a Slack user ID. Caches across runs."""
+    if not user_id:
+        return ''
+    if user_id in cache:
+        return cache[user_id]
+    j = slack_call('users.info', params={'user': user_id})
+    if not j:
+        cache[user_id] = user_id  # negative-cache so we don't refetch
+        return user_id
+    user = j.get('user') or {}
+    profile = user.get('profile') or {}
+    # Prefer real_name, fall back to display_name, then to user_id
+    name = (profile.get('real_name')
+            or profile.get('display_name')
+            or user.get('real_name')
+            or user.get('name')
+            or user_id)
+    cache[user_id] = name
+    return name
+
+
 def fetch_messages(channel_id, oldest_ts):
     """Pull messages newer than oldest_ts (Slack timestamp string).
 
@@ -369,6 +412,8 @@ def _main_inner():
         return 'ANTHROPIC_API_KEY missing'
 
     state = load_state()
+    users_cache = load_users_cache()
+    print(f'Loaded user-name cache ({len(users_cache)} entries)')
     print('Resolving channel IDs...')
     chan_ids = list_channel_ids()
     print(f'  Visible channels: {len(chan_ids)}')
@@ -405,52 +450,55 @@ def _main_inner():
             # Enrich candidates with full contact details (only here — not for all 2400)
             enriched = [enrich_contact(dict(c)) for c in cands]
             result = analyze_with_claude(m['text'], m.get('user',''), ch_name, enriched)
-            # Capture EVERYTHING with a match_cid, including 'low' confidence —
-            # the weekly dashboard surfaces low/medium as 'suggestions' the
-            # team can review and apply to GHL with one click. Only HIGH
-            # auto-applies field updates without human review.
+            # Capture EVERYTHING with a match_cid (high/medium/low confidence).
+            # NO AUTO-APPLY — every match becomes a suggestion the team reviews
+            # and applies via the dashboard's 'Apply to GHL' button. This keeps
+            # Claude from silently overwriting GHL fields based on a noisy
+            # Slack message. Cost: team has to click Apply. Benefit: nothing
+            # gets corrupted by misinterpreted chatter.
             if result and result.get('match_cid') and result.get('match_confidence') in ('high','medium','low'):
                 cid = result['match_cid']
                 summary = result.get('summary','')
                 conf = result.get('match_confidence')
-                changed = {}
-                # Auto-apply only on HIGH. medium/low become suggestions for review.
-                if conf == 'high':
-                    changed = update_fields(cid, result.get('field_updates') or {})
-                # Render the SUGGESTED updates so the dashboard can offer them as
-                # 'Apply to GHL' actions. Format: key1=val1; key2=val2
+                # Resolve the Slack user ID to a real name so the dashboard
+                # shows 'by Mido' instead of 'by U05XYZABC'.
+                slack_user_id = m.get('user', '') or ''
+                slack_user_name = resolve_user(slack_user_id, users_cache) if slack_user_id else ''
+                # Render the suggested updates for the dashboard's Apply button
                 suggested = result.get('field_updates') or {}
                 suggested_clean = {k: v for k, v in suggested.items()
-                                   if v not in (None, '', 'null') and k not in changed}
+                                   if v not in (None, '', 'null')}
                 suggested_line = ''
                 if suggested_clean:
                     suggested_line = '\nSuggested: ' + '; '.join(
                         f'{k}={v}' for k, v in suggested_clean.items())
-                # Note with audit trail — include real Slack permalink so the
-                # weekly dashboard can link straight to the original message.
+                # Note with audit trail + real Slack permalink
                 permalink = slack_permalink(ch_id, m['ts'])
                 permalink_line = f'\nSlack: {permalink}' if permalink else ''
+                # Friendly attribution: 'by Real Name (uid)' so we never lose
+                # the raw ID for debugging but the human name renders.
+                attribution = (f'{slack_user_name} ({slack_user_id})'
+                               if slack_user_name and slack_user_name != slack_user_id
+                               else slack_user_id or 'unknown')
                 note_body = (
                     f'Slack mention\n'
-                    f'#{ch_name} by <@{m.get("user","")}> — {fmt_slack_ts(m["ts"])}'
+                    f'#{ch_name} by {attribution} — {fmt_slack_ts(m["ts"])}'
                     f'{permalink_line}\n'
                     f'Confidence: {conf}{suggested_line}\n\n'
                     f'Original: "{m["text"][:600]}"\n\n'
                     f'Summary: {summary}'
                 )
-                if changed:
-                    note_body += f'\n\nFields auto-updated: {", ".join(f"{k}={v}" for k,v in changed.items())}'
                 add_note(cid, note_body)
                 matches += 1
-                if changed: updates_made += 1
-                print(f'  ✓ Matched cid={cid[-6:]} | {conf} | applied={list(changed.keys())} | suggested={list(suggested_clean.keys())}')
+                print(f'  ✓ Matched cid={cid[-6:]} | {conf} | by {slack_user_name or slack_user_id} | suggested={list(suggested_clean.keys())}')
             if float(m['ts']) > float(latest_ts): latest_ts = m['ts']
             time.sleep(0.2)
         state[ch_name] = latest_ts
 
     save_state(state)
-    msg = f'scanned {scanned} | matched {matches} | updates {updates_made}'
-    print(f'\nDONE — {msg}')
+    save_users_cache(users_cache)
+    msg = f'scanned {scanned} | matched {matches} | suggestions surfaced (no auto-apply)'
+    print(f'\nDONE — {msg} | user cache: {len(users_cache)} entries')
     return msg
 
 
