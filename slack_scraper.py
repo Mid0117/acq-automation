@@ -405,12 +405,27 @@ def _main_inner():
             # Enrich candidates with full contact details (only here — not for all 2400)
             enriched = [enrich_contact(dict(c)) for c in cands]
             result = analyze_with_claude(m['text'], m.get('user',''), ch_name, enriched)
-            if result and result.get('match_cid') and result.get('match_confidence') in ('high','medium'):
+            # Capture EVERYTHING with a match_cid, including 'low' confidence —
+            # the weekly dashboard surfaces low/medium as 'suggestions' the
+            # team can review and apply to GHL with one click. Only HIGH
+            # auto-applies field updates without human review.
+            if result and result.get('match_cid') and result.get('match_confidence') in ('high','medium','low'):
                 cid = result['match_cid']
                 summary = result.get('summary','')
+                conf = result.get('match_confidence')
                 changed = {}
-                if result.get('match_confidence') == 'high':
+                # Auto-apply only on HIGH. medium/low become suggestions for review.
+                if conf == 'high':
                     changed = update_fields(cid, result.get('field_updates') or {})
+                # Render the SUGGESTED updates so the dashboard can offer them as
+                # 'Apply to GHL' actions. Format: key1=val1; key2=val2
+                suggested = result.get('field_updates') or {}
+                suggested_clean = {k: v for k, v in suggested.items()
+                                   if v not in (None, '', 'null') and k not in changed}
+                suggested_line = ''
+                if suggested_clean:
+                    suggested_line = '\nSuggested: ' + '; '.join(
+                        f'{k}={v}' for k, v in suggested_clean.items())
                 # Note with audit trail — include real Slack permalink so the
                 # weekly dashboard can link straight to the original message.
                 permalink = slack_permalink(ch_id, m['ts'])
@@ -419,7 +434,7 @@ def _main_inner():
                     f'Slack mention\n'
                     f'#{ch_name} by <@{m.get("user","")}> — {fmt_slack_ts(m["ts"])}'
                     f'{permalink_line}\n'
-                    f'Confidence: {result.get("match_confidence")}\n\n'
+                    f'Confidence: {conf}{suggested_line}\n\n'
                     f'Original: "{m["text"][:600]}"\n\n'
                     f'Summary: {summary}'
                 )
@@ -428,7 +443,7 @@ def _main_inner():
                 add_note(cid, note_body)
                 matches += 1
                 if changed: updates_made += 1
-                print(f'  ✓ Matched cid={cid[-6:]} | {result.get("match_confidence")} | changes={list(changed.keys())}')
+                print(f'  ✓ Matched cid={cid[-6:]} | {conf} | applied={list(changed.keys())} | suggested={list(suggested_clean.keys())}')
             if float(m['ts']) > float(latest_ts): latest_ts = m['ts']
             time.sleep(0.2)
         state[ch_name] = latest_ts

@@ -173,15 +173,19 @@ def fetch_summary_note(cid):
 
 SLACK_NOTE_HEAD_RE      = re.compile(r'#(\S+)\s+by\s+<@([^>]+)>\s+—\s+(.+?)(?:\n|$)')
 SLACK_PERMALINK_RE      = re.compile(r'Slack:\s*(https?://\S+)')
+SLACK_CONFIDENCE_RE     = re.compile(r'Confidence:\s*(high|medium|low)', re.IGNORECASE)
+SLACK_SUGGESTED_RE      = re.compile(r'Suggested:\s*(.+?)(?:\n|$)', re.IGNORECASE)
+SLACK_AUTOAPPLIED_RE    = re.compile(r'Fields auto-updated:\s*(.+?)(?:\n|$)', re.IGNORECASE)
 SLACK_ORIGINAL_RE       = re.compile(r'Original:\s*"(.+?)"', re.DOTALL)
 SLACK_SUMMARY_RE        = re.compile(r'Summary:\s*(.+?)(?:\n\n|\nFields auto-updated|$)', re.DOTALL)
 
 
 def parse_slack_note(body):
     """Parse a 'Slack mention' note body. Returns dict with channel, user, ts,
-    permalink, original, summary."""
+    permalink, original, summary, confidence, suggested updates, auto-applied."""
     out = {'channel': '', 'user': '', 'ts_text': '',
-           'permalink': '', 'original': '', 'summary': ''}
+           'permalink': '', 'original': '', 'summary': '',
+           'confidence': '', 'suggested': {}, 'auto_applied': {}}
     m = SLACK_NOTE_HEAD_RE.search(body)
     if m:
         out['channel'] = m.group(1)
@@ -189,10 +193,25 @@ def parse_slack_note(body):
         out['ts_text'] = m.group(3).strip()
     m = SLACK_PERMALINK_RE.search(body)
     if m: out['permalink'] = m.group(1).strip()
+    m = SLACK_CONFIDENCE_RE.search(body)
+    if m: out['confidence'] = m.group(1).lower()
     m = SLACK_ORIGINAL_RE.search(body)
     if m: out['original'] = m.group(1).strip().replace('\n', ' ')[:280]
     m = SLACK_SUMMARY_RE.search(body)
     if m: out['summary'] = m.group(1).strip().replace('\n', ' ')[:280]
+    # Suggested key=val; key=val
+    m = SLACK_SUGGESTED_RE.search(body)
+    if m:
+        for pair in m.group(1).split(';'):
+            if '=' in pair:
+                k, v = pair.split('=', 1)
+                out['suggested'][k.strip()] = v.strip()
+    m = SLACK_AUTOAPPLIED_RE.search(body)
+    if m:
+        for pair in m.group(1).split(','):
+            if '=' in pair:
+                k, v = pair.split('=', 1)
+                out['auto_applied'][k.strip()] = v.strip()
     return out
 
 
@@ -790,6 +809,16 @@ h2 .sec-count {
   text-transform: uppercase;
 }
 .slack-card .actions a:hover { background: var(--gold); color: var(--ink); }
+.slack-card button.apply-btn, .slack-card button.dismiss-btn {
+  font-size: 10px; padding: 4px 10px; border: 1px solid var(--rule); cursor: pointer;
+  font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: inherit; transition: all 0.12s;
+}
+.slack-card button.apply-btn { background: var(--ink); color: var(--gold); border-color: var(--ink); }
+.slack-card button.apply-btn:hover { background: var(--gold); color: var(--ink); }
+.slack-card button.apply-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.slack-card button.dismiss-btn { background: transparent; color: var(--muted); }
+.slack-card button.dismiss-btn:hover { color: var(--ink); border-color: var(--ink); }
 
 .empty {
   text-align: center; color: var(--muted); padding: 36px;
@@ -1025,21 +1054,63 @@ function toggleDeal(head) {
   head.parentElement.classList.toggle('open');
 }
 
+// Friendly labels for the suggested-update keys the Slack scraper extracts
+const SUGGEST_LABELS = {
+  asking_price: 'Asking Price',
+  timeline: 'Timeline',
+  motivation: 'Motivation',
+  reason_for_selling: 'Reason for Selling',
+};
+
 function renderSlackSection(week) {
   const items = (week.slack_mentions || []).filter(s => stageFilter === 'all' || s.lead_stage === stageFilter);
   if (!items.length) return '';
-  let html = '<section><h2><span class="num">📡</span>Slack Mentions This Week<span class="sec-count">' + items.length + ' mention' + (items.length===1?'':'s') + '</span></h2>';
-  html += '<p class="lede">Lead mentions captured from APG Slack channels in the last 7 days. Click "Open in Slack" to jump to the original message.</p>';
+  // Sort: suggestions with proposed updates first, then by recency
+  items.sort((a, b) => {
+    const aHas = Object.keys(a.suggested || {}).length > 0 ? 1 : 0;
+    const bHas = Object.keys(b.suggested || {}).length > 0 ? 1 : 0;
+    if (aHas !== bHas) return bHas - aHas;
+    return (b.added_at || '').localeCompare(a.added_at || '');
+  });
+  let html = '<section><h2><span class="num">📡</span>Slack Suggestions<span class="sec-count">' + items.length + ' mention' + (items.length===1?'':'s') + '</span></h2>';
+  html += '<p class="lede">Lead mentions captured from APG Slack channels this week. <strong>Suggested updates</strong> are what Claude inferred from the message — review and click "Apply to GHL" to push the change, or "Dismiss" if it\\'s wrong.</p>';
   html += '<div class="deal-grid">';
   for (const s of items) {
     const ghl = GHL_BASE + '/' + s.cid;
+    const conf = (s.confidence || '').toLowerCase();
+    const confTone = conf === 'high' ? 'green' : conf === 'medium' ? 'warm' : conf === 'low' ? 'hold' : 'gray';
+    const suggested = s.suggested || {};
+    const suggestedKeys = Object.keys(suggested);
+    const auto = s.auto_applied || {};
+    const autoKeys = Object.keys(auto);
+
     html += '<div class="slack-card">';
-    html += '<div class="slack-meta">#' + escapeHtml(s.channel || '?') + ' · ' + escapeHtml(s.ts_text || '') + ' · ' + escapeHtml(s.lead_stage || '') + '</div>';
+    html += '<div class="slack-meta">#' + escapeHtml(s.channel || '?') + ' · ' + escapeHtml(s.ts_text || '') + ' · ' + escapeHtml(s.lead_stage || '') + ' · <span class="sg ' + confTone + '" style="margin-left:6px">' + escapeHtml(conf || 'no-conf') + '</span></div>';
     html += '<a class="lead-link" href="' + ghl + '" target="_blank">' + escapeHtml(s.lead_name || '(no name)') + '</a>';
     if (s.lead_addr) html += '<span style="color:var(--muted);font-size:12px"> · ' + escapeHtml(s.lead_addr) + '</span>';
     if (s.original)  html += '<div class="original">"' + escapeHtml(s.original) + '"</div>';
-    if (s.summary)   html += '<div class="summary"><strong>AI:</strong> ' + escapeHtml(s.summary) + '</div>';
-    html += '<div class="actions">';
+    if (s.summary)   html += '<div class="summary"><strong>AI summary:</strong> ' + escapeHtml(s.summary) + '</div>';
+
+    // Auto-applied (already pushed to GHL)
+    if (autoKeys.length) {
+      html += '<div style="margin-top:8px;font-size:12px;color:var(--s-live)"><strong>✓ Already applied:</strong> ' +
+        autoKeys.map(k => (SUGGEST_LABELS[k] || k) + ' = <strong>' + escapeHtml(auto[k]) + '</strong>').join(', ') +
+        '</div>';
+    }
+    // Suggested but NOT applied — show with action buttons
+    if (suggestedKeys.length) {
+      html += '<div style="margin-top:8px;padding:8px 10px;background:var(--gold-wash);border-left:3px solid var(--gold);font-size:12px">';
+      html += '<strong style="color:var(--ink);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase">Suggested updates</strong>';
+      for (const k of suggestedKeys) {
+        html += '<div style="margin-top:4px">' + escapeHtml(SUGGEST_LABELS[k] || k) + ' → <strong>' + escapeHtml(String(suggested[k])) + '</strong></div>';
+      }
+      html += '<div class="actions" style="margin-top:8px">';
+      html += '<button onclick="applySuggestion(\\''+ escapeHtml(s.cid) +'\\', \\''+ escapeHtml(JSON.stringify(suggested).replace(/[\'\\\\]/g,c=>\'\\\\\'+c)) +'\\', this)" class="apply-btn">Apply to GHL</button>';
+      html += '<button onclick="dismissSuggestion(this)" class="dismiss-btn">Dismiss</button>';
+      html += '</div></div>';
+    }
+
+    html += '<div class="actions" style="margin-top:8px">';
     if (s.permalink) html += '<a href="' + escapeHtml(s.permalink) + '" target="_blank">Open in Slack ↗</a>';
     html += '<a href="' + ghl + '" target="_blank">Open in GHL ↗</a>';
     html += '</div>';
@@ -1047,6 +1118,81 @@ function renderSlackSection(week) {
   }
   html += '</div></section>';
   return html;
+}
+
+// GHL custom field IDs that Slack-extracted suggestions can update
+const SUGGEST_FIELD_IDS = {
+  asking_price:       '6q7syt4puxfP7E03Xxhd',
+  timeline:           'v47I1Mi63RBpCD5N5RrH',
+  motivation:         'rbYZAdhvuvX1NQgexhxy',
+  reason_for_selling: 'cJdRGRoox0RZCytRAVSI',
+};
+
+const GHL_TOKEN_KEY = 'apg_ghl_token_v1';
+
+async function applySuggestion(cid, suggestedJson, btn) {
+  let suggested;
+  try { suggested = JSON.parse(suggestedJson); } catch (e) { alert('Could not parse suggestion'); return; }
+
+  let token = localStorage.getItem(GHL_TOKEN_KEY);
+  if (!token) {
+    token = prompt(
+      'Applying suggestions to GHL needs a GHL Private Integration token (one-time setup).\\n\\n' +
+      '1. GHL → Settings → Private Integrations → Create new\\n' +
+      '2. Scopes: contacts.write\\n' +
+      '3. Paste the pit-... token here. Stored only in your browser.'
+    );
+    if (!token) return;
+    localStorage.setItem(GHL_TOKEN_KEY, token.trim());
+  }
+
+  const customFields = [];
+  for (const [k, v] of Object.entries(suggested)) {
+    const fid = SUGGEST_FIELD_IDS[k];
+    if (!fid || v == null || v === '') continue;
+    customFields.push({id: fid, field_value: String(v)});
+  }
+  if (!customFields.length) { alert('Nothing to apply'); return; }
+
+  btn.disabled = true; btn.textContent = 'Applying…';
+  try {
+    const r = await fetch('https://services.leadconnectorhq.com/contacts/' + cid, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Version': '2021-07-28',
+      },
+      body: JSON.stringify({customFields}),
+    });
+    if (r.ok) {
+      btn.textContent = '✓ Applied';
+      btn.style.background = 'var(--s-live)';
+      btn.style.color = '#fff';
+    } else if (r.status === 401 || r.status === 403) {
+      localStorage.removeItem(GHL_TOKEN_KEY);
+      btn.disabled = false; btn.textContent = 'Apply to GHL';
+      alert('GHL token rejected — please re-enter.');
+    } else {
+      const t = await r.text();
+      btn.disabled = false; btn.textContent = 'Apply to GHL';
+      alert('Failed: ' + r.status + ' ' + t.slice(0, 200));
+    }
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'Apply to GHL';
+    alert('Network error: ' + e.message);
+  }
+}
+
+function dismissSuggestion(btn) {
+  const card = btn.closest('.slack-card');
+  if (card) {
+    card.style.transition = 'opacity 0.2s';
+    card.style.opacity = '0.4';
+    btn.textContent = '✓ Dismissed';
+    btn.disabled = true;
+    setTimeout(() => card.style.display = 'none', 250);
+  }
 }
 
 function render(week) {

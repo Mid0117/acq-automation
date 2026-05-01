@@ -676,24 +676,32 @@ section h2, h2 {
   <section class="sec">
     <div class="tag-row"><span class="num">04</span><h2><span class="dot warm"></span>Dormant — Manual Call Needed</h2></div>
     <hr>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 12px">Leads that received all 6 SMS with no reply. Jeff calls these manually.</p>
     <div class="lead-table">__DORMANT_TABLE__</div>
   </section>
 
   <section class="sec">
-    <div class="tag-row"><span class="num">05</span><h2><span class="dot green"></span>Active in Sequence</h2></div>
+    <div class="tag-row"><span class="num">05</span><h2><span class="dot gray"></span>DND — Do Not Contact <span class="sec-count" style="margin-left:auto;font-size:11px;color:var(--muted)">excluded from outreach</span></h2></div>
+    <hr>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 12px">GHL DND was set on these contacts before our sequence started — or they replied STOP / hostile / wrong-number. <strong style="color:var(--ink)">Do NOT call.</strong> Listed for visibility only.</p>
+    <div class="lead-table">__DND_TABLE__</div>
+  </section>
+
+  <section class="sec">
+    <div class="tag-row"><span class="num">06</span><h2><span class="dot green"></span>Active in Sequence</h2></div>
     <hr>
     <input type="text" class="search" id="searchActive" placeholder="Search by name, address, state...">
     <div class="lead-table">__ACTIVE_TABLE__</div>
   </section>
 
   <section class="sec">
-    <div class="tag-row"><span class="num">06</span><h2><span class="dot hot"></span>Open Tasks</h2></div>
+    <div class="tag-row"><span class="num">07</span><h2><span class="dot hot"></span>Open Tasks</h2></div>
     <hr>
     <div class="lead-table">__TASKS_TABLE__</div>
   </section>
 
   <section class="sec">
-    <div class="tag-row"><span class="num">07</span><h2><span class="dot gray"></span>SMS Templates — Edit Live</h2></div>
+    <div class="tag-row"><span class="num">08</span><h2><span class="dot gray"></span>SMS Templates — Edit Live</h2></div>
     <hr>
     <p class="help-line">
       Click any cell below to edit. Changes save instantly to the sheet and apply on the next 30-min cron run.
@@ -916,9 +924,10 @@ def _main_inner():
     by_state   = {}
     sms_progress = [0] * 7
     by_number  = {}
-    replied = dormant = active = 0
+    replied = dormant = active = dnd_excluded = 0
     replied_rows = []
-    dormant_rows = []
+    dormant_rows = []   # only sequence-exhausted (6 SMS sent, no reply)
+    dnd_rows     = []   # DND was set before SMS started — never to be contacted
     active_rows  = []
     open_tasks   = []  # [{name, title, assignee, due, contact_url}]
 
@@ -951,7 +960,13 @@ def _main_inner():
         if st.get('replied'):
             replied_rows.append(row); replied += 1
         elif st.get('dormant'):
-            dormant_rows.append(row); dormant += 1
+            # Split: if DND was already set when sequence started (or set
+            # by reply classifier), this is "do not contact, do not call".
+            # Otherwise it's sequence-exhausted and Jeff manually calls.
+            if st.get('dnd') or st.get('reply_class') in ('HARD_STOP','HOSTILE','WRONG'):
+                dnd_rows.append(row); dnd_excluded += 1
+            else:
+                dormant_rows.append(row); dormant += 1
         else:
             active_rows.append(row); active += 1
 
@@ -1051,6 +1066,7 @@ def _main_inner():
     html = html.replace('__NUMBER_DATA__', json.dumps([n for _, n in top_numbers]))
     html = html.replace('__REPLIED_TABLE__', render_table(replied_rows, 'replied'))
     html = html.replace('__DORMANT_TABLE__', render_table(dormant_rows, 'dormant'))
+    html = html.replace('__DND_TABLE__', render_table(dnd_rows, 'dormant'))
     html = html.replace('__ACTIVE_TABLE__', render_table(active_rows, 'active'))
     html = html.replace('__STATUS_BANNER__', banner)
     html = html.replace('__TEMPLATES_BLOCK__', tmpl_html)
