@@ -46,18 +46,25 @@ def http(method, url, **kw):
             raise
 
 
-# Stages = "real deals" (advanced past initial qualification)
+# Stages = "real deals" — full pipeline from Qualified through Disposition
+STAGE_QUALIFIED = 'a17517be-8d1a-49fd-bd53-b9128a66e242'
 STAGE_LAO       = 'd43fddd8-3a17-46b2-a193-cf18619f654f'
 STAGE_RR        = '23a159ad-ba39-4c74-9d07-c1beb219d9f2'
 STAGE_MAO       = '43589167-14f0-4e09-ba2a-8b9bd3296a4a'
-STAGE_QUALIFIED = 'a17517be-8d1a-49fd-bd53-b9128a66e242'
+STAGE_CONTRACT  = '53eb29e2-92d9-439e-8865-a875a46a6fd8'   # 5. Contract Sent
+STAGE_PSA       = 'e377ba40-6d3b-4981-86cb-d31e7ef0c9c1'   # 6. Executed PSA
+STAGE_DISPO     = 'aefeb703-5ab9-403c-b2eb-47fe550d62ee'   # 7. Disposition
 
 DEAL_STAGES = {
-    STAGE_LAO: '2. LAO',
-    STAGE_RR:  '3. Due Diligence',
-    STAGE_MAO: '4. MAO',
+    STAGE_QUALIFIED: '1. Qualified',
+    STAGE_LAO:       '2. LAO',
+    STAGE_RR:        '3. Due Diligence',
+    STAGE_MAO:       '4. MAO',
+    STAGE_CONTRACT:  '5. Contract Sent',
+    STAGE_PSA:       '6. Executed PSA',
+    STAGE_DISPO:     '7. Disposition',
 }
-INCLUDE_QUALIFIED = True
+INCLUDE_QUALIFIED = True   # legacy flag — kept for back-compat (no-op now)
 
 # Contact custom fields
 CF_BED         = 'xXEm77wvbxEbiqsw3lAz'
@@ -130,10 +137,7 @@ def get_opp_fields(oid):
 
 def fetch_deals():
     out = []
-    stage_set = dict(DEAL_STAGES)
-    if INCLUDE_QUALIFIED:
-        stage_set[STAGE_QUALIFIED] = '1. Qualified'
-    for stage_id, label in stage_set.items():
+    for stage_id, label in DEAL_STAGES.items():
         page = 1
         while True:
             r = http('GET', 'https://services.leadconnectorhq.com/opportunities/search',
@@ -253,10 +257,13 @@ def temp_class(temp):
 
 
 def stage_class(stage_id):
+    if stage_id == STAGE_QUALIFIED: return 'stage-qualified'
     if stage_id == STAGE_LAO:       return 'stage-lao'
     if stage_id == STAGE_RR:        return 'stage-rr'
     if stage_id == STAGE_MAO:       return 'stage-mao'
-    if stage_id == STAGE_QUALIFIED: return 'stage-qualified'
+    if stage_id == STAGE_CONTRACT:  return 'stage-contract'
+    if stage_id == STAGE_PSA:       return 'stage-psa'
+    if stage_id == STAGE_DISPO:     return 'stage-dispo'
     return ''
 
 
@@ -444,8 +451,11 @@ body {
 }
 .stage-pill.stage-qualified { background: var(--gold-soft); color: var(--ink); }
 .stage-pill.stage-lao       { background: rgba(181,122,26,0.15); color: var(--warm); }
-.stage-pill.stage-rr        { background: rgba(201,165,42,0.18); color: var(--gold-deep); }
-.stage-pill.stage-mao       { background: rgba(47,125,91,0.15); color: var(--green); }
+.stage-pill.stage-rr        { background: rgba(201,149,0,0.18);  color: var(--gold-deep); }
+.stage-pill.stage-mao       { background: rgba(47,125,91,0.15);  color: var(--green); }
+.stage-pill.stage-contract  { background: rgba(47,125,91,0.22);  color: var(--green); border: 1px solid rgba(47,125,91,0.4); }
+.stage-pill.stage-psa       { background: rgba(26,40,64,0.15);   color: var(--ink); border: 1px solid rgba(26,40,64,0.3); }
+.stage-pill.stage-dispo     { background: var(--ink); color: var(--gold); }
 
 .card .pillrow { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .pill {
@@ -633,6 +643,9 @@ a:hover { color: var(--ink); }
       <span class="filter-chip" data-filter="2. LAO">LAO</span>
       <span class="filter-chip" data-filter="3. Due Diligence">DD</span>
       <span class="filter-chip" data-filter="4. MAO">MAO</span>
+      <span class="filter-chip" data-filter="5. Contract Sent">Contract</span>
+      <span class="filter-chip" data-filter="6. Executed PSA">PSA</span>
+      <span class="filter-chip" data-filter="7. Disposition">Dispo</span>
       <span class="filter-chip" data-filter="hot">🔥 Hot</span>
       <span class="filter-chip" data-filter="has-arv">Has ARV</span>
     </div>
@@ -649,6 +662,12 @@ const search = document.getElementById('searchBox');
 const chips  = Array.from(document.querySelectorAll('.filter-chip'));
 let activeFilter = 'all';
 
+// Filters that match stage labels exactly. Anything else is treated as a flag.
+const STAGE_FILTERS = new Set([
+  '1. Qualified', '2. LAO', '3. Due Diligence', '4. MAO',
+  '5. Contract Sent', '6. Executed PSA', '7. Disposition',
+]);
+
 function applyFilters() {
   const q = (search.value || '').toLowerCase();
   cards.forEach(c => {
@@ -658,8 +677,7 @@ function applyFilters() {
     let visible = true;
     if (q && !text.includes(q)) visible = false;
     if (visible && activeFilter !== 'all') {
-      if (activeFilter.startsWith('1.') || activeFilter.startsWith('2.') ||
-          activeFilter.startsWith('3.') || activeFilter.startsWith('4.')) {
+      if (STAGE_FILTERS.has(activeFilter)) {
         if (stage !== activeFilter) visible = false;
       } else if (!flags.includes(activeFilter)) {
         visible = false;
@@ -967,9 +985,18 @@ def _main_inner():
 
     avg_rating = (sum(rated) / len(rated)) if rated else 0
 
-    # Group by stage in display order: MAO → RR → LAO → Qualified
-    order = [STAGE_MAO, STAGE_RR, STAGE_LAO, STAGE_QUALIFIED]
-    section_nums = {STAGE_MAO: '03', STAGE_RR: '04', STAGE_LAO: '05', STAGE_QUALIFIED: '06'}
+    # Group by stage in priority order: closed-on-track first (PSA/Disposition),
+    # then in-flight (Contract → MAO → DD → LAO), then top of funnel (Qualified).
+    order = [STAGE_DISPO, STAGE_PSA, STAGE_CONTRACT, STAGE_MAO, STAGE_RR, STAGE_LAO, STAGE_QUALIFIED]
+    section_nums = {
+        STAGE_DISPO:     '03',
+        STAGE_PSA:       '04',
+        STAGE_CONTRACT:  '05',
+        STAGE_MAO:       '06',
+        STAGE_RR:        '07',
+        STAGE_LAO:       '08',
+        STAGE_QUALIFIED: '09',
+    }
     sections_html = []
     for stage_id in order:
         in_stage = [d for d in enriched if d['stage'] == stage_id]

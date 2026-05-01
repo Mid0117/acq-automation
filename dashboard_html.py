@@ -773,11 +773,22 @@ def render_table(rows, kind):
             for r in rows
         )
     elif kind == 'dormant':
-        head = '<thead><tr><th>Contact</th><th>Address</th><th>Stage</th><th>SMS Sent</th><th>Last Sent</th></tr></thead>'
+        head = '<thead><tr><th>Contact</th><th>Address</th><th>Stage</th><th>Reason</th><th>SMS Sent</th><th>Last Sent</th></tr></thead>'
+        def _reason_tag(r):
+            # Dormant-because-DND (sequence never started): GHL DND was on
+            # before our first send, so we marked dormant with sms_count=0.
+            # No manual call needed — they don't want to be contacted.
+            if r.get('dnd') or r.get('reply_class') in ('HARD_STOP','HOSTILE','WRONG'):
+                return '<span class="tag gray">DND — do not contact</span>'
+            if r.get('sms_count', 0) == 0:
+                return '<span class="tag gray">DND — sequence never started</span>'
+            # Sequence-exhausted: 6 SMS sent, no reply → manual call needed
+            return '<span class="tag warm">6 SMS no reply — call manually</span>'
         body = '\n'.join(
             f'<tr><td><strong>{escape(r["name"])}</strong></td>'
             f'<td>{escape(r["addr"])}</td>'
             f'<td><span class="tag">{escape(r["stage"])}</span></td>'
+            f'<td>{_reason_tag(r)}</td>'
             f'<td><span class="tag warm">{r["sms_count"]}/6</span></td>'
             f'<td>{escape(r["last_sms"])}</td></tr>'
             for r in rows
@@ -862,14 +873,16 @@ def _main_inner():
             by_number[fn] = by_number.get(fn, 0) + 1
 
         row = {
-            'name':      f"{c.get('firstName','')} {c.get('lastName','')}".strip() or '(no name)',
-            'addr':      c.get('address1', '') or c.get('city', ''),
-            'state':     c.get('state', '') or '',
-            'stage':     e['stage'],
-            'sms_count': n,
-            'last_sms':  to_et(st.get('last_sms_at')),
+            'name':       f"{c.get('firstName','')} {c.get('lastName','')}".strip() or '(no name)',
+            'addr':       c.get('address1', '') or c.get('city', ''),
+            'state':      c.get('state', '') or '',
+            'stage':      e['stage'],
+            'sms_count':  n,
+            'last_sms':   to_et(st.get('last_sms_at')),
             'replied_at': to_et(st.get('replied_at')),
-            'from_num':  st.get('last_from_number', '') or '',
+            'from_num':   st.get('last_from_number', '') or '',
+            'dnd':        bool(st.get('dnd')),
+            'reply_class': st.get('reply_class', ''),
         }
 
         if st.get('replied'):
