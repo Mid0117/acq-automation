@@ -4,6 +4,18 @@ on:
   schedule:
     - cron: '*/15 * * * *'   # every 15 minutes
   workflow_dispatch:           # manual trigger from GitHub UI
+    inputs:
+      backfill_recompute:
+        description: 'Re-analyze ARV for ALL stage 1-4 leads (ignore existing ARV). Costs ~$1.50/lead.'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false','true']
+      backfill_cap:
+        description: 'Max leads to backfill in this run (default 15).'
+        required: false
+        default: '15'
+        type: string
 
 jobs:
   run:
@@ -34,4 +46,6 @@ jobs:
           GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BACKFILL_RECOMPUTE: ${{ inputs.backfill_recompute || 'false' }}
+          BACKFILL_CAP_PER_RUN: ${{ inputs.backfill_cap || '15' }}
         run: python acq_automation.py

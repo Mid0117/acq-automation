@@ -193,6 +193,21 @@ def fetch_summary_note(cid):
         return {}
 
 
+def zillow_search_url(addr1, city, state, zipc):
+    """Build a Zillow search URL that works for any property with an address.
+    Used as a fallback when we don't have the actual /homedetails/ URL from Apify.
+    Format: https://www.zillow.com/homes/<slug>_rb/"""
+    parts = []
+    for p in (addr1, city, state, zipc):
+        if p:
+            slug = re.sub(r'[^a-zA-Z0-9 ]', '', str(p)).strip().replace(' ', '-')
+            if slug:
+                parts.append(slug)
+    if not parts:
+        return ''
+    return f'https://www.zillow.com/homes/{"-".join(parts)}_rb/'
+
+
 def fmt_money(v):
     try:
         v = int(v)
@@ -681,7 +696,9 @@ def render_card(d):
     deal_t = cf.get(CF_DEAL_TYPE) or of.get(OF_DEAL_TYPE) or ''
     repairs = cf.get(CF_REPAIRS) or ''
     rehab_url = of.get(OF_REHAB) or ''
-    zillow = cf.get(CF_ZILLOW) or ''
+    # Always have a Zillow link: prefer the saved /homedetails/ URL from Apify,
+    # fall back to a search URL built from the address parts.
+    zillow = cf.get(CF_ZILLOW) or zillow_search_url(addr1, city, state, zipc)
     assign_fee_raw = cf.get(CF_ASSIGN_FEE) or ''
     try:
         assign_fee_v = int(float(assign_fee_raw)) if assign_fee_raw else None

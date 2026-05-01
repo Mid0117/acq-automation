@@ -994,13 +994,17 @@ def process_contact(cid, oid, google_svc):
     return 'ok'
 
 
-def backfill_property_data(cid, oid, contact, cfields, opp_cf):
+def backfill_property_data(cid, oid, contact, cfields, opp_cf, force=False):
     """Enrich property + financial data for a stage 1-4 lead that doesn't have ARV
     yet — even if there's no call recording. Skips if ARV already present, no
     address, or Apify is over budget. Refreshes the APG Lead Summary note on
     success.
+
+    If force=True, ignore existing CF_ARV and recompute (used for refreshing
+    stale or wrong ARVs across the deal stages — set BACKFILL_RECOMPUTE=1 in
+    the workflow env to enable).
     """
-    if cfields.get(CF_ARV):
+    if cfields.get(CF_ARV) and not force:
         return 'has_arv'
 
     addr1 = (contact.get('address1') or '').strip()
@@ -1197,9 +1201,11 @@ def _main_inner():
     # Apify; budget guard inside lookup_property/fetch_sold_comps stops cleanly
     # when monthly cap is hit.
     BACKFILL_CAP = int(os.environ.get('BACKFILL_CAP_PER_RUN', '15'))
+    BACKFILL_RECOMPUTE = os.environ.get('BACKFILL_RECOMPUTE', '').lower() in ('1','true','yes','on')
     bf_ok = bf_partial = bf_skip = bf_nobudget = 0
     bf_attempts = 0
-    print(f'\n[Backfill] scanning for stage 1-4 leads missing ARV (cap={BACKFILL_CAP}/run)...')
+    mode = 'RECOMPUTE (re-running every lead)' if BACKFILL_RECOMPUTE else 'fill missing ARV only'
+    print(f'\n[Backfill] {mode} | cap={BACKFILL_CAP}/run')
 
     for e in entries:
         if bf_attempts >= BACKFILL_CAP:
@@ -1211,12 +1217,12 @@ def _main_inner():
                 continue
             contact = r.json().get('contact', {})
             cfields = {f['id']: (f.get('value') or '') for f in contact.get('customFields', [])}
-            if cfields.get(CF_ARV):
+            if cfields.get(CF_ARV) and not BACKFILL_RECOMPUTE:
                 bf_skip += 1
                 continue
             opp_cf = get_opp_fields(oid)
             bf_attempts += 1
-            r = backfill_property_data(cid, oid, contact, cfields, opp_cf)
+            r = backfill_property_data(cid, oid, contact, cfields, opp_cf, force=BACKFILL_RECOMPUTE)
             if r == 'ok':
                 bf_ok += 1
             elif r == 'partial':
