@@ -359,9 +359,9 @@ WEEKLY_HTML = """<!doctype html>
   --ink: #1A2840;
   --ink-soft: #455066;
   --ink-mute: #6B7591;
-  --gold: #E8C547;
-  --gold-deep: #C9A52A;
-  --gold-soft: #FFF6D6;
+  --gold: #FFC72C;
+  --gold-deep: #C99500;
+  --gold-soft: #FFF6CC;
   --rule: rgba(26,40,64,0.12);
   --rule-strong: rgba(26,40,64,0.22);
   --green: #2F7D5B;
@@ -598,6 +598,49 @@ footer {
 }
 a { color: var(--gold-deep); }
 a:hover { color: var(--ink); }
+
+/* ── Animations & micro-interactions ─────────────────────── */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.fade-in-up { animation: fade-in-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.fade-in    { animation: fade-in 0.4s ease-out backwards; }
+
+/* Smooth filter transitions */
+.card, .lead-line, .stat, .bucket, .chart-card, .roadmap .item, .cron-card {
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card.filtered-out, .lead-line.filtered-out {
+  opacity: 0; transform: scale(0.96) translateY(-4px); pointer-events: none;
+}
+
+/* Hover lift for clickable cards */
+.card { will-change: transform; }
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(26,40,64,0.08);
+}
+.bucket .lead-line { transition: background 0.15s ease, transform 0.15s ease; }
+.bucket .lead-line:hover { transform: translateX(2px); }
+
+/* Filter chip + button micro-interactions */
+.filter-chip, .nav a, .btn, .ghl-link {
+  transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.filter-chip:active { transform: scale(0.96); }
+.btn:active, .ghl-link:active { transform: scale(0.97); }
+
+/* Stat KPI value entrance */
+.stat .v { transition: color 0.3s ease; }
+
+/* Smooth section reveal (set via JS-applied stagger) */
+.bucket, .stat, .card { animation-fill-mode: backwards; }
+
 </style>
 </head>
 <body>
@@ -806,6 +849,8 @@ function render(week) {
   if (!html.includes('bucket')) html += '<div class="empty">No leads match this filter for this week.</div>';
 
   c.innerHTML = html;
+  // Re-run entrance animations on the freshly rendered DOM
+  if (window.runEntranceAnimations) window.runEntranceAnimations(c);
 }
 
 let _currentWeekData = null;
@@ -855,6 +900,61 @@ async function main() {
 }
 
 main();
+
+// ── Animation runtime (count-up + stagger) ──────────────────
+function animateNumber(el, durationMs) {
+  durationMs = durationMs || 700;
+  const original = el.textContent.trim();
+  const m = original.match(/-?\d+(?:\.\d+)?/);
+  if (!m) return;
+  const target = parseFloat(m[0]);
+  const decimals = (m[0].split('.')[1] || '').length;
+  if (target === 0) return;  // nothing to animate
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min(1, (now - start) / durationMs);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const current = (target * eased).toFixed(decimals);
+    el.textContent = original.replace(/-?\d+(?:\.\d+)?/, current);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = original;
+  }
+  requestAnimationFrame(tick);
+}
+
+function staggerIn(selector, baseDelay) {
+  baseDelay = baseDelay || 0;
+  document.querySelectorAll(selector).forEach((el, i) => {
+    el.style.animationDelay = (baseDelay + i * 35) + 'ms';
+    el.classList.add('fade-in-up');
+  });
+}
+
+function runEntranceAnimations(root) {
+  root = root || document;
+  root.querySelectorAll('.stat .v').forEach(el => animateNumber(el));
+  // Stagger top-level grid children within key containers
+  ['.stat-row', '.charts-grid', '.kpi-row'].forEach(sel => {
+    root.querySelectorAll(sel).forEach(parent => {
+      Array.from(parent.children).forEach((el, i) => {
+        el.style.animationDelay = (i * 50) + 'ms';
+        el.classList.add('fade-in-up');
+      });
+    });
+  });
+  ['.bucket', '.cron-card', '.roadmap .item', '.grid > .card'].forEach(sel => {
+    root.querySelectorAll(sel).forEach((el, i) => {
+      el.style.animationDelay = (i * 30) + 'ms';
+      el.classList.add('fade-in-up');
+    });
+  });
+}
+
+// Run once on initial load. For pages that re-render content (weekly,
+// follow-ups), they should call this again after replacing the DOM.
+document.addEventListener('DOMContentLoaded', () => runEntranceAnimations());
+window.runEntranceAnimations = runEntranceAnimations;  // expose for re-render
+
 </script>
 </body>
 </html>

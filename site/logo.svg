@@ -2,8 +2,8 @@
   <defs>
     <style>
       .ink   { fill: #1A2840; }
-      .gold  { fill: #F4B400; }
-      .stroke{ stroke: #F4B400; stroke-width: 5; fill: none; stroke-linecap: round; }
+      .gold  { fill: #FFC72C; }
+      .stroke{ stroke: #FFC72C; stroke-width: 5; fill: none; stroke-linecap: round; }
     </style>
   </defs>
 
