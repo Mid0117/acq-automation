@@ -82,6 +82,7 @@ CF_ARV         = 'nCWzIGfZHki0dv84gUem'
 CF_70_ARV      = 'R7QUzOdOnJXgoGRPwxdF'
 CF_MOTIVATION  = 'rbYZAdhvuvX1NQgexhxy'
 CF_TIMELINE    = 'v47I1Mi63RBpCD5N5RrH'
+CF_VA_NOTES    = 'ctNVXVw8VY1PD4B1oqXj'  # Last-call summary written by acq cron
 
 NOTE_RATING_RE = re.compile(r'Rating:\s*(\d+)\s*/\s*10', re.IGNORECASE)
 NOTE_TEMP_RE   = re.compile(r'Lead Temp:\s*([A-Za-z]+)', re.IGNORECASE)
@@ -270,6 +271,19 @@ def build_lead_record(lead, sms_state):
         arv70 = int(arv * 0.7)
     spread = (arv70 - asking) if (arv70 is not None and asking is not None) else None
 
+    # Phone — strip to digits then format as +1 (XXX) XXX-XXXX for display
+    raw_phone = (c.get('phone') or '').strip()
+    digits = re.sub(r'\D', '', raw_phone)
+    if len(digits) == 10:
+        phone_display = f'({digits[0:3]}) {digits[3:6]}-{digits[6:]}'
+        phone_e164    = f'+1{digits}'
+    elif len(digits) == 11 and digits.startswith('1'):
+        phone_display = f'+1 ({digits[1:4]}) {digits[4:7]}-{digits[7:]}'
+        phone_e164    = f'+{digits}'
+    else:
+        phone_display = raw_phone
+        phone_e164    = raw_phone
+
     return {
         'cid':         lead['cid'],
         'oid':         lead['oid'],
@@ -291,15 +305,38 @@ def build_lead_record(lead, sms_state):
         'last_sms_at': sms.get('last_sms_at') or '',
         'sms_count':   sms.get('sms_count') or 0,
         'replied':     bool(sms.get('replied')),
+        'replied_at':  sms.get('replied_at') or '',
+        'reply_text':  (sms.get('reply_text') or '')[:400],
+        'reply_class': sms.get('reply_class') or '',
+        'last_from_number': sms.get('last_from_number') or '',
         'dormant':     bool(sms.get('dormant')),
+        'dnd':         bool(sms.get('dnd')),
+        'phone':       phone_display,
+        'phone_e164':  phone_e164,
+        'last_call_summary': (cf.get(CF_VA_NOTES) or '')[:500],
         'last_updated': lead.get('updated', ''),
     }
 
 
-def categorize(curr, prev_map, week_start_iso):
-    """Bucket a single lead based on this-week vs last-week diff."""
+def categorize(curr, prev_map, week_start_iso, slack_mention_count):
+    """Bucket a single lead based on this-week vs last-week diff.
+
+    Weekly view focuses on what's CHANGED or had ACTIVITY this week.
+    Stagnant-no-activity leads are still categorized but rendered separately
+    (collapsed by default) so the team isn't drowning in pipeline noise.
+    """
     cid = curr['cid']
     prev = prev_map.get(cid)
+
+    # Did anything happen for this lead in the last 7 days?
+    last_sms_at  = curr.get('last_sms_at') or ''
+    replied_at   = curr.get('replied_at') or ''
+    last_updated = curr.get('last_updated') or ''
+    sms_this_week    = bool(last_sms_at  and last_sms_at  >= week_start_iso)
+    reply_this_week  = bool(replied_at   and replied_at   >= week_start_iso)
+    update_this_week = bool(last_updated and last_updated >= week_start_iso)
+    slack_this_week  = slack_mention_count > 0
+    had_activity = sms_this_week or reply_this_week or slack_this_week
 
     # Movement bucket
     if not prev:
@@ -312,10 +349,8 @@ def categorize(curr, prev_map, week_start_iso):
         movement = 'demoted'
         movement_meta = {'from': prev.get('stage_label',''), 'to': curr['stage_label']}
     else:
-        # Same stage — stagnant. Active if any SMS/reply since week_start.
-        last_sms = curr.get('last_sms_at') or ''
-        active = bool(last_sms and last_sms >= week_start_iso) or curr.get('replied')
-        movement = 'stagnant_active' if active else 'stagnant_inactive'
+        # Same stage — split by activity.
+        movement = 'active_no_move' if had_activity else 'quiet'
         movement_meta = {'stage': curr['stage_label'],
                          'days_in_stage': days_between(prev.get('first_seen_at') or week_start_iso)}
 
@@ -328,8 +363,17 @@ def categorize(curr, prev_map, week_start_iso):
         action_tags.append('ready_mao')
     if (curr['stage_id'] in ACTIVE_STAGES
             and curr['temp'] in ('cold', 'nurture')
-            and movement.startswith('stagnant')):
+            and movement == 'quiet'):
         action_tags.append('drop_suggest')
+
+    # Activity flags exposed for the modal
+    curr['_activity'] = {
+        'sms_this_week':    sms_this_week,
+        'reply_this_week':  reply_this_week,
+        'slack_this_week':  slack_this_week,
+        'slack_count':      slack_mention_count,
+        'had_activity':     had_activity,
+    }
 
     return movement, movement_meta, action_tags
 
@@ -458,10 +502,148 @@ body {
 }
 .slack-list .lead-line .channel-tag {
   font-size: 10px; padding: 3px 8px; border-radius: 3px;
-  background: rgba(232,197,71,0.18); color: var(--ink);
+  background: rgba(255,199,44,0.20); color: var(--ink);
   font-weight: 700; letter-spacing: 0.04em;
   font-family: ui-monospace, monospace;
 }
+
+.lead-line.clickable { cursor: pointer; }
+.lead-line.clickable:hover .nm { color: var(--gold-deep); }
+
+/* Description rows inside buckets */
+.lead-line.desc-row {
+  background: rgba(0,0,0,0.02); font-style: italic;
+  color: var(--ink-soft); grid-template-columns: 1fr;
+}
+
+/* Quiet bucket — collapsible details */
+details.quiet-block { background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 14px; overflow: hidden; }
+details.quiet-block > summary {
+  list-style: none; cursor: pointer;
+  padding: 14px 18px;
+  background: rgba(26,40,64,0.06);
+  display: flex; align-items: center; gap: 12px;
+}
+details.quiet-block > summary::-webkit-details-marker { display: none; }
+details.quiet-block > summary::after {
+  content: '▼'; margin-left: auto; color: var(--ink-mute);
+  transition: transform 0.2s ease;
+}
+details[open].quiet-block > summary::after { transform: rotate(180deg); }
+.quiet-summary-text { font-size: 14px; color: var(--ink); }
+.quiet-summary-text .ct { font-size: 12px; color: var(--ink-mute); margin-left: 6px; }
+
+/* In-page refresh button */
+.refresh-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: 12px 0 0;
+}
+.refresh-btn {
+  padding: 8px 14px; border-radius: 3px;
+  background: var(--ink); color: var(--gold);
+  border: 1px solid var(--ink); cursor: pointer;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
+  text-transform: uppercase; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.refresh-btn:hover { background: var(--gold-deep); color: var(--ink); }
+.refresh-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.refresh-btn .spin {
+  display: inline-block; width: 12px; height: 12px;
+  border: 2px solid currentColor; border-right-color: transparent;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.refresh-status { font-size: 12px; color: var(--ink-soft); }
+
+/* Lead Detail Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(26,40,64,0.55);
+  backdrop-filter: blur(4px);
+  display: none; align-items: flex-start; justify-content: center;
+  z-index: 1000; padding: 60px 20px 20px;
+  overflow-y: auto;
+  opacity: 0; transition: opacity 0.2s ease;
+}
+.modal-overlay.open {
+  display: flex; opacity: 1; animation: modal-fade-in 0.2s ease forwards;
+}
+@keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--paper); border-radius: 8px;
+  border: 1px solid var(--rule);
+  width: 100%; max-width: 720px;
+  box-shadow: 0 20px 60px rgba(26,40,64,0.30);
+  transform: translateY(20px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+.modal-close {
+  position: absolute; top: 14px; right: 18px;
+  background: transparent; border: 0; font-size: 22px;
+  color: var(--ink-mute); cursor: pointer; line-height: 1;
+  padding: 4px 8px;
+}
+.modal-close:hover { color: var(--ink); }
+.modal-body { padding: 28px 32px 24px; position: relative; }
+.modal-header {
+  display: flex; justify-content: space-between; align-items: start; gap: 12px;
+  padding-bottom: 16px; margin-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.modal-header h2 {
+  font-family: "Iowan Old Style", Georgia, serif;
+  margin: 0 0 4px; font-size: 24px; font-weight: 600; color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.modal-sub { font-size: 13px; color: var(--ink-soft); }
+.modal-row {
+  display: grid; grid-template-columns: 110px 1fr; gap: 16px;
+  padding: 12px 0; border-bottom: 1px solid var(--rule);
+}
+.modal-row:last-of-type { border-bottom: 0; }
+.modal-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-mute); padding-top: 4px;
+}
+.modal-value { font-size: 14px; color: var(--ink); line-height: 1.5; }
+.modal-value strong { font-weight: 700; }
+.modal-value .quote {
+  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
+  border-left: 2px solid var(--gold); padding: 2px 12px;
+  color: var(--ink-soft); margin: 4px 0;
+}
+.phone-link {
+  font-family: ui-monospace, monospace; font-size: 14px; font-weight: 700;
+  color: var(--gold-deep); text-decoration: none;
+}
+.phone-link:hover { color: var(--ink); text-decoration: underline; }
+.slack-card {
+  background: rgba(255,199,44,0.08); border: 1px solid rgba(255,199,44,0.25);
+  border-radius: 4px; padding: 10px 12px; margin-bottom: 8px;
+}
+.slack-card .slack-meta {
+  font-size: 11px; color: var(--ink-mute); margin-bottom: 4px;
+  font-family: ui-monospace, monospace;
+}
+.modal-actions {
+  display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+.modal-actions .btn {
+  padding: 8px 16px; border-radius: 3px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
+  text-transform: uppercase; text-decoration: none; cursor: pointer;
+  border: 1px solid transparent; transition: all 0.15s;
+}
+.modal-actions .btn.primary  { background: var(--ink); color: var(--gold); border-color: var(--ink); }
+.modal-actions .btn.primary:hover { background: var(--gold-deep); color: var(--ink); }
+.modal-actions .btn.secondary{ background: transparent; color: var(--ink); border-color: var(--rule-strong); }
+.modal-actions .btn.secondary:hover { border-color: var(--ink); }
+.modal-actions .btn.ghost    { background: transparent; color: var(--ink-mute); border-color: var(--rule); }
+.modal-actions .btn.ghost:hover { color: var(--ink); }
 
 hr.head { border: 0; border-top: 1px solid var(--rule); margin: 24px 0 0; }
 
@@ -675,6 +857,14 @@ a:hover { color: var(--ink); }
     <span class="meta" id="weekMeta"></span>
   </div>
 
+  <div class="refresh-bar">
+    <button class="refresh-btn" id="refreshBtn">
+      <span id="refreshIcon">↻</span>
+      <span id="refreshLabel">Refresh Now</span>
+    </button>
+    <span class="refresh-status" id="refreshStatus"></span>
+  </div>
+
   <div class="stage-filter" id="stageFilter">
     <span class="filter-chip active" data-stage="all">All Stages</span>
     <span class="filter-chip" data-stage="0. Unqualified Leads">Unqualified</span>
@@ -691,6 +881,14 @@ a:hover { color: var(--ink); }
   <div id="content"><div class="loading">Loading analysis…</div></div>
 
   <footer>Auto-generated each Friday 10 AM ET · APG ACQ Operating Layer</footer>
+</div>
+
+<!-- Lead detail modal — populated by openLeadModal(cid) -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" onclick="closeLeadModal()" aria-label="Close">×</button>
+    <div class="modal-body" id="leadModalBody"></div>
+  </div>
 </div>
 
 <script>
@@ -732,28 +930,173 @@ function renderLead(l, opts={}) {
     signals.push('<span class="tag ' + cls + '">spread ' + (l.spread>=0?'+':'') + fmtMoney(l.spread) + '</span>');
   }
   if (l.replied) signals.push('<span class="tag green">replied</span>');
-  if (l.dormant) signals.push('<span class="tag warm">dormant</span>');
+  if (l.dormant && !l.dnd) signals.push('<span class="tag warm">dormant</span>');
+  if (l.dnd)     signals.push('<span class="tag gray">DND</span>');
+  // Activity flags drawn from the lead's _activity object
+  const a = l._activity || {};
+  if (a.sms_this_week)   signals.push('<span class="tag green">📱 SMS this wk</span>');
+  if (a.reply_this_week) signals.push('<span class="tag green">💬 reply this wk</span>');
+  if (a.slack_count > 0) signals.push('<span class="tag warm">📡 ' + a.slack_count + ' Slack</span>');
 
-  return '<div class="lead-line">' +
+  return '<div class="lead-line clickable" data-cid="' + escapeHtml(l.cid) + '" tabindex="0">' +
     '<div class="who"><div class="nm">' + (l.name || '(no name)') + '</div>' +
     '<div class="pl">' + (l.addr ? l.addr + ' · ' : '') + (l.place || '') + '</div></div>' +
     '<span class="stage-pill">' + (l.stage_label || '?') + '</span>' +
     move +
     '<div class="signal">' + signals.join('') + '</div>' +
-    '<a class="ghl-link" href="' + ghl + '" target="_blank">Open</a>' +
+    '<a class="ghl-link" href="' + ghl + '" target="_blank" onclick="event.stopPropagation()">Open</a>' +
     '</div>';
 }
 
+// ─────────────── Lead Detail Modal ───────────────
+function findLeadByCid(cid) {
+  if (!_currentWeekData) return null;
+  const buckets = _currentWeekData.buckets || {};
+  for (const k of Object.keys(buckets)) {
+    const found = (buckets[k] || []).find(l => l && l.cid === cid);
+    if (found) return found;
+  }
+  return null;
+}
+
+function openLeadModal(cid) {
+  const l = findLeadByCid(cid);
+  if (!l) return;
+  const ghl = GHL_BASE + '/' + l.cid;
+  const modal = document.getElementById('leadModal');
+  const body  = document.getElementById('leadModalBody');
+
+  let html = '';
+  // Header
+  html += '<div class="modal-header">';
+  html += '<div><h2>' + escapeHtml(l.name || '(no name)') + '</h2>';
+  html += '<div class="modal-sub">' + escapeHtml((l.addr ? l.addr + ' · ' : '') + (l.place || '')) + '</div></div>';
+  html += '<span class="stage-pill">' + escapeHtml(l.stage_label || '?') + '</span>';
+  html += '</div>';
+
+  // Phone + quick contact
+  if (l.phone) {
+    html += '<div class="modal-row">';
+    html += '<div class="modal-label">Phone</div>';
+    html += '<div class="modal-value"><a href="tel:' + escapeHtml(l.phone_e164 || l.phone) + '" class="phone-link">📞 ' + escapeHtml(l.phone) + '</a>';
+    if (l.phone_e164) html += ' <a href="sms:' + escapeHtml(l.phone_e164) + '" class="phone-link" style="margin-left:8px">💬 Text</a>';
+    html += '</div></div>';
+  }
+
+  // Financials
+  if (l.asking || l.arv || l.mao) {
+    html += '<div class="modal-row">';
+    html += '<div class="modal-label">Numbers</div>';
+    html += '<div class="modal-value">';
+    if (l.asking) html += '<strong>Asking:</strong> ' + fmtMoney(l.asking) + '  ·  ';
+    if (l.arv)    html += '<strong>ARV:</strong> ' + fmtMoney(l.arv) + '  ·  ';
+    if (l.mao)    html += '<strong>70% MAO:</strong> ' + fmtMoney(l.mao);
+    if (l.spread != null) {
+      const sign = l.spread >= 0 ? '+' : '';
+      html += '  ·  <strong>Spread:</strong> <span style="color:' + (l.spread>=0?'var(--green)':'var(--hot)') + '">' + sign + fmtMoney(l.spread) + '</span>';
+    }
+    html += '</div></div>';
+  }
+
+  // Last call summary (from acq_automation Claude analysis)
+  if (l.last_call_summary) {
+    html += '<div class="modal-row">';
+    html += '<div class="modal-label">Last call</div>';
+    html += '<div class="modal-value"><div class="quote">' + escapeHtml(l.last_call_summary) + '</div>';
+    if (l.rating != null) html += '<div style="margin-top:6px;font-size:12px"><strong>Rating:</strong> ' + l.rating + '/10' + (l.temp ? ' · <strong>Temp:</strong> ' + l.temp : '') + '</div>';
+    html += '</div></div>';
+  }
+
+  // SMS history summary
+  if (l.sms_count || l.last_sms_at) {
+    html += '<div class="modal-row">';
+    html += '<div class="modal-label">SMS</div>';
+    html += '<div class="modal-value">';
+    html += '<strong>' + (l.sms_count || 0) + '</strong> sent';
+    if (l.last_sms_at) html += '  ·  Last: ' + escapeHtml(new Date(l.last_sms_at).toLocaleString('en-US', {timeZone:'America/New_York', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) + ' ET');
+    if (l.last_from_number) html += '  ·  From ' + escapeHtml(l.last_from_number);
+    html += '</div></div>';
+  }
+
+  // Last reply text (if there was one)
+  if (l.replied && l.reply_text) {
+    html += '<div class="modal-row">';
+    html += '<div class="modal-label">Last reply</div>';
+    html += '<div class="modal-value">';
+    if (l.reply_class) html += '<span class="tag ' + (l.reply_class==='POSITIVE'?'green':l.reply_class==='NEUTRAL'?'warm':'hot') + '">' + escapeHtml(l.reply_class) + '</span> ';
+    html += '<div class="quote">"' + escapeHtml(l.reply_text) + '"</div>';
+    html += '</div></div>';
+  }
+
+  // Slack mentions for this lead this week
+  if (l.slack_this_week && l.slack_this_week.length) {
+    html += '<div class="modal-row">';
+    html += '<div class="modal-label">Slack this week</div>';
+    html += '<div class="modal-value">';
+    for (const sm of l.slack_this_week) {
+      html += '<div class="slack-card">';
+      html += '<div class="slack-meta">#' + escapeHtml(sm.channel || '?') + ' · ' + escapeHtml(sm.ts_text || '');
+      if (sm.permalink) html += ' · <a href="' + escapeHtml(sm.permalink) + '" target="_blank">Open in Slack ↗</a>';
+      html += '</div>';
+      if (sm.original) html += '<div class="quote">"' + escapeHtml(sm.original) + '"</div>';
+      if (sm.summary)  html += '<div style="font-size:12px;color:var(--ink-soft);margin-top:4px"><strong>AI summary:</strong> ' + escapeHtml(sm.summary) + '</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  // Motivation, timeline, deal context
+  if (l.motivation || l.timeline) {
+    html += '<div class="modal-row">';
+    html += '<div class="modal-label">Context</div>';
+    html += '<div class="modal-value">';
+    if (l.motivation) html += '<strong>Motivation:</strong> ' + escapeHtml(l.motivation) + '<br>';
+    if (l.timeline)   html += '<strong>Timeline:</strong> ' + escapeHtml(l.timeline);
+    html += '</div></div>';
+  }
+
+  // Footer actions
+  html += '<div class="modal-actions">';
+  html += '<a class="btn primary" href="' + ghl + '" target="_blank">Open in GHL ↗</a>';
+  if (l.phone_e164) html += '<a class="btn secondary" href="tel:' + escapeHtml(l.phone_e164) + '">Call</a>';
+  html += '<button class="btn ghost" onclick="closeLeadModal()">Close</button>';
+  html += '</div>';
+
+  body.innerHTML = html;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLeadModal() {
+  const m = document.getElementById('leadModal');
+  m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Click anywhere on a lead row → open modal (anchors inside row stop propagation)
+document.addEventListener('click', e => {
+  const row = e.target.closest('.lead-line.clickable');
+  if (row && row.dataset.cid) openLeadModal(row.dataset.cid);
+  if (e.target.matches('.modal-overlay')) closeLeadModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLeadModal();
+});
+
+// Buckets sorted by what mattered THIS WEEK. Quiet (no activity, no movement)
+// is at the bottom inside a collapsed details element so it doesn't bury the signal.
 const BUCKET_DEFS = [
-  {key:'ready_contract',    title:'Ready for Contract',   tone:'green', num:'01', desc:'In MAO with Hot temp + ARV + positive spread. Send the contract.'},
-  {key:'ready_mao',         title:'Ready for MAO Offer',  tone:'green', num:'02', desc:'In Due Diligence with Hot temp + ARV calculated. Time to put a number on it.'},
-  {key:'advanced',          title:'Advanced This Week',   tone:'green', num:'03', desc:'Stage moved forward. The system is working on these.', showMove: true},
-  {key:'new',               title:'New This Week',        tone:'warm',  num:'04', desc:'First appearance in the pipeline.'},
-  {key:'stagnant_active',   title:'Stagnant — Active',    tone:'warm',  num:'05', desc:'Same stage as last week, but had SMS/reply activity. Keep them warm.'},
-  {key:'stagnant_inactive', title:'Stagnant — Cold',      tone:'hot',   num:'06', desc:'Same stage, no activity. Need a touchpoint or drop.'},
-  {key:'demoted',           title:'Demoted This Week',    tone:'gray',  num:'07', desc:'Moved backward (auto-routed to Unqualified, etc).', showMove: true},
-  {key:'drop_suggest',      title:'Drop Suggestions',     tone:'gray',  num:'08', desc:'Cold/Nurture sitting in active stages > 30 days. Consider moving to Unqualified.'},
+  {key:'ready_contract', title:'Ready for Contract',  tone:'green', num:'01', desc:'In MAO + Hot + ARV + positive spread. Send the contract.'},
+  {key:'ready_mao',      title:'Ready for MAO Offer', tone:'green', num:'02', desc:'In Due Diligence + Hot + ARV. Time to put a number on it.'},
+  {key:'advanced',       title:'Moved Forward',       tone:'green', num:'03', desc:'Stage advanced this week.', showMove: true},
+  {key:'new',            title:'New This Week',       tone:'warm',  num:'04', desc:'First appearance in the pipeline.'},
+  {key:'active_no_move', title:'Active — No Stage Move', tone:'warm', num:'05', desc:'Same stage, but had SMS / reply / Slack activity this week. Keep warm.'},
+  {key:'demoted',        title:'Moved Backward',      tone:'gray',  num:'06', desc:'Auto-routed to Unqualified or downgraded.', showMove: true},
+  {key:'drop_suggest',   title:'Drop Suggestions',    tone:'gray',  num:'07', desc:'Cold/Nurture sitting in active stages > 30 days.'},
 ];
+// Quiet is rendered separately, inside a <details> collapsed by default
+const QUIET_DEF = {key:'quiet', title:'Quiet — No Activity This Week', tone:'gray', num:'∅',
+                   desc:'Leads in the pipeline but no SMS, reply, Slack mention, or stage move in the past 7 days. Click to expand.'};
 
 // Active stage filter (set by chip clicks). 'all' = no filter.
 let stageFilter = 'all';
@@ -810,24 +1153,24 @@ function render(week) {
 
   let html = '';
 
-  // KPIs (always show full totals — filter only affects bucket lists below)
+  // KPIs — focus on WEEKLY ACTIVITY, not pipeline totals
   html += '<section class="sec">';
-  html += '<div class="tag-row"><span class="num">00</span><h2>At a Glance</h2></div><hr>';
+  html += '<div class="tag-row"><span class="num">00</span><h2>This Week</h2></div><hr>';
   html += '<div class="stat-row">';
-  html += '<div class="stat"><div class="lab">Total Leads</div><div class="v">' + (totals.total||0) + '</div><div class="sub">in pipeline this week</div></div>';
-  html += '<div class="stat green"><div class="lab">Advanced</div><div class="v">' + (totals.advanced||0) + '</div><div class="sub">moved forward</div></div>';
-  html += '<div class="stat hot"><div class="lab">Stagnant Cold</div><div class="v">' + (totals.stagnant_inactive||0) + '</div><div class="sub">no activity, no movement</div></div>';
-  html += '<div class="stat warm"><div class="lab">New</div><div class="v">' + (totals.new||0) + '</div><div class="sub">added this week</div></div>';
+  html += '<div class="stat green"><div class="lab">Active This Week</div><div class="v">' + (totals.active_this_week||0) + '</div><div class="sub">had SMS / reply / Slack</div></div>';
+  html += '<div class="stat green"><div class="lab">Stage Moves</div><div class="v">' + ((totals.advanced||0) + (totals.demoted||0)) + '</div><div class="sub">' + (totals.advanced||0) + ' forward · ' + (totals.demoted||0) + ' back</div></div>';
+  html += '<div class="stat warm"><div class="lab">New This Week</div><div class="v">' + (totals.new||0) + '</div><div class="sub">added to pipeline</div></div>';
+  html += '<div class="stat"><div class="lab">SMS Sent</div><div class="v">' + (totals.sms_sent_week||0) + '</div><div class="sub">' + (totals.replies_week||0) + ' reply' + (totals.replies_week===1?'':'ies') + ' received</div></div>';
+  html += '<div class="stat"><div class="lab">Slack Mentions</div><div class="v">' + (totals.slack_mentions||0) + '</div><div class="sub">captured this week</div></div>';
   html += '<div class="stat green"><div class="lab">Ready Contract</div><div class="v">' + (totals.ready_contract||0) + '</div><div class="sub">send it</div></div>';
-  if (totals.slack_mentions != null) {
-    html += '<div class="stat"><div class="lab">Slack Mentions</div><div class="v">' + totals.slack_mentions + '</div><div class="sub">captured this week</div></div>';
-  }
-  html += '</div></section>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-size:12px;color:var(--ink-mute)">Pipeline total this snapshot: <strong>' + (totals.total_pipeline||0) + '</strong> · Quiet (no activity): <strong>' + (totals.quiet||0) + '</strong></div>';
+  html += '</section>';
 
   // Slack mentions section first (high signal — what the team talked about)
   html += renderSlack(week);
 
-  // Buckets — apply stage filter to each bucket's items
+  // Active buckets — apply stage filter to each bucket's items
   for (const def of BUCKET_DEFS) {
     const all = buckets[def.key] || [];
     const items = all.filter(leadMatchesStage);
@@ -841,12 +1184,26 @@ function render(week) {
     html += '<span class="ct">' + items.length + ' lead' + (items.length===1?'':'s') + filterNote + '</span>';
     html += '</div>';
     html += '<div class="body">';
-    if (def.desc) html += '<div class="lead-line" style="background:rgba(0,0,0,0.02);font-style:italic;color:var(--ink-soft);grid-template-columns:1fr;"><div>' + def.desc + '</div></div>';
+    if (def.desc) html += '<div class="lead-line desc-row"><div>' + def.desc + '</div></div>';
     for (const l of items) html += renderLead(l, {showMove: def.showMove});
     html += '</div></div>';
   }
 
-  if (!html.includes('bucket')) html += '<div class="empty">No leads match this filter for this week.</div>';
+  // Quiet bucket — collapsed details so it's findable but not in the way
+  const quietAll = buckets['quiet'] || [];
+  const quietItems = quietAll.filter(leadMatchesStage);
+  if (quietItems.length) {
+    html += '<details class="bucket gray quiet-block"><summary>';
+    html += '<span class="num-big">∅</span>';
+    html += '<span class="quiet-summary-text"><strong>' + QUIET_DEF.title + '</strong>';
+    html += ' <span class="ct">' + quietItems.length + ' lead' + (quietItems.length===1?'':'s') + '</span></span>';
+    html += '</summary><div class="body">';
+    html += '<div class="lead-line desc-row"><div>' + QUIET_DEF.desc + '</div></div>';
+    for (const l of quietItems) html += renderLead(l, {});
+    html += '</div></details>';
+  }
+
+  if (!html.includes('bucket')) html += '<div class="empty">No weekly activity to show. The pipeline is quiet.</div>';
 
   c.innerHTML = html;
   // Re-run entrance animations on the freshly rendered DOM
@@ -865,6 +1222,102 @@ function applyStageFilter(stage) {
 
 document.querySelectorAll('.stage-filter .filter-chip').forEach(chip => {
   chip.addEventListener('click', e => applyStageFilter(chip.dataset.stage));
+});
+
+// ─────────────── In-page refresh (workflow_dispatch via PAT) ───────────────
+const REPO = 'Mid0117/acq-automation';
+const PAT_KEY = 'apg_gh_pat_v1';
+
+async function dispatchWorkflow(workflowFile, ref='main', inputs={}) {
+  let pat = localStorage.getItem(PAT_KEY);
+  if (!pat) {
+    pat = prompt(
+      'Refreshing requires a GitHub personal access token (one-time setup).\\n\\n' +
+      '1. Open: https://github.com/settings/tokens?type=beta\\n' +
+      '2. Create a fine-grained token with "Actions: Read & Write" on Mid0117/acq-automation\\n' +
+      '3. Paste it here. Stored only in your browser.'
+    );
+    if (!pat) throw new Error('No token provided');
+    localStorage.setItem(PAT_KEY, pat.trim());
+  }
+  const url = 'https://api.github.com/repos/' + REPO + '/actions/workflows/' + workflowFile + '/dispatches';
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + pat,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ref, inputs}),
+  });
+  if (r.status === 204) return true;
+  if (r.status === 401 || r.status === 403) {
+    localStorage.removeItem(PAT_KEY);
+    throw new Error('Token rejected — please re-enter');
+  }
+  const txt = await r.text();
+  throw new Error('Dispatch failed: ' + r.status + ' ' + txt.slice(0, 120));
+}
+
+async function pollLatestRun(workflowName, sinceMs, maxMs=180000) {
+  const pat = localStorage.getItem(PAT_KEY);
+  const url = 'https://api.github.com/repos/' + REPO + '/actions/runs?per_page=10';
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    const r = await fetch(url, {
+      headers: {
+        'Authorization': 'Bearer ' + pat,
+        'Accept': 'application/vnd.github+json',
+      }
+    });
+    if (r.ok) {
+      const js = await r.json();
+      const run = (js.workflow_runs || []).find(rr =>
+        rr.name === workflowName && new Date(rr.created_at).getTime() > sinceMs - 5000
+      );
+      if (run) {
+        if (run.status === 'completed') return run;
+      }
+    }
+    await new Promise(res => setTimeout(res, 4000));
+  }
+  return null;
+}
+
+document.getElementById('refreshBtn').addEventListener('click', async () => {
+  const btn   = document.getElementById('refreshBtn');
+  const icon  = document.getElementById('refreshIcon');
+  const label = document.getElementById('refreshLabel');
+  const stat  = document.getElementById('refreshStatus');
+  btn.disabled = true;
+  icon.outerHTML = '<span class="spin" id="refreshIcon"></span>';
+  label.textContent = 'Triggering…';
+  stat.textContent  = '';
+  const startedAt = Date.now();
+  try {
+    await dispatchWorkflow('weekly.yml');
+    label.textContent = 'Running…';
+    stat.textContent  = 'Snapshot in progress (typically ~1 min)';
+    const run = await pollLatestRun('Weekly Analysis', startedAt);
+    if (run && run.conclusion === 'success') {
+      label.textContent = 'Done — reloading';
+      stat.textContent  = 'Fresh snapshot ready.';
+      setTimeout(() => location.reload(), 800);
+    } else {
+      label.textContent = 'Refresh';
+      stat.textContent  = 'Workflow may still be running. Refresh manually in a minute.';
+    }
+  } catch (e) {
+    label.textContent = 'Refresh';
+    stat.textContent = '⚠ ' + (e.message || e);
+  } finally {
+    document.getElementById('refreshBtn').disabled = false;
+    const newIcon = document.getElementById('refreshIcon');
+    if (newIcon && newIcon.classList.contains('spin')) {
+      newIcon.outerHTML = '<span id="refreshIcon">↻</span>';
+    }
+  }
 });
 
 async function main() {
@@ -977,6 +1430,7 @@ def main():
 
     current = {}
     slack_mentions_week = []   # [{lead_name, lead_addr, cid, channel, user, permalink, original, summary, added_at}]
+    slack_count_by_cid = {}    # for activity scoring + modal display
     for lead in leads:
         rec = build_lead_record(lead, sms_state)
         # carry over first_seen_at from prev if we had it
@@ -985,30 +1439,41 @@ def main():
         else:
             rec['first_seen_at'] = now_utc().isoformat()
         rec['snapshot_at'] = now_utc().isoformat()
-        current[lead['cid']] = rec
 
         # Slack mentions captured this week for this lead
+        per_lead_slacks = []
         for sm in fetch_slack_mentions(lead['cid']):
             if sm.get('added_at') and sm['added_at'] >= week_start_iso:
-                slack_mentions_week.append({
+                entry = {
                     'cid':       lead['cid'],
                     'lead_name': rec['name'],
                     'lead_addr': rec['addr'],
                     'lead_place': rec['place'],
                     'lead_stage': rec['stage_label'],
                     **sm,
-                })
+                }
+                slack_mentions_week.append(entry)
+                per_lead_slacks.append(entry)
+        rec['slack_this_week'] = per_lead_slacks
+        slack_count_by_cid[lead['cid']] = len(per_lead_slacks)
+
+        current[lead['cid']] = rec
         time.sleep(0.05)
 
     slack_mentions_week.sort(key=lambda x: x.get('added_at',''), reverse=True)
 
-    # Categorize
+    # Categorize. Buckets focus on weekly activity:
+    #   advanced / demoted / new       — stage moves and additions
+    #   active_no_move                  — same stage but had SMS / reply / Slack this week
+    #   ready_contract / ready_mao      — overlay tags for action items
+    #   drop_suggest                    — overlay for cold/nurture too long
+    #   quiet                           — same stage, no activity (shown collapsed at bottom)
     buckets = {k: [] for k in (
-        'ready_contract','ready_mao','advanced','new',
-        'stagnant_active','stagnant_inactive','demoted','drop_suggest')}
+        'ready_contract','ready_mao','advanced','demoted','new',
+        'active_no_move','drop_suggest','quiet')}
 
     for cid, c in current.items():
-        movement, meta, action_tags = categorize(c, prev, week_start_iso)
+        movement, meta, action_tags = categorize(c, prev, week_start_iso, slack_count_by_cid.get(cid, 0))
         c_out = dict(c)
         c_out['movement'] = movement
         c_out['movement_meta'] = meta
@@ -1017,26 +1482,34 @@ def main():
         for tag in action_tags:
             buckets[tag].append(c_out)
 
-    # Sort within buckets
+    # Sort within buckets — most-relevant first
     for k in buckets:
         if k in ('ready_contract', 'ready_mao'):
             buckets[k].sort(key=lambda x: -(x.get('rating') or 0))
-        elif k in ('advanced', 'new'):
+        elif k in ('advanced', 'new', 'active_no_move'):
             buckets[k].sort(key=lambda x: x.get('snapshot_at',''), reverse=True)
         else:
             buckets[k].sort(key=lambda x: -(x.get('rating') or 0))
 
+    # Totals oriented around WEEKLY activity, not pipeline state
+    sms_sent_this_week = sum(1 for c in current.values() if c['_activity']['sms_this_week'])
+    replies_this_week  = sum(1 for c in current.values() if c['_activity']['reply_this_week'])
+    active_this_week_total = sum(1 for c in current.values() if c['_activity']['had_activity'])
+
     totals = {
-        'total':              len(current),
+        'total_pipeline':     len(current),
+        'active_this_week':   active_this_week_total,
+        'sms_sent_week':      sms_sent_this_week,
+        'replies_week':       replies_this_week,
+        'slack_mentions':     len(slack_mentions_week),
         'advanced':           len(buckets['advanced']),
         'demoted':            len(buckets['demoted']),
         'new':                len(buckets['new']),
-        'stagnant_active':    len(buckets['stagnant_active']),
-        'stagnant_inactive':  len(buckets['stagnant_inactive']),
+        'active_no_move':     len(buckets['active_no_move']),
         'ready_contract':     len(buckets['ready_contract']),
         'ready_mao':          len(buckets['ready_mao']),
         'drop_suggest':       len(buckets['drop_suggest']),
-        'slack_mentions':     len(slack_mentions_week),
+        'quiet':              len(buckets['quiet']),
     }
 
     # Range label
