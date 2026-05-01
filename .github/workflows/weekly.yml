@@ -1,0 +1,39 @@
+name: Weekly Analysis
+
+on:
+  schedule:
+    - cron: '0 14 * * 5'   # Every Friday 14:00 UTC ≈ 10 AM ET (EDT). Drifts to 9 AM ET in EST.
+  workflow_dispatch:        # manual trigger from Actions tab
+
+permissions:
+  contents: write           # commit weekly outputs back to main
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run weekly analysis
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+        run: python weekly_analysis.py
+
+      - name: Commit outputs to main
+        run: |
+          git config user.name  "apg-weekly-bot"
+          git config user.email "apg-weekly-bot@users.noreply.github.com"
+          git add weekly/ site/weekly.html
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Weekly Analysis snapshot $(date -u +%Y-W%V)"
+            git push
+          fi

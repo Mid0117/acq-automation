@@ -67,6 +67,17 @@ jobs:
           GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
         run: python deals_dashboard.py
 
+      - name: Bundle weekly analysis files into site/
+        run: |
+          mkdir -p site/weekly
+          if [ -d weekly ]; then
+            cp -r weekly/* site/weekly/ 2>/dev/null || true
+            echo "Copied weekly snapshots into site/weekly/"
+            ls -la site/weekly/ || true
+          else
+            echo "No weekly/ directory yet (first weekly run hasn't fired)."
+          fi
+
       - name: Deploy HTML dashboard to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

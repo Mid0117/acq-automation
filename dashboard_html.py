@@ -534,6 +534,7 @@ a:hover { color: var(--ink); }
     <div class="nav">
       <a href="index.html" class="active">Follow-Ups</a>
       <a href="deals.html">Deals</a>
+      <a href="weekly.html">Weekly</a>
       <a href="about.html">About</a>
     </div>
   </div>
