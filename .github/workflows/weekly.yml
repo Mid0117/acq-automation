@@ -33,7 +33,19 @@ jobs:
           git add weekly/ site/weekly.html
           if git diff --staged --quiet; then
             echo "No changes to commit."
-          else
-            git commit -m "Weekly Analysis snapshot $(date -u +%Y-W%V)"
-            git push
+            exit 0
           fi
+          git commit -m "Weekly Analysis snapshot $(date -u +%Y-W%V)"
+          # Retry-on-race: another workflow may have pushed while we were
+          # generating the snapshot. Rebase on top, push, repeat up to 5x.
+          for i in 1 2 3 4 5; do
+            if git push 2>&1; then
+              echo "Pushed on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i/5), rebasing..."
+            git pull --rebase origin main || true
+            sleep 3
+          done
+          echo "Failed to push after 5 retries"
+          exit 1
