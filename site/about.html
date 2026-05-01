@@ -54,19 +54,14 @@ body {
   display: inline-flex; flex-direction: column; align-items: center;
   margin-bottom: 18px;
 }
-.logo-mark {
-  width: 86px; height: 86px; border-radius: 22px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 30px; letter-spacing: 0.04em;
-  color: #fff; box-shadow: 0 12px 32px rgba(99,102,241,0.35);
-  margin-bottom: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+.logo-svg {
+  width: 280px; height: auto; max-width: 100%;
+  filter: drop-shadow(0 8px 24px rgba(244,180,0,0.25));
 }
-.logo-text {
-  font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--text-dim);
-}
+.logo-svg .atom-orbit { stroke: #F4B400; stroke-width: 3; fill: none; }
+.logo-svg .atom-core  { fill: #F4B400; }
+.logo-svg .brand-main { fill: #fff; }
+.logo-svg .brand-sub  { fill: rgba(255,255,255,0.78); letter-spacing: 6px; }
 .hero .eyebrow {
   display: inline-block;
   font-size: 11px; padding: 4px 12px; border-radius: 999px;
@@ -296,9 +291,30 @@ code {
   <!-- ─────────────────────── HERO ─────────────────────── -->
   <div class="hero">
     <div class="logo-wrap">
-      <!-- Replace this block with <img src="logo.png" alt="APG"> when you have the real logo file -->
-      <div class="logo-mark">APG</div>
-      <div class="logo-text">Atom Property Group</div>
+      <!-- Atom Property Group — inline SVG so it ships without an external file.
+           If you drop a real logo.png/svg into site/, swap this <svg> block
+           for <img src="logo.png" alt="Atom Property Group"> -->
+      <svg class="logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" aria-label="Atom Property Group">
+        <!-- "AT" -->
+        <text x="50" y="70" font-family="Arial Black, Helvetica, sans-serif"
+              font-weight="900" font-size="64" class="brand-main">AT</text>
+
+        <!-- Atom emblem replacing the "O" -->
+        <g transform="translate(166, 40)">
+          <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" />
+          <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(60 28 28)" />
+          <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(-60 28 28)" />
+          <circle  class="atom-core"  cx="28" cy="28" r="5" />
+        </g>
+
+        <!-- "M" -->
+        <text x="232" y="70" font-family="Arial Black, Helvetica, sans-serif"
+              font-weight="900" font-size="64" class="brand-main">M</text>
+
+        <!-- "PROPERTY GROUP" -->
+        <text x="50" y="108" font-family="Arial, Helvetica, sans-serif"
+              font-weight="700" font-size="14" class="brand-sub">PROPERTY GROUP</text>
+      </svg>
     </div>
     <div class="eyebrow">ACQ Pipeline · Acquisitions Automation</div>
     <h1>Three Robots, Working 24/7</h1>
