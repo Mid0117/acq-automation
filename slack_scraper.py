@@ -300,6 +300,18 @@ Return JSON per system instructions."""
         return None
 
 
+def slack_permalink(channel_id, ts):
+    """Get a real Slack permalink for a message via chat.getPermalink. Returns
+    empty string if anything fails (the note is still useful without it)."""
+    try:
+        j = slack_call('chat.getPermalink', params={'channel': channel_id, 'message_ts': ts})
+        if j and j.get('permalink'):
+            return j['permalink']
+    except Exception:
+        pass
+    return ''
+
+
 def add_note(cid, body):
     try:
         requests.post(f'https://services.leadconnectorhq.com/contacts/{cid}/notes',
@@ -399,10 +411,14 @@ def _main_inner():
                 changed = {}
                 if result.get('match_confidence') == 'high':
                     changed = update_fields(cid, result.get('field_updates') or {})
-                # Note with audit trail
+                # Note with audit trail — include real Slack permalink so the
+                # weekly dashboard can link straight to the original message.
+                permalink = slack_permalink(ch_id, m['ts'])
+                permalink_line = f'\nSlack: {permalink}' if permalink else ''
                 note_body = (
                     f'Slack mention\n'
-                    f'#{ch_name} by <@{m.get("user","")}> — {fmt_slack_ts(m["ts"])}\n'
+                    f'#{ch_name} by <@{m.get("user","")}> — {fmt_slack_ts(m["ts"])}'
+                    f'{permalink_line}\n'
                     f'Confidence: {result.get("match_confidence")}\n\n'
                     f'Original: "{m["text"][:600]}"\n\n'
                     f'Summary: {summary}'

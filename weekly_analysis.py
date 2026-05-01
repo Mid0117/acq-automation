@@ -170,6 +170,53 @@ def fetch_summary_note(cid):
     return {}
 
 
+SLACK_NOTE_HEAD_RE      = re.compile(r'#(\S+)\s+by\s+<@([^>]+)>\s+—\s+(.+?)(?:\n|$)')
+SLACK_PERMALINK_RE      = re.compile(r'Slack:\s*(https?://\S+)')
+SLACK_ORIGINAL_RE       = re.compile(r'Original:\s*"(.+?)"', re.DOTALL)
+SLACK_SUMMARY_RE        = re.compile(r'Summary:\s*(.+?)(?:\n\n|\nFields auto-updated|$)', re.DOTALL)
+
+
+def parse_slack_note(body):
+    """Parse a 'Slack mention' note body. Returns dict with channel, user, ts,
+    permalink, original, summary."""
+    out = {'channel': '', 'user': '', 'ts_text': '',
+           'permalink': '', 'original': '', 'summary': ''}
+    m = SLACK_NOTE_HEAD_RE.search(body)
+    if m:
+        out['channel'] = m.group(1)
+        out['user']    = m.group(2)
+        out['ts_text'] = m.group(3).strip()
+    m = SLACK_PERMALINK_RE.search(body)
+    if m: out['permalink'] = m.group(1).strip()
+    m = SLACK_ORIGINAL_RE.search(body)
+    if m: out['original'] = m.group(1).strip().replace('\n', ' ')[:280]
+    m = SLACK_SUMMARY_RE.search(body)
+    if m: out['summary'] = m.group(1).strip().replace('\n', ' ')[:280]
+    return out
+
+
+def fetch_slack_mentions(cid):
+    """Return list of Slack mention notes added to this contact, sorted newest first.
+    Each entry: {note_id, added_at, channel, user, permalink, original, summary}."""
+    out = []
+    try:
+        r = http('GET', f'https://services.leadconnectorhq.com/contacts/{cid}/notes', headers=GHL_H)
+        if r.status_code != 200:
+            return out
+        for n in r.json().get('notes', []):
+            body = n.get('body') or ''
+            if not body.startswith('Slack mention'):
+                continue
+            parsed = parse_slack_note(body)
+            parsed['note_id']  = n.get('id', '')
+            parsed['added_at'] = n.get('dateAdded') or n.get('createdAt') or ''
+            out.append(parsed)
+    except Exception:
+        pass
+    out.sort(key=lambda x: x.get('added_at',''), reverse=True)
+    return out
+
+
 def load_state():
     path = os.path.join(WEEKLY_DIR, '_state.json')
     if not os.path.exists(path):
@@ -386,6 +433,36 @@ body {
 }
 .week-picker .meta { color: var(--ink-soft); font-size: 12px; margin-left: auto; }
 
+.stage-filter {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-top: 14px; padding: 10px 14px;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px;
+}
+.filter-chip {
+  padding: 6px 12px; border-radius: 3px;
+  background: transparent; border: 1px solid var(--rule);
+  color: var(--ink-soft); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  cursor: pointer; user-select: none; transition: all .12s;
+}
+.filter-chip:hover { color: var(--ink); border-color: var(--ink); }
+.filter-chip.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
+
+.slack-list .lead-line { grid-template-columns: 1fr auto auto; }
+.slack-list .lead-line .who .nm a { color: var(--ink); text-decoration: none; }
+.slack-list .lead-line .who .nm a:hover { color: var(--gold-deep); text-decoration: underline; }
+.slack-list .lead-line .excerpt {
+  font-style: italic; color: var(--ink-soft); margin-top: 4px;
+  font-size: 12px; line-height: 1.5;
+  border-left: 2px solid var(--rule); padding-left: 10px; max-width: 600px;
+}
+.slack-list .lead-line .channel-tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 3px;
+  background: rgba(232,197,71,0.18); color: var(--ink);
+  font-weight: 700; letter-spacing: 0.04em;
+  font-family: ui-monospace, monospace;
+}
+
 hr.head { border: 0; border-top: 1px solid var(--rule); margin: 24px 0 0; }
 
 .sec { margin: 36px 0 18px; }
@@ -555,6 +632,19 @@ a:hover { color: var(--ink); }
     <span class="meta" id="weekMeta"></span>
   </div>
 
+  <div class="stage-filter" id="stageFilter">
+    <span class="filter-chip active" data-stage="all">All Stages</span>
+    <span class="filter-chip" data-stage="0. Unqualified Leads">Unqualified</span>
+    <span class="filter-chip" data-stage="1. Qualified Leads (Warm/Hot)">Qualified</span>
+    <span class="filter-chip" data-stage="2. Prequalified Offer (LAO)">LAO</span>
+    <span class="filter-chip" data-stage="3. Due Diligence (RR)">DD</span>
+    <span class="filter-chip" data-stage="4. Negotiate (MAO)">MAO</span>
+    <span class="filter-chip" data-stage="5. Contract Sent">Contract</span>
+    <span class="filter-chip" data-stage="Follow Up (1.5 month)">FU 1.5mo</span>
+    <span class="filter-chip" data-stage="Follow Up (3 months)">FU 3mo</span>
+    <span class="filter-chip" data-stage="Dead Deals">Dead</span>
+  </div>
+
   <div id="content"><div class="loading">Loading analysis…</div></div>
 
   <footer>Auto-generated each Friday 10 AM ET · APG ACQ Operating Layer</footer>
@@ -622,6 +712,50 @@ const BUCKET_DEFS = [
   {key:'drop_suggest',      title:'Drop Suggestions',     tone:'gray',  num:'08', desc:'Cold/Nurture sitting in active stages > 30 days. Consider moving to Unqualified.'},
 ];
 
+// Active stage filter (set by chip clicks). 'all' = no filter.
+let stageFilter = 'all';
+
+function leadMatchesStage(l) {
+  if (stageFilter === 'all') return true;
+  return (l.stage_label || '').trim() === stageFilter;
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+function renderSlack(week) {
+  const items = week.slack_mentions || [];
+  if (!items.length) return '';
+  const filtered = items.filter(s => stageFilter === 'all' || s.lead_stage === stageFilter);
+  if (!filtered.length) return '';
+  let html = '<div class="bucket warm slack-list">';
+  html += '<div class="head"><span class="num-big">📡</span><h3>Slack Mentions This Week</h3>';
+  html += '<span class="ct">' + filtered.length + ' mention' + (filtered.length===1?'':'s') + '</span></div>';
+  html += '<div class="body">';
+  html += '<div class="lead-line" style="background:rgba(0,0,0,0.02);font-style:italic;color:var(--ink-soft);grid-template-columns:1fr;"><div>Lead mentions captured from APG Slack channels this week. Each card links to the GHL contact and to the original Slack message.</div></div>';
+  for (const s of filtered) {
+    const ghl = GHL_BASE + '/' + s.cid;
+    const slackBtn = s.permalink
+      ? '<a class="ghl-link" href="' + escapeHtml(s.permalink) + '" target="_blank">Open in Slack</a>'
+      : '<span class="channel-tag">#' + escapeHtml(s.channel || '?') + '</span>';
+    const ghlBtn = '<a class="ghl-link" href="' + ghl + '" target="_blank">Open GHL</a>';
+    html += '<div class="lead-line">' +
+      '<div class="who">' +
+      '<div class="nm"><a href="' + ghl + '" target="_blank">' + escapeHtml(s.lead_name || '(no name)') + '</a></div>' +
+      '<div class="pl">' + escapeHtml((s.lead_addr ? s.lead_addr + ' · ' : '') + (s.lead_place || '')) +
+        ' · <span class="channel-tag">#' + escapeHtml(s.channel || '?') + '</span></div>' +
+      (s.original ? '<div class="excerpt">"' + escapeHtml(s.original) + '"</div>' : '') +
+      (s.summary  ? '<div class="excerpt" style="border-left-color:var(--gold-deep)">' + escapeHtml(s.summary) + '</div>' : '') +
+      '</div>' +
+      slackBtn + ghlBtn + '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
 function render(week) {
   const c = document.getElementById('content');
   if (!week) {
@@ -633,7 +767,7 @@ function render(week) {
 
   let html = '';
 
-  // KPIs
+  // KPIs (always show full totals — filter only affects bucket lists below)
   html += '<section class="sec">';
   html += '<div class="tag-row"><span class="num">00</span><h2>At a Glance</h2></div><hr>';
   html += '<div class="stat-row">';
@@ -642,17 +776,26 @@ function render(week) {
   html += '<div class="stat hot"><div class="lab">Stagnant Cold</div><div class="v">' + (totals.stagnant_inactive||0) + '</div><div class="sub">no activity, no movement</div></div>';
   html += '<div class="stat warm"><div class="lab">New</div><div class="v">' + (totals.new||0) + '</div><div class="sub">added this week</div></div>';
   html += '<div class="stat green"><div class="lab">Ready Contract</div><div class="v">' + (totals.ready_contract||0) + '</div><div class="sub">send it</div></div>';
+  if (totals.slack_mentions != null) {
+    html += '<div class="stat"><div class="lab">Slack Mentions</div><div class="v">' + totals.slack_mentions + '</div><div class="sub">captured this week</div></div>';
+  }
   html += '</div></section>';
 
-  // Buckets
+  // Slack mentions section first (high signal — what the team talked about)
+  html += renderSlack(week);
+
+  // Buckets — apply stage filter to each bucket's items
   for (const def of BUCKET_DEFS) {
-    const items = buckets[def.key] || [];
+    const all = buckets[def.key] || [];
+    const items = all.filter(leadMatchesStage);
     if (!items.length) continue;
     html += '<div class="bucket ' + def.tone + '">';
     html += '<div class="head">';
     html += '<span class="num-big">' + def.num + '</span>';
     html += '<h3>' + def.title + '</h3>';
-    html += '<span class="ct">' + items.length + ' lead' + (items.length===1?'':'s') + '</span>';
+    const filterNote = (stageFilter !== 'all' && all.length !== items.length) ?
+        ' <span style="color:var(--ink-mute);font-weight:500">of ' + all.length + '</span>' : '';
+    html += '<span class="ct">' + items.length + ' lead' + (items.length===1?'':'s') + filterNote + '</span>';
     html += '</div>';
     html += '<div class="body">';
     if (def.desc) html += '<div class="lead-line" style="background:rgba(0,0,0,0.02);font-style:italic;color:var(--ink-soft);grid-template-columns:1fr;"><div>' + def.desc + '</div></div>';
@@ -660,10 +803,24 @@ function render(week) {
     html += '</div></div>';
   }
 
-  if (!html.includes('bucket')) html += '<div class="empty">No actionable buckets this week.</div>';
+  if (!html.includes('bucket')) html += '<div class="empty">No leads match this filter for this week.</div>';
 
   c.innerHTML = html;
 }
+
+let _currentWeekData = null;
+
+function applyStageFilter(stage) {
+  stageFilter = stage;
+  document.querySelectorAll('.stage-filter .filter-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.stage === stage);
+  });
+  if (_currentWeekData) render(_currentWeekData);
+}
+
+document.querySelectorAll('.stage-filter .filter-chip').forEach(chip => {
+  chip.addEventListener('click', e => applyStageFilter(chip.dataset.stage));
+});
 
 async function main() {
   let idx;
@@ -682,10 +839,12 @@ async function main() {
     document.getElementById('content').innerHTML = '<div class="loading">Loading ' + w + '…</div>';
     try {
       const data = await fetch(ROOT + w + '.json', {cache:'no-store'}).then(r => r.json());
+      _currentWeekData = data;
       document.getElementById('metaWeek').textContent = w + ' · ' + (data.range_label || '');
       document.getElementById('weekMeta').textContent = 'Generated ' + (data.generated_at_et || '');
       render(data);
     } catch(e) {
+      _currentWeekData = null;
       document.getElementById('content').innerHTML = '<div class="empty">Failed to load this week\\'s data.</div>';
     }
   }
@@ -717,6 +876,7 @@ def main():
     week_start_iso = week_start.astimezone(timezone.utc).isoformat()
 
     current = {}
+    slack_mentions_week = []   # [{lead_name, lead_addr, cid, channel, user, permalink, original, summary, added_at}]
     for lead in leads:
         rec = build_lead_record(lead, sms_state)
         # carry over first_seen_at from prev if we had it
@@ -726,7 +886,21 @@ def main():
             rec['first_seen_at'] = now_utc().isoformat()
         rec['snapshot_at'] = now_utc().isoformat()
         current[lead['cid']] = rec
+
+        # Slack mentions captured this week for this lead
+        for sm in fetch_slack_mentions(lead['cid']):
+            if sm.get('added_at') and sm['added_at'] >= week_start_iso:
+                slack_mentions_week.append({
+                    'cid':       lead['cid'],
+                    'lead_name': rec['name'],
+                    'lead_addr': rec['addr'],
+                    'lead_place': rec['place'],
+                    'lead_stage': rec['stage_label'],
+                    **sm,
+                })
         time.sleep(0.05)
+
+    slack_mentions_week.sort(key=lambda x: x.get('added_at',''), reverse=True)
 
     # Categorize
     buckets = {k: [] for k in (
@@ -762,18 +936,20 @@ def main():
         'ready_contract':     len(buckets['ready_contract']),
         'ready_mao':          len(buckets['ready_mao']),
         'drop_suggest':       len(buckets['drop_suggest']),
+        'slack_mentions':     len(slack_mentions_week),
     }
 
     # Range label
     range_label = f'{week_start.strftime("%b %d")} → {et_now.strftime("%b %d, %Y")}'
 
     output = {
-        'week_id':         week,
-        'range_label':     range_label,
-        'generated_at':    now_utc().isoformat(),
-        'generated_at_et': et_now.strftime('%b %d, %Y %I:%M %p ET'),
-        'totals':          totals,
-        'buckets':         buckets,
+        'week_id':              week,
+        'range_label':          range_label,
+        'generated_at':         now_utc().isoformat(),
+        'generated_at_et':      et_now.strftime('%b %d, %Y %I:%M %p ET'),
+        'totals':               totals,
+        'buckets':              buckets,
+        'slack_mentions':       slack_mentions_week,
     }
 
     save_json(os.path.join(WEEKLY_DIR, f'{week}.json'), output)
