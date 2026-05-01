@@ -1120,67 +1120,42 @@ function renderSlackSection(week) {
   return html;
 }
 
-// GHL custom field IDs that Slack-extracted suggestions can update
-const SUGGEST_FIELD_IDS = {
-  asking_price:       '6q7syt4puxfP7E03Xxhd',
-  timeline:           'v47I1Mi63RBpCD5N5RrH',
-  motivation:         'rbYZAdhvuvX1NQgexhxy',
-  reason_for_selling: 'cJdRGRoox0RZCytRAVSI',
-};
-
-const GHL_TOKEN_KEY = 'apg_ghl_token_v1';
-
+// Apply a Slack suggestion. The actual GHL write happens server-side in the
+// 'Apply Slack Suggestion' workflow, which uses the GHL_TOKEN secret. The
+// browser only needs the user's GitHub PAT (already stored from the Refresh
+// Now button) — no GHL token in browser.
 async function applySuggestion(cid, suggestedJson, btn) {
   let suggested;
-  try { suggested = JSON.parse(suggestedJson); } catch (e) { alert('Could not parse suggestion'); return; }
+  try { suggested = JSON.parse(suggestedJson); }
+  catch (e) { alert('Could not parse suggestion'); return; }
+  if (!cid || !Object.keys(suggested).length) { alert('Nothing to apply'); return; }
 
-  let token = localStorage.getItem(GHL_TOKEN_KEY);
-  if (!token) {
-    token = prompt(
-      'Applying suggestions to GHL needs a GHL Private Integration token (one-time setup).\\n\\n' +
-      '1. GHL → Settings → Private Integrations → Create new\\n' +
-      '2. Scopes: contacts.write\\n' +
-      '3. Paste the pit-... token here. Stored only in your browser.'
-    );
-    if (!token) return;
-    localStorage.setItem(GHL_TOKEN_KEY, token.trim());
-  }
-
-  const customFields = [];
-  for (const [k, v] of Object.entries(suggested)) {
-    const fid = SUGGEST_FIELD_IDS[k];
-    if (!fid || v == null || v === '') continue;
-    customFields.push({id: fid, field_value: String(v)});
-  }
-  if (!customFields.length) { alert('Nothing to apply'); return; }
-
-  btn.disabled = true; btn.textContent = 'Applying…';
+  btn.disabled = true;
+  const oldText = btn.textContent;
+  btn.textContent = 'Triggering…';
+  const startedAt = Date.now();
   try {
-    const r = await fetch('https://services.leadconnectorhq.com/contacts/' + cid, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-        'Version': '2021-07-28',
-      },
-      body: JSON.stringify({customFields}),
+    await dispatchWorkflow('apply_suggestion.yml', 'main', {
+      cid: String(cid),
+      field_updates: JSON.stringify(suggested),
     });
-    if (r.ok) {
+    btn.textContent = 'Running…';
+    const run = await pollLatestRun('Apply Slack Suggestion', startedAt, 90000);
+    if (run && run.conclusion === 'success') {
       btn.textContent = '✓ Applied';
       btn.style.background = 'var(--s-live)';
       btn.style.color = '#fff';
-    } else if (r.status === 401 || r.status === 403) {
-      localStorage.removeItem(GHL_TOKEN_KEY);
-      btn.disabled = false; btn.textContent = 'Apply to GHL';
-      alert('GHL token rejected — please re-enter.');
+      btn.style.borderColor = 'var(--s-live)';
+    } else if (run) {
+      btn.disabled = false; btn.textContent = oldText;
+      alert('Workflow ' + (run.conclusion || 'in progress') + '. Check Actions tab for details.');
     } else {
-      const t = await r.text();
-      btn.disabled = false; btn.textContent = 'Apply to GHL';
-      alert('Failed: ' + r.status + ' ' + t.slice(0, 200));
+      btn.disabled = false; btn.textContent = oldText;
+      alert('Workflow timed out. Check Actions tab manually.');
     }
   } catch (e) {
-    btn.disabled = false; btn.textContent = 'Apply to GHL';
-    alert('Network error: ' + e.message);
+    btn.disabled = false; btn.textContent = oldText;
+    alert('Failed: ' + (e.message || e));
   }
 }
 
