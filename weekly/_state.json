@@ -32,7 +32,7 @@
     "last_updated": "2026-05-01T19:34:20.049Z",
     "contact_updated_at": "2026-05-01T19:58:44.089Z",
     "first_seen_at": "2026-05-01T19:49:24.395290+00:00",
-    "snapshot_at": "2026-05-01T20:22:33.641757+00:00",
+    "snapshot_at": "2026-05-01T20:49:59.860111+00:00",
     "slack_this_week": [
       {
         "cid": "ZarZCLmDwBnVGKVjUl6g",
@@ -41,7 +41,30 @@
         "lead_place": "Orange, NJ, 07050",
         "lead_stage": "0. Unqualified Leads",
         "channel": "base1-sms-leadgen",
-        "user": "Ayaz Ahmad (U06DLELJJFJ)",
+        "user": "Ayaz Ahmad",
+        "ts_text": "May 01, 2026 06:05 PM UTC",
+        "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777658714176449?thread_ts=1777658714.176449&cid=C06MM4DQZ28",
+        "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P4-TM1*  *Linda Charles - <tel:2016752021|(201) 675-2021> - 450 Seven Oaks Rd, Orange, NJ, 07050-3122*  Zillow: *$700,600* Realtor: *$753,553* Redfin: *$676,818*  12:58 PM Hey Linda it's Jake. I'm interested in 450 Seven",
+        "summary": "Linda wants $784k for her property, would sell ASAP if price is right, moving to Florida, but demands deposit before further discussion.",
+        "confidence": "high",
+        "suggested": {
+          "asking_price": "784000",
+          "timeline": "ASAP",
+          "motivation": "Would sell ASAP if price is right, but requires deposit to continue conversation",
+          "reason_for_selling": "Moving to Florida"
+        },
+        "auto_applied": {},
+        "note_id": "AFBcskBp4cBMpOv2wGbN",
+        "added_at": "2026-05-01T20:45:28.837Z"
+      },
+      {
+        "cid": "ZarZCLmDwBnVGKVjUl6g",
+        "lead_name": "Linda Charles",
+        "lead_addr": "450 Seven Oaks Rd",
+        "lead_place": "Orange, NJ, 07050",
+        "lead_stage": "0. Unqualified Leads",
+        "channel": "base1-sms-leadgen",
+        "user": "Ayaz Ahmad",
         "ts_text": "May 01, 2026 06:05 PM UTC",
         "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777658714176449?thread_ts=1777658714.176449&cid=C06MM4DQZ28",
         "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P4-TM1*  *Linda Charles - <tel:2016752021|(201) 675-2021> - 450 Seven Oaks Rd, Orange, NJ, 07050-3122*  Zillow: *$700,600* Realtor: *$753,553* Redfin: *$676,818*  12:58 PM Hey Linda it's Jake. I'm interested in 450 Seven",
@@ -64,7 +87,7 @@
         "lead_place": "Orange, NJ, 07050",
         "lead_stage": "0. Unqualified Leads",
         "channel": "base1-sms-leadgen",
-        "user": "Ayaz Ahmad (U06DLELJJFJ)",
+        "user": "Ayaz Ahmad",
         "ts_text": "May 01, 2026 06:05 PM UTC",
         "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777658714176449?thread_ts=1777658714.176449&cid=C06MM4DQZ28",
         "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P4-TM1*  *Linda Charles - <tel:2016752021|(201) 675-2021> - 450 Seven Oaks Rd, Orange, NJ, 07050-3122*  Zillow: *$700,600* Realtor: *$753,553* Redfin: *$676,818*  12:58 PM Hey Linda it's Jake. I'm interested in 450 Seven",
@@ -165,15 +188,15 @@
         "added_at": "2026-05-01T19:36:58.308Z"
       }
     ],
-    "notes_added_this_week": 1,
+    "notes_added_this_week": 2,
     "_activity": {
       "sms_this_week": false,
       "reply_this_week": false,
       "slack_this_week": true,
-      "slack_count": 5,
+      "slack_count": 6,
       "opp_update_week": true,
       "contact_update_week": true,
-      "notes_this_week": 1,
+      "notes_this_week": 2,
       "had_activity": true
     }
   },
@@ -210,7 +233,7 @@
     "last_updated": "2026-05-01T19:33:16.466Z",
     "contact_updated_at": "2026-05-01T19:58:30.096Z",
     "first_seen_at": "2026-05-01T19:49:24.931350+00:00",
-    "snapshot_at": "2026-05-01T20:22:34.671276+00:00",
+    "snapshot_at": "2026-05-01T20:50:00.645925+00:00",
     "slack_this_week": [
       {
         "cid": "xtkiLGHffkjzyyIUgNIm",
@@ -219,7 +242,30 @@
         "lead_place": "West Orange, NJ, 07052",
         "lead_stage": "0. Unqualified Leads",
         "channel": "base1-sms-leadgen",
-        "user": "Ayaz Ahmad (U06DLELJJFJ)",
+        "user": "Ayaz Ahmad",
+        "ts_text": "May 01, 2026 07:32 PM UTC",
+        "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777663965774559?thread_ts=1777663965.774559&cid=C06MM4DQZ28",
+        "original": "<@U09HXCFD86R> <@U06DLS3K62U> *Available around 7 pm today or tomorrow morning after 9:30 am.*  Campaign: *031726 NJ-1 Motive-P2-TM1*  *Mina Hwang - <tel:9175204681|(917) 520-4681> - 154 Marion Dr, West Orange, NJ, 07052*  *Zillow: $499,999 (Listed)*  02:16 PM Hey Mina Jake here.",
+        "summary": "Mina Hwang is interested in selling, property is listed at $499,999, doesn't need major work, wants to discuss options later at 7pm today or tomorrow morning after 9:30am.",
+        "confidence": "high",
+        "suggested": {
+          "asking_price": "499999",
+          "timeline": "ASAP",
+          "motivation": "Currently listed, open to direct purchase options that could bring more funds",
+          "reason_for_selling": "Property is already on the market and seller is evaluating direct purchase options to maximize proceeds"
+        },
+        "auto_applied": {},
+        "note_id": "SFTueRERtCFhJQP9hqT4",
+        "added_at": "2026-05-01T20:45:14.534Z"
+      },
+      {
+        "cid": "xtkiLGHffkjzyyIUgNIm",
+        "lead_name": "Mina Hwang",
+        "lead_addr": "154 Marion Dr",
+        "lead_place": "West Orange, NJ, 07052",
+        "lead_stage": "0. Unqualified Leads",
+        "channel": "base1-sms-leadgen",
+        "user": "Ayaz Ahmad",
         "ts_text": "May 01, 2026 07:32 PM UTC",
         "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777663965774559",
         "original": "<@U09HXCFD86R> <@U06DLS3K62U> *Available around 7 pm today or tomorrow morning after 9:30 am.*  Campaign: *031726 NJ-1 Motive-P2-TM1*  *Mina Hwang - <tel:9175204681|(917) 520-4681> - 154 Marion Dr, West Orange, NJ, 07052*  *Zillow: $499,999 (Listed)*  02:16 PM Hey Mina Jake here.",
@@ -242,7 +288,7 @@
         "lead_place": "West Orange, NJ, 07052",
         "lead_stage": "0. Unqualified Leads",
         "channel": "base1-sms-leadgen",
-        "user": "Ayaz Ahmad (U06DLELJJFJ)",
+        "user": "Ayaz Ahmad",
         "ts_text": "May 01, 2026 07:32 PM UTC",
         "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777663965774559",
         "original": "<@U09HXCFD86R> <@U06DLS3K62U> *Available around 7 pm today or tomorrow morning after 9:30 am.*  Campaign: *031726 NJ-1 Motive-P2-TM1*  *Mina Hwang - <tel:9175204681|(917) 520-4681> - 154 Marion Dr, West Orange, NJ, 07052*  *Zillow: $499,999 (Listed)*  02:16 PM Hey Mina Jake here.",
@@ -339,15 +385,15 @@
         "added_at": "2026-05-01T19:36:46.553Z"
       }
     ],
-    "notes_added_this_week": 1,
+    "notes_added_this_week": 2,
     "_activity": {
       "sms_this_week": false,
       "reply_this_week": false,
       "slack_this_week": true,
-      "slack_count": 5,
+      "slack_count": 6,
       "opp_update_week": true,
       "contact_update_week": true,
-      "notes_this_week": 1,
+      "notes_this_week": 2,
       "had_activity": true
     }
   },
@@ -382,9 +428,9 @@
     "phone_e164": "+19734643733",
     "last_call_summary": "",
     "last_updated": "2026-05-01T19:17:19.946Z",
-    "contact_updated_at": "2026-05-01T19:58:35.373Z",
+    "contact_updated_at": "2026-05-01T20:32:45.360Z",
     "first_seen_at": "2026-05-01T19:49:25.393286+00:00",
-    "snapshot_at": "2026-05-01T20:22:35.512957+00:00",
+    "snapshot_at": "2026-05-01T20:50:01.393320+00:00",
     "slack_this_week": [
       {
         "cid": "MrmaDqKRnuJf5eFUDp4i",
@@ -393,7 +439,30 @@
         "lead_place": "Bloomfield, NJ, 07003",
         "lead_stage": "0. Unqualified Leads",
         "channel": "base1-sms-leadgen",
-        "user": "Ayaz Ahmad (U06DLELJJFJ)",
+        "user": "Ayaz Ahmad",
+        "ts_text": "May 01, 2026 07:17 PM UTC",
+        "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777663069331659?thread_ts=1777663069.331659&cid=C06MM4DQZ28",
+        "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P2-TM1*  *Samuel Ciccone - <tel:9734643733|(973) 464-3733> - 114 W Passaic Ave, Bloomfield, NJ 07003*  *Zillow: $691,500* *Redfin: $671,568* *Realtor: $756,800*  02:54 PM Hey Samuel Jake here. Have you considered selling",
+        "summary": "Samuel confirmed property is 95% renovated with new finishes, currently empty, wants to sell now, turned down $800k offer from NY buyers today.",
+        "confidence": "high",
+        "suggested": {
+          "asking_price": "800000",
+          "timeline": "ASAP",
+          "motivation": "already purchased new home",
+          "reason_for_selling": "He has already purchased a new home and needs to sell this renovated property"
+        },
+        "auto_applied": {},
+        "note_id": "Ysfp7SU2sL2lMpoDgbSI",
+        "added_at": "2026-05-01T20:45:20.807Z"
+      },
+      {
+        "cid": "MrmaDqKRnuJf5eFUDp4i",
+        "lead_name": "Samuel Ciccone",
+        "lead_addr": "114 W Passaic Ave",
+        "lead_place": "Bloomfield, NJ, 07003",
+        "lead_stage": "0. Unqualified Leads",
+        "channel": "base1-sms-leadgen",
+        "user": "Ayaz Ahmad",
         "ts_text": "May 01, 2026 07:17 PM UTC",
         "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777663069331659",
         "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P2-TM1*  *Samuel Ciccone - <tel:9734643733|(973) 464-3733> - 114 W Passaic Ave, Bloomfield, NJ 07003*  *Zillow: $691,500* *Redfin: $671,568* *Realtor: $756,800*  02:54 PM Hey Samuel Jake here. Have you considered selling",
@@ -416,7 +485,7 @@
         "lead_place": "Bloomfield, NJ, 07003",
         "lead_stage": "0. Unqualified Leads",
         "channel": "base1-sms-leadgen",
-        "user": "Ayaz Ahmad (U06DLELJJFJ)",
+        "user": "Ayaz Ahmad",
         "ts_text": "May 01, 2026 07:17 PM UTC",
         "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777663069331659",
         "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P2-TM1*  *Samuel Ciccone - <tel:9734643733|(973) 464-3733> - 114 W Passaic Ave, Bloomfield, NJ 07003*  *Zillow: $691,500* *Redfin: $671,568* *Realtor: $756,800*  02:54 PM Hey Samuel Jake here. Have you considered selling",
@@ -517,15 +586,15 @@
         "added_at": "2026-05-01T19:36:51.545Z"
       }
     ],
-    "notes_added_this_week": 1,
+    "notes_added_this_week": 2,
     "_activity": {
       "sms_this_week": false,
       "reply_this_week": false,
       "slack_this_week": true,
-      "slack_count": 5,
+      "slack_count": 6,
       "opp_update_week": true,
       "contact_update_week": true,
-      "notes_this_week": 1,
+      "notes_this_week": 2,
       "had_activity": true
     }
   },
@@ -562,7 +631,7 @@
     "last_updated": "2026-05-01T19:05:00.063Z",
     "contact_updated_at": "2026-05-01T19:58:39.807Z",
     "first_seen_at": "2026-05-01T19:49:26.309343+00:00",
-    "snapshot_at": "2026-05-01T20:22:40.932916+00:00",
+    "snapshot_at": "2026-05-01T20:50:02.705144+00:00",
     "slack_this_week": [
       {
         "cid": "iolAf04kOv5iQku5coym",
@@ -571,7 +640,30 @@
         "lead_place": "Roseland, NJ, 07068",
         "lead_stage": "0. Unqualified Leads",
         "channel": "base1-sms-leadgen",
-        "user": "Ayaz Ahmad (U06DLELJJFJ)",
+        "user": "Ayaz Ahmad",
+        "ts_text": "May 01, 2026 07:07 PM UTC",
+        "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777662472511159?thread_ts=1777662472.511159&cid=C06MM4DQZ28",
+        "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P2-TM1*  *Scott Savarese - <tel:9178487202|(917) 848-7202> - 6 Schweinberg Dr, Roseland, NJ, 07068*  Zillow: *$742,300*  02:34 PM Hey Scott Jake here. I noticed 6 Schweinberg Dr and was wondering if you'd be open to chat",
+        "summary": "Scott confirmed he wants to sell 6 Schweinberg Dr because he just purchased another property and prefers to avoid using a realtor.",
+        "confidence": "high",
+        "suggested": {
+          "asking_price": "742300",
+          "timeline": "ASAP",
+          "motivation": "Just purchased another property, wants to avoid realtor fees",
+          "reason_for_selling": "Already purchased another property and looking to sell quickly without going through a realtor"
+        },
+        "auto_applied": {},
+        "note_id": "lOHhabKfUUIj3uBIvhqg",
+        "added_at": "2026-05-01T20:45:24.690Z"
+      },
+      {
+        "cid": "iolAf04kOv5iQku5coym",
+        "lead_name": "Scott Savarese",
+        "lead_addr": "6 Schweinberg Dr",
+        "lead_place": "Roseland, NJ, 07068",
+        "lead_stage": "0. Unqualified Leads",
+        "channel": "base1-sms-leadgen",
+        "user": "Ayaz Ahmad",
         "ts_text": "May 01, 2026 07:07 PM UTC",
         "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777662472511159?thread_ts=1777662472.511159&cid=C06MM4DQZ28",
         "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P2-TM1*  *Scott Savarese - <tel:9178487202|(917) 848-7202> - 6 Schweinberg Dr, Roseland, NJ, 07068*  Zillow: *$742,300*  02:34 PM Hey Scott Jake here. I noticed 6 Schweinberg Dr and was wondering if you'd be open to chat",
@@ -593,7 +685,7 @@
         "lead_place": "Roseland, NJ, 07068",
         "lead_stage": "0. Unqualified Leads",
         "channel": "base1-sms-leadgen",
-        "user": "Ayaz Ahmad (U06DLELJJFJ)",
+        "user": "Ayaz Ahmad",
         "ts_text": "May 01, 2026 07:07 PM UTC",
         "permalink": "https://atompropertygroup.slack.com/archives/C06MM4DQZ28/p1777662472511159",
         "original": "<@U09HXCFD86R> <@U06DLS3K62U> Campaign: *031726 NJ-1 Motive-P2-TM1*  *Scott Savarese - <tel:9178487202|(917) 848-7202> - 6 Schweinberg Dr, Roseland, NJ, 07068*  Zillow: *$742,300*  02:34 PM Hey Scott Jake here. I noticed 6 Schweinberg Dr and was wondering if you'd be open to chat",
@@ -693,15 +785,15 @@
         "added_at": "2026-05-01T19:36:54.976Z"
       }
     ],
-    "notes_added_this_week": 2,
+    "notes_added_this_week": 3,
     "_activity": {
       "sms_this_week": false,
       "reply_this_week": false,
       "slack_this_week": true,
-      "slack_count": 5,
+      "slack_count": 6,
       "opp_update_week": true,
       "contact_update_week": true,
-      "notes_this_week": 2,
+      "notes_this_week": 3,
       "had_activity": true
     }
   },
@@ -738,7 +830,7 @@
     "last_updated": "2026-04-29T21:01:38.285Z",
     "contact_updated_at": "2026-04-29T21:03:39.322Z",
     "first_seen_at": "2026-05-01T17:44:35.777349+00:00",
-    "snapshot_at": "2026-05-01T20:22:41.577467+00:00",
+    "snapshot_at": "2026-05-01T20:50:03.518506+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -785,7 +877,7 @@
     "last_updated": "2026-04-28T23:54:20.933Z",
     "contact_updated_at": "2026-04-29T00:48:16.505Z",
     "first_seen_at": "2026-05-01T17:44:36.206705+00:00",
-    "snapshot_at": "2026-05-01T20:22:42.163349+00:00",
+    "snapshot_at": "2026-05-01T20:50:04.259304+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -832,7 +924,7 @@
     "last_updated": "2026-04-28T23:54:45.227Z",
     "contact_updated_at": "2026-04-29T00:50:06.019Z",
     "first_seen_at": "2026-05-01T17:44:36.663750+00:00",
-    "snapshot_at": "2026-05-01T20:22:42.776990+00:00",
+    "snapshot_at": "2026-05-01T20:50:04.998397+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -879,7 +971,7 @@
     "last_updated": "2026-04-28T23:54:57.586Z",
     "contact_updated_at": "2026-04-29T00:05:31.465Z",
     "first_seen_at": "2026-05-01T17:44:37.241515+00:00",
-    "snapshot_at": "2026-05-01T20:22:43.375187+00:00",
+    "snapshot_at": "2026-05-01T20:50:05.711266+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -926,7 +1018,7 @@
     "last_updated": "2026-04-28T14:25:11.944Z",
     "contact_updated_at": "2026-04-29T00:02:04.508Z",
     "first_seen_at": "2026-05-01T17:44:37.922400+00:00",
-    "snapshot_at": "2026-05-01T20:22:43.925832+00:00",
+    "snapshot_at": "2026-05-01T20:50:06.537130+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -973,7 +1065,7 @@
     "last_updated": "2026-04-28T23:55:15.458Z",
     "contact_updated_at": "2026-04-29T00:53:08.719Z",
     "first_seen_at": "2026-05-01T17:44:38.395544+00:00",
-    "snapshot_at": "2026-05-01T20:22:44.502031+00:00",
+    "snapshot_at": "2026-05-01T20:50:07.263086+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -1020,7 +1112,7 @@
     "last_updated": "2026-04-28T14:25:16.725Z",
     "contact_updated_at": "2026-04-29T00:54:10.699Z",
     "first_seen_at": "2026-05-01T17:44:38.827136+00:00",
-    "snapshot_at": "2026-05-01T20:22:45.067428+00:00",
+    "snapshot_at": "2026-05-01T20:50:08.285779+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -1067,7 +1159,7 @@
     "last_updated": "2026-04-28T23:55:44.808Z",
     "contact_updated_at": "2026-04-29T00:06:12.688Z",
     "first_seen_at": "2026-05-01T17:44:39.717528+00:00",
-    "snapshot_at": "2026-05-01T20:22:45.626690+00:00",
+    "snapshot_at": "2026-05-01T20:50:08.950246+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1114,7 +1206,7 @@
     "last_updated": "2026-04-28T14:25:26.914Z",
     "contact_updated_at": "2026-04-29T00:06:21.883Z",
     "first_seen_at": "2026-05-01T17:44:40.117649+00:00",
-    "snapshot_at": "2026-05-01T20:22:48.626477+00:00",
+    "snapshot_at": "2026-05-01T20:50:09.958018+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1161,7 +1253,7 @@
     "last_updated": "2026-04-28T14:25:30.241Z",
     "contact_updated_at": "2026-04-28T04:25:13.137Z",
     "first_seen_at": "2026-05-01T17:44:40.557281+00:00",
-    "snapshot_at": "2026-05-01T20:22:49.278796+00:00",
+    "snapshot_at": "2026-05-01T20:50:10.695792+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1208,7 +1300,7 @@
     "last_updated": "2026-04-28T14:25:32.923Z",
     "contact_updated_at": "2026-04-29T00:02:16.545Z",
     "first_seen_at": "2026-05-01T17:44:41.078400+00:00",
-    "snapshot_at": "2026-05-01T20:22:49.953883+00:00",
+    "snapshot_at": "2026-05-01T20:50:11.446610+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1255,7 +1347,7 @@
     "last_updated": "2026-04-30T21:45:52.066Z",
     "contact_updated_at": "2026-04-30T21:45:52.457Z",
     "first_seen_at": "2026-05-01T17:44:41.535636+00:00",
-    "snapshot_at": "2026-05-01T20:22:50.641900+00:00",
+    "snapshot_at": "2026-05-01T20:50:12.551702+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 2,
     "_activity": {
@@ -1302,7 +1394,7 @@
     "last_updated": "2026-04-28T14:25:36.985Z",
     "contact_updated_at": "2026-04-29T00:08:28.105Z",
     "first_seen_at": "2026-05-01T17:44:42.067875+00:00",
-    "snapshot_at": "2026-05-01T20:22:51.307817+00:00",
+    "snapshot_at": "2026-05-01T20:50:13.291327+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1349,7 +1441,7 @@
     "last_updated": "2026-04-28T14:25:39.538Z",
     "contact_updated_at": "2026-04-29T00:08:57.902Z",
     "first_seen_at": "2026-05-01T17:44:42.510149+00:00",
-    "snapshot_at": "2026-05-01T20:22:51.883060+00:00",
+    "snapshot_at": "2026-05-01T20:50:14.186479+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1396,7 +1488,7 @@
     "last_updated": "2026-04-28T14:25:44.859Z",
     "contact_updated_at": "2026-04-29T00:09:14.240Z",
     "first_seen_at": "2026-05-01T17:44:42.931356+00:00",
-    "snapshot_at": "2026-05-01T20:22:52.490458+00:00",
+    "snapshot_at": "2026-05-01T20:50:14.848075+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1443,7 +1535,7 @@
     "last_updated": "2026-04-28T14:25:47.627Z",
     "contact_updated_at": "2026-04-29T00:02:23.227Z",
     "first_seen_at": "2026-05-01T17:44:43.431466+00:00",
-    "snapshot_at": "2026-05-01T20:22:53.109915+00:00",
+    "snapshot_at": "2026-05-01T20:50:15.551811+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1490,7 +1582,7 @@
     "last_updated": "2026-04-30T23:35:48.008Z",
     "contact_updated_at": "2026-04-30T23:35:48.278Z",
     "first_seen_at": "2026-05-01T17:44:43.894625+00:00",
-    "snapshot_at": "2026-05-01T20:22:53.982412+00:00",
+    "snapshot_at": "2026-05-01T20:50:16.246098+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -1537,7 +1629,7 @@
     "last_updated": "2026-04-28T23:39:32.721Z",
     "contact_updated_at": "2026-04-29T00:10:25.059Z",
     "first_seen_at": "2026-05-01T17:44:44.361217+00:00",
-    "snapshot_at": "2026-05-01T20:22:54.626743+00:00",
+    "snapshot_at": "2026-05-01T20:50:17.285979+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1584,7 +1676,7 @@
     "last_updated": "2026-04-28T23:39:38.436Z",
     "contact_updated_at": "2026-04-29T00:10:36.758Z",
     "first_seen_at": "2026-05-01T17:44:44.808690+00:00",
-    "snapshot_at": "2026-05-01T20:22:55.503084+00:00",
+    "snapshot_at": "2026-05-01T20:50:18.207926+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1631,7 +1723,7 @@
     "last_updated": "2026-04-28T14:25:57.785Z",
     "contact_updated_at": "2026-04-29T00:10:48.816Z",
     "first_seen_at": "2026-05-01T17:44:45.394356+00:00",
-    "snapshot_at": "2026-05-01T20:22:56.090840+00:00",
+    "snapshot_at": "2026-05-01T20:50:18.867382+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1678,7 +1770,7 @@
     "last_updated": "2026-04-28T14:26:00.350Z",
     "contact_updated_at": "2026-04-29T00:10:55.810Z",
     "first_seen_at": "2026-05-01T17:44:45.816550+00:00",
-    "snapshot_at": "2026-05-01T20:22:56.959555+00:00",
+    "snapshot_at": "2026-05-01T20:50:19.552590+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1725,7 +1817,7 @@
     "last_updated": "2026-04-28T23:39:44.532Z",
     "contact_updated_at": "2026-04-29T00:11:06.315Z",
     "first_seen_at": "2026-05-01T17:44:46.302742+00:00",
-    "snapshot_at": "2026-05-01T20:22:57.572665+00:00",
+    "snapshot_at": "2026-05-01T20:50:20.225382+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1772,7 +1864,7 @@
     "last_updated": "2026-04-28T14:26:05.665Z",
     "contact_updated_at": "2026-04-29T00:11:18.905Z",
     "first_seen_at": "2026-05-01T17:44:46.731370+00:00",
-    "snapshot_at": "2026-05-01T20:22:58.180298+00:00",
+    "snapshot_at": "2026-05-01T20:50:20.938263+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1819,7 +1911,7 @@
     "last_updated": "2026-04-29T00:11:57.776Z",
     "contact_updated_at": "2026-04-29T00:11:56.946Z",
     "first_seen_at": "2026-05-01T17:44:47.218923+00:00",
-    "snapshot_at": "2026-05-01T20:22:59.402529+00:00",
+    "snapshot_at": "2026-05-01T20:50:21.630458+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1866,7 +1958,7 @@
     "last_updated": "2026-04-28T14:26:10.798Z",
     "contact_updated_at": "2026-04-29T00:12:04.179Z",
     "first_seen_at": "2026-05-01T17:44:47.723225+00:00",
-    "snapshot_at": "2026-05-01T20:22:59.976589+00:00",
+    "snapshot_at": "2026-05-01T20:50:22.326862+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1913,7 +2005,7 @@
     "last_updated": "2026-04-28T14:26:13.221Z",
     "contact_updated_at": "2026-04-29T00:12:14.899Z",
     "first_seen_at": "2026-05-01T17:44:48.138218+00:00",
-    "snapshot_at": "2026-05-01T20:23:00.576311+00:00",
+    "snapshot_at": "2026-05-01T20:50:23.018176+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -1960,7 +2052,7 @@
     "last_updated": "2026-04-28T14:26:15.568Z",
     "contact_updated_at": "2026-04-29T00:13:28.971Z",
     "first_seen_at": "2026-05-01T17:44:48.652400+00:00",
-    "snapshot_at": "2026-05-01T20:23:01.094022+00:00",
+    "snapshot_at": "2026-05-01T20:50:23.885137+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2007,7 +2099,7 @@
     "last_updated": "2026-04-28T23:39:56.320Z",
     "contact_updated_at": "2026-04-29T00:14:39.416Z",
     "first_seen_at": "2026-05-01T17:44:49.387539+00:00",
-    "snapshot_at": "2026-05-01T20:23:01.709063+00:00",
+    "snapshot_at": "2026-05-01T20:50:24.601373+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2054,7 +2146,7 @@
     "last_updated": "2026-04-30T21:46:32.887Z",
     "contact_updated_at": "2026-04-30T21:46:33.324Z",
     "first_seen_at": "2026-05-01T17:44:49.803410+00:00",
-    "snapshot_at": "2026-05-01T20:23:02.308990+00:00",
+    "snapshot_at": "2026-05-01T20:50:25.261715+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -2101,7 +2193,7 @@
     "last_updated": "2026-04-30T21:46:45.889Z",
     "contact_updated_at": "2026-04-30T21:46:46.326Z",
     "first_seen_at": "2026-05-01T17:44:50.266421+00:00",
-    "snapshot_at": "2026-05-01T20:23:03.438607+00:00",
+    "snapshot_at": "2026-05-01T20:50:26.112883+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -2148,7 +2240,7 @@
     "last_updated": "2026-04-28T23:40:14.469Z",
     "contact_updated_at": "2026-04-29T00:16:12.178Z",
     "first_seen_at": "2026-05-01T17:44:50.677509+00:00",
-    "snapshot_at": "2026-05-01T20:23:04.043032+00:00",
+    "snapshot_at": "2026-05-01T20:50:26.791243+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2195,7 +2287,7 @@
     "last_updated": "2026-04-29T00:17:18.815Z",
     "contact_updated_at": "2026-04-29T00:17:18.023Z",
     "first_seen_at": "2026-05-01T17:44:51.110576+00:00",
-    "snapshot_at": "2026-05-01T20:23:05.340077+00:00",
+    "snapshot_at": "2026-05-01T20:50:27.602610+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2242,7 +2334,7 @@
     "last_updated": "2026-04-30T21:47:16.919Z",
     "contact_updated_at": "2026-04-30T21:47:17.316Z",
     "first_seen_at": "2026-05-01T17:44:51.519344+00:00",
-    "snapshot_at": "2026-05-01T20:23:06.186740+00:00",
+    "snapshot_at": "2026-05-01T20:50:28.287393+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -2289,7 +2381,7 @@
     "last_updated": "2026-04-29T00:19:51.231Z",
     "contact_updated_at": "2026-04-29T00:19:50.370Z",
     "first_seen_at": "2026-05-01T17:44:52.311188+00:00",
-    "snapshot_at": "2026-05-01T20:23:06.791277+00:00",
+    "snapshot_at": "2026-05-01T20:50:28.990176+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2336,7 +2428,7 @@
     "last_updated": "2026-04-30T21:47:57.586Z",
     "contact_updated_at": "2026-04-30T21:47:57.869Z",
     "first_seen_at": "2026-05-01T17:44:52.915503+00:00",
-    "snapshot_at": "2026-05-01T20:23:07.518525+00:00",
+    "snapshot_at": "2026-05-01T20:50:29.721623+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -2383,7 +2475,7 @@
     "last_updated": "2026-04-30T21:48:20.388Z",
     "contact_updated_at": "2026-04-30T21:48:20.821Z",
     "first_seen_at": "2026-05-01T17:44:53.384713+00:00",
-    "snapshot_at": "2026-05-01T20:23:08.147987+00:00",
+    "snapshot_at": "2026-05-01T20:50:31.186069+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -2430,7 +2522,7 @@
     "last_updated": "2026-04-30T21:48:37.305Z",
     "contact_updated_at": "2026-04-30T21:48:37.482Z",
     "first_seen_at": "2026-05-01T17:44:53.821166+00:00",
-    "snapshot_at": "2026-05-01T20:23:08.720626+00:00",
+    "snapshot_at": "2026-05-01T20:50:31.870596+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -2477,7 +2569,7 @@
     "last_updated": "2026-04-28T14:26:52.957Z",
     "contact_updated_at": "2026-04-28T04:25:35.041Z",
     "first_seen_at": "2026-05-01T17:44:54.277699+00:00",
-    "snapshot_at": "2026-05-01T20:23:09.332992+00:00",
+    "snapshot_at": "2026-05-01T20:50:32.602517+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2524,7 +2616,7 @@
     "last_updated": "2026-04-28T14:26:55.604Z",
     "contact_updated_at": "2026-04-29T00:20:36.379Z",
     "first_seen_at": "2026-05-01T17:44:54.686751+00:00",
-    "snapshot_at": "2026-05-01T20:23:09.985599+00:00",
+    "snapshot_at": "2026-05-01T20:50:33.280769+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2571,7 +2663,7 @@
     "last_updated": "2026-04-28T14:26:58.094Z",
     "contact_updated_at": "2026-04-29T00:20:59.960Z",
     "first_seen_at": "2026-05-01T17:44:55.106712+00:00",
-    "snapshot_at": "2026-05-01T20:23:10.607676+00:00",
+    "snapshot_at": "2026-05-01T20:50:33.954243+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2618,7 +2710,7 @@
     "last_updated": "2026-04-29T00:21:09.017Z",
     "contact_updated_at": "2026-04-29T00:21:08.203Z",
     "first_seen_at": "2026-05-01T17:44:56.220160+00:00",
-    "snapshot_at": "2026-05-01T20:23:11.357387+00:00",
+    "snapshot_at": "2026-05-01T20:50:34.644422+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2665,7 +2757,7 @@
     "last_updated": "2026-04-28T14:27:02.520Z",
     "contact_updated_at": "2026-04-28T04:25:37.527Z",
     "first_seen_at": "2026-05-01T17:44:56.653610+00:00",
-    "snapshot_at": "2026-05-01T20:23:11.922851+00:00",
+    "snapshot_at": "2026-05-01T20:50:35.404260+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2712,7 +2804,7 @@
     "last_updated": "2026-04-28T14:27:05.073Z",
     "contact_updated_at": "2026-04-28T04:25:38.381Z",
     "first_seen_at": "2026-05-01T17:44:57.102614+00:00",
-    "snapshot_at": "2026-05-01T20:23:12.515425+00:00",
+    "snapshot_at": "2026-05-01T20:50:36.099569+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2759,7 +2851,7 @@
     "last_updated": "2026-04-28T14:27:07.697Z",
     "contact_updated_at": "2026-04-29T00:22:15.518Z",
     "first_seen_at": "2026-05-01T17:44:57.515188+00:00",
-    "snapshot_at": "2026-05-01T20:23:13.120981+00:00",
+    "snapshot_at": "2026-05-01T20:50:36.776820+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2806,7 +2898,7 @@
     "last_updated": "2026-04-29T00:22:24.627Z",
     "contact_updated_at": "2026-04-29T00:22:23.845Z",
     "first_seen_at": "2026-05-01T17:44:57.928136+00:00",
-    "snapshot_at": "2026-05-01T20:23:13.750043+00:00",
+    "snapshot_at": "2026-05-01T20:50:37.516160+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2853,7 +2945,7 @@
     "last_updated": "2026-04-29T00:22:34.974Z",
     "contact_updated_at": "2026-04-29T00:22:34.146Z",
     "first_seen_at": "2026-05-01T17:44:58.383660+00:00",
-    "snapshot_at": "2026-05-01T20:23:14.808295+00:00",
+    "snapshot_at": "2026-05-01T20:50:38.185506+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2900,7 +2992,7 @@
     "last_updated": "2026-04-28T14:27:14.430Z",
     "contact_updated_at": "2026-04-29T00:22:41.769Z",
     "first_seen_at": "2026-05-01T17:44:58.812898+00:00",
-    "snapshot_at": "2026-05-01T20:23:15.495895+00:00",
+    "snapshot_at": "2026-05-01T20:50:38.919177+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2947,7 +3039,7 @@
     "last_updated": "2026-04-28T14:27:17.076Z",
     "contact_updated_at": "2026-04-28T04:25:41.294Z",
     "first_seen_at": "2026-05-01T17:44:59.240044+00:00",
-    "snapshot_at": "2026-05-01T20:23:16.119995+00:00",
+    "snapshot_at": "2026-05-01T20:50:39.716492+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -2994,7 +3086,7 @@
     "last_updated": "2026-04-28T14:27:19.661Z",
     "contact_updated_at": "2026-04-29T00:22:56.872Z",
     "first_seen_at": "2026-05-01T17:45:00.064714+00:00",
-    "snapshot_at": "2026-05-01T20:23:16.735061+00:00",
+    "snapshot_at": "2026-05-01T20:50:40.417886+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3041,7 +3133,7 @@
     "last_updated": "2026-04-28T14:27:22.329Z",
     "contact_updated_at": "2026-04-29T00:23:03.595Z",
     "first_seen_at": "2026-05-01T17:45:00.763529+00:00",
-    "snapshot_at": "2026-05-01T20:23:17.309127+00:00",
+    "snapshot_at": "2026-05-01T20:50:41.212147+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3088,7 +3180,7 @@
     "last_updated": "2026-04-28T14:27:24.981Z",
     "contact_updated_at": "2026-04-28T04:25:43.877Z",
     "first_seen_at": "2026-05-01T17:45:01.188643+00:00",
-    "snapshot_at": "2026-05-01T20:23:17.910652+00:00",
+    "snapshot_at": "2026-05-01T20:50:41.844345+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3135,7 +3227,7 @@
     "last_updated": "2026-04-28T14:27:27.633Z",
     "contact_updated_at": "2026-04-29T00:23:22.973Z",
     "first_seen_at": "2026-05-01T17:45:02.006376+00:00",
-    "snapshot_at": "2026-05-01T20:23:18.532653+00:00",
+    "snapshot_at": "2026-05-01T20:50:42.544186+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3182,7 +3274,7 @@
     "last_updated": "2026-04-28T14:27:30.229Z",
     "contact_updated_at": "2026-04-28T04:25:45.581Z",
     "first_seen_at": "2026-05-01T17:45:03.949896+00:00",
-    "snapshot_at": "2026-05-01T20:23:19.169818+00:00",
+    "snapshot_at": "2026-05-01T20:50:43.218826+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3229,7 +3321,7 @@
     "last_updated": "2026-04-28T14:27:32.856Z",
     "contact_updated_at": "2026-04-29T00:23:38.661Z",
     "first_seen_at": "2026-05-01T17:45:04.408109+00:00",
-    "snapshot_at": "2026-05-01T20:23:20.194433+00:00",
+    "snapshot_at": "2026-05-01T20:50:44.350796+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3276,7 +3368,7 @@
     "last_updated": "2026-04-28T14:27:35.963Z",
     "contact_updated_at": "2026-04-29T00:23:46.888Z",
     "first_seen_at": "2026-05-01T17:45:04.850341+00:00",
-    "snapshot_at": "2026-05-01T20:23:20.776662+00:00",
+    "snapshot_at": "2026-05-01T20:50:45.019042+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3323,7 +3415,7 @@
     "last_updated": "2026-04-28T23:41:03.506Z",
     "contact_updated_at": "2026-04-29T00:23:54.981Z",
     "first_seen_at": "2026-05-01T17:45:05.769254+00:00",
-    "snapshot_at": "2026-05-01T20:23:21.342723+00:00",
+    "snapshot_at": "2026-05-01T20:50:45.977599+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3370,7 +3462,7 @@
     "last_updated": "2026-04-29T00:24:03.531Z",
     "contact_updated_at": "2026-04-29T00:24:02.719Z",
     "first_seen_at": "2026-05-01T17:45:06.304550+00:00",
-    "snapshot_at": "2026-05-01T20:23:21.922714+00:00",
+    "snapshot_at": "2026-05-01T20:50:46.632636+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3417,7 +3509,7 @@
     "last_updated": "2026-04-28T14:27:43.808Z",
     "contact_updated_at": "2026-04-29T00:24:11.063Z",
     "first_seen_at": "2026-05-01T17:45:06.756558+00:00",
-    "snapshot_at": "2026-05-01T20:23:22.900531+00:00",
+    "snapshot_at": "2026-05-01T20:50:48.653330+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3464,7 +3556,7 @@
     "last_updated": "2026-04-28T14:27:46.454Z",
     "contact_updated_at": "2026-04-29T00:24:20.144Z",
     "first_seen_at": "2026-05-01T17:45:07.357545+00:00",
-    "snapshot_at": "2026-05-01T20:23:23.539318+00:00",
+    "snapshot_at": "2026-05-01T20:50:49.426534+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3511,7 +3603,7 @@
     "last_updated": "2026-04-29T00:24:40.368Z",
     "contact_updated_at": "2026-04-29T00:24:39.576Z",
     "first_seen_at": "2026-05-01T17:45:10.679959+00:00",
-    "snapshot_at": "2026-05-01T20:23:24.356079+00:00",
+    "snapshot_at": "2026-05-01T20:50:50.093767+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3558,7 +3650,7 @@
     "last_updated": "2026-04-29T00:24:49.890Z",
     "contact_updated_at": "2026-04-29T00:24:49.081Z",
     "first_seen_at": "2026-05-01T17:45:11.209023+00:00",
-    "snapshot_at": "2026-05-01T20:23:28.675747+00:00",
+    "snapshot_at": "2026-05-01T20:50:50.756439+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3605,7 +3697,7 @@
     "last_updated": "2026-04-28T14:27:53.115Z",
     "contact_updated_at": "2026-04-29T00:25:01.221Z",
     "first_seen_at": "2026-05-01T17:45:11.651252+00:00",
-    "snapshot_at": "2026-05-01T20:23:29.297951+00:00",
+    "snapshot_at": "2026-05-01T20:50:51.439882+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3652,7 +3744,7 @@
     "last_updated": "2026-04-28T14:27:58.092Z",
     "contact_updated_at": "2026-04-29T00:26:09.190Z",
     "first_seen_at": "2026-05-01T17:45:12.106849+00:00",
-    "snapshot_at": "2026-05-01T20:23:29.901941+00:00",
+    "snapshot_at": "2026-05-01T20:50:52.113617+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3699,7 +3791,7 @@
     "last_updated": "2026-04-28T14:28:00.574Z",
     "contact_updated_at": "2026-04-29T00:26:16.802Z",
     "first_seen_at": "2026-05-01T17:45:12.560480+00:00",
-    "snapshot_at": "2026-05-01T20:23:30.535036+00:00",
+    "snapshot_at": "2026-05-01T20:50:52.769773+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3746,7 +3838,7 @@
     "last_updated": "2026-04-28T23:41:19.942Z",
     "contact_updated_at": "2026-04-29T00:26:24.447Z",
     "first_seen_at": "2026-05-01T17:45:13.110822+00:00",
-    "snapshot_at": "2026-05-01T20:23:31.150829+00:00",
+    "snapshot_at": "2026-05-01T20:50:53.705753+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3793,7 +3885,7 @@
     "last_updated": "2026-04-28T23:41:25.293Z",
     "contact_updated_at": "2026-04-29T00:26:36.745Z",
     "first_seen_at": "2026-05-01T17:45:13.538926+00:00",
-    "snapshot_at": "2026-05-01T20:23:31.685912+00:00",
+    "snapshot_at": "2026-05-01T20:50:54.390686+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3840,7 +3932,7 @@
     "last_updated": "2026-04-28T14:28:08.034Z",
     "contact_updated_at": "2026-04-29T00:26:43.966Z",
     "first_seen_at": "2026-05-01T17:45:14.849148+00:00",
-    "snapshot_at": "2026-05-01T20:23:32.312084+00:00",
+    "snapshot_at": "2026-05-01T20:50:55.115618+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3887,7 +3979,7 @@
     "last_updated": "2026-04-28T14:28:10.377Z",
     "contact_updated_at": "2026-04-28T04:25:57.345Z",
     "first_seen_at": "2026-05-01T17:45:15.285706+00:00",
-    "snapshot_at": "2026-05-01T20:23:32.893114+00:00",
+    "snapshot_at": "2026-05-01T20:50:55.811981+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3934,7 +4026,7 @@
     "last_updated": "2026-04-28T14:28:12.866Z",
     "contact_updated_at": "2026-04-29T00:27:01.945Z",
     "first_seen_at": "2026-05-01T17:45:15.711167+00:00",
-    "snapshot_at": "2026-05-01T20:23:33.452591+00:00",
+    "snapshot_at": "2026-05-01T20:50:56.558885+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -3981,7 +4073,7 @@
     "last_updated": "2026-04-28T23:41:32.106Z",
     "contact_updated_at": "2026-04-29T00:27:09.157Z",
     "first_seen_at": "2026-05-01T17:45:16.207765+00:00",
-    "snapshot_at": "2026-05-01T20:23:34.086789+00:00",
+    "snapshot_at": "2026-05-01T20:50:57.353174+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4028,7 +4120,7 @@
     "last_updated": "2026-04-29T00:27:17.892Z",
     "contact_updated_at": "2026-04-29T00:27:17.080Z",
     "first_seen_at": "2026-05-01T17:45:16.652455+00:00",
-    "snapshot_at": "2026-05-01T20:23:34.733882+00:00",
+    "snapshot_at": "2026-05-01T20:50:58.211485+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4075,7 +4167,7 @@
     "last_updated": "2026-05-01T18:48:51.519Z",
     "contact_updated_at": "2026-04-29T22:25:47.929Z",
     "first_seen_at": "2026-05-01T17:48:05.105454+00:00",
-    "snapshot_at": "2026-05-01T20:28:01.213655+00:00",
+    "snapshot_at": "2026-05-01T20:55:23.948175+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -4122,7 +4214,7 @@
     "last_updated": "2026-04-28T14:28:24.527Z",
     "contact_updated_at": "2026-04-29T00:27:49.901Z",
     "first_seen_at": "2026-05-01T17:45:17.626320+00:00",
-    "snapshot_at": "2026-05-01T20:23:37.580586+00:00",
+    "snapshot_at": "2026-05-01T20:51:00.017005+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4169,7 +4261,7 @@
     "last_updated": "2026-04-28T14:28:27.356Z",
     "contact_updated_at": "2026-04-29T00:27:58.350Z",
     "first_seen_at": "2026-05-01T17:45:22.351401+00:00",
-    "snapshot_at": "2026-05-01T20:23:38.165477+00:00",
+    "snapshot_at": "2026-05-01T20:51:00.743547+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4216,7 +4308,7 @@
     "last_updated": "2026-04-28T14:28:30.165Z",
     "contact_updated_at": "2026-04-29T00:28:06.016Z",
     "first_seen_at": "2026-05-01T17:45:22.980937+00:00",
-    "snapshot_at": "2026-05-01T20:23:38.778001+00:00",
+    "snapshot_at": "2026-05-01T20:51:01.440095+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4263,7 +4355,7 @@
     "last_updated": "2026-04-28T14:28:33.005Z",
     "contact_updated_at": "2026-04-29T00:28:24.718Z",
     "first_seen_at": "2026-05-01T17:45:23.677363+00:00",
-    "snapshot_at": "2026-05-01T20:23:39.350863+00:00",
+    "snapshot_at": "2026-05-01T20:51:02.107526+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4310,7 +4402,7 @@
     "last_updated": "2026-04-28T14:28:37.980Z",
     "contact_updated_at": "2026-04-29T00:29:22.608Z",
     "first_seen_at": "2026-05-01T17:45:24.150632+00:00",
-    "snapshot_at": "2026-05-01T20:23:39.961567+00:00",
+    "snapshot_at": "2026-05-01T20:51:05.087186+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4357,7 +4449,7 @@
     "last_updated": "2026-04-30T21:49:11.190Z",
     "contact_updated_at": "2026-04-30T21:49:11.608Z",
     "first_seen_at": "2026-05-01T17:45:24.639404+00:00",
-    "snapshot_at": "2026-05-01T20:23:40.720671+00:00",
+    "snapshot_at": "2026-05-01T20:51:05.777745+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 3,
     "_activity": {
@@ -4404,7 +4496,7 @@
     "last_updated": "2026-04-29T00:29:40.505Z",
     "contact_updated_at": "2026-04-29T00:29:39.707Z",
     "first_seen_at": "2026-05-01T17:45:25.110839+00:00",
-    "snapshot_at": "2026-05-01T20:23:41.299770+00:00",
+    "snapshot_at": "2026-05-01T20:51:06.793920+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4451,7 +4543,7 @@
     "last_updated": "2026-04-28T14:28:44.473Z",
     "contact_updated_at": "2026-04-29T00:29:46.489Z",
     "first_seen_at": "2026-05-01T17:45:25.581476+00:00",
-    "snapshot_at": "2026-05-01T20:23:41.944267+00:00",
+    "snapshot_at": "2026-05-01T20:51:07.498659+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4498,7 +4590,7 @@
     "last_updated": "2026-04-29T00:30:40.292Z",
     "contact_updated_at": "2026-04-29T00:30:39.508Z",
     "first_seen_at": "2026-05-01T17:45:26.248098+00:00",
-    "snapshot_at": "2026-05-01T20:23:42.498172+00:00",
+    "snapshot_at": "2026-05-01T20:51:08.173074+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4545,7 +4637,7 @@
     "last_updated": "2026-04-29T00:30:55.833Z",
     "contact_updated_at": "2026-04-29T00:30:54.971Z",
     "first_seen_at": "2026-05-01T17:45:26.927074+00:00",
-    "snapshot_at": "2026-05-01T20:23:43.104575+00:00",
+    "snapshot_at": "2026-05-01T20:51:08.919730+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4592,7 +4684,7 @@
     "last_updated": "2026-04-28T14:28:49.786Z",
     "contact_updated_at": "2026-04-28T04:26:08.516Z",
     "first_seen_at": "2026-05-01T17:45:27.450142+00:00",
-    "snapshot_at": "2026-05-01T20:23:43.681352+00:00",
+    "snapshot_at": "2026-05-01T20:51:09.655505+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4639,7 +4731,7 @@
     "last_updated": "2026-04-28T14:28:52.137Z",
     "contact_updated_at": "2026-04-29T00:31:54.190Z",
     "first_seen_at": "2026-05-01T17:45:28.063470+00:00",
-    "snapshot_at": "2026-05-01T20:23:44.269086+00:00",
+    "snapshot_at": "2026-05-01T20:51:10.355967+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4686,7 +4778,7 @@
     "last_updated": "2026-04-28T14:28:54.702Z",
     "contact_updated_at": "2026-04-29T00:32:02.140Z",
     "first_seen_at": "2026-05-01T17:45:28.650543+00:00",
-    "snapshot_at": "2026-05-01T20:23:44.839779+00:00",
+    "snapshot_at": "2026-05-01T20:51:11.086525+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4733,7 +4825,7 @@
     "last_updated": "2026-04-28T14:28:57.221Z",
     "contact_updated_at": "2026-04-29T00:32:10.550Z",
     "first_seen_at": "2026-05-01T17:45:29.085473+00:00",
-    "snapshot_at": "2026-05-01T20:23:45.445362+00:00",
+    "snapshot_at": "2026-05-01T20:51:11.759515+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4780,7 +4872,7 @@
     "last_updated": "2026-04-29T00:32:34.975Z",
     "contact_updated_at": "2026-04-29T00:32:34.178Z",
     "first_seen_at": "2026-05-01T17:45:29.819732+00:00",
-    "snapshot_at": "2026-05-01T20:23:46.269286+00:00",
+    "snapshot_at": "2026-05-01T20:51:12.412042+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4827,7 +4919,7 @@
     "last_updated": "2026-04-28T14:29:02.636Z",
     "contact_updated_at": "2026-04-29T00:32:42.876Z",
     "first_seen_at": "2026-05-01T17:45:30.521282+00:00",
-    "snapshot_at": "2026-05-01T20:23:46.869500+00:00",
+    "snapshot_at": "2026-05-01T20:51:13.116218+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4874,7 +4966,7 @@
     "last_updated": "2026-04-28T14:29:05.211Z",
     "contact_updated_at": "2026-04-29T00:33:02.050Z",
     "first_seen_at": "2026-05-01T17:45:31.023037+00:00",
-    "snapshot_at": "2026-05-01T20:23:47.486531+00:00",
+    "snapshot_at": "2026-05-01T20:51:13.823512+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4921,7 +5013,7 @@
     "last_updated": "2026-04-28T23:41:59.823Z",
     "contact_updated_at": "2026-04-29T00:33:11.624Z",
     "first_seen_at": "2026-05-01T17:45:31.454469+00:00",
-    "snapshot_at": "2026-05-01T20:23:48.353928+00:00",
+    "snapshot_at": "2026-05-01T20:51:14.485421+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -4968,7 +5060,7 @@
     "last_updated": "2026-04-28T14:29:10.249Z",
     "contact_updated_at": "2026-04-28T04:26:15.285Z",
     "first_seen_at": "2026-05-01T17:45:31.887846+00:00",
-    "snapshot_at": "2026-05-01T20:23:49.035459+00:00",
+    "snapshot_at": "2026-05-01T20:51:15.283688+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5015,7 +5107,7 @@
     "last_updated": "2026-04-28T14:29:12.826Z",
     "contact_updated_at": "2026-04-29T00:33:27.551Z",
     "first_seen_at": "2026-05-01T17:45:32.382972+00:00",
-    "snapshot_at": "2026-05-01T20:23:49.614408+00:00",
+    "snapshot_at": "2026-05-01T20:51:15.928361+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5062,7 +5154,7 @@
     "last_updated": "2026-04-28T14:29:15.355Z",
     "contact_updated_at": "2026-04-29T00:33:34.999Z",
     "first_seen_at": "2026-05-01T17:45:33.190926+00:00",
-    "snapshot_at": "2026-05-01T20:23:50.197131+00:00",
+    "snapshot_at": "2026-05-01T20:51:16.703504+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5109,7 +5201,7 @@
     "last_updated": "2026-04-29T19:33:32.100Z",
     "contact_updated_at": "2026-04-29T19:33:31.900Z",
     "first_seen_at": "2026-05-01T17:45:33.613861+00:00",
-    "snapshot_at": "2026-05-01T20:23:50.756152+00:00",
+    "snapshot_at": "2026-05-01T20:51:17.359686+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5156,7 +5248,7 @@
     "last_updated": "2026-04-14T16:04:45.651Z",
     "contact_updated_at": "2026-04-27T19:51:15.198Z",
     "first_seen_at": "2026-05-01T17:45:34.052051+00:00",
-    "snapshot_at": "2026-05-01T20:23:51.327566+00:00",
+    "snapshot_at": "2026-05-01T20:51:18.046554+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5203,7 +5295,7 @@
     "last_updated": "2026-04-28T14:29:24.487Z",
     "contact_updated_at": "2026-04-28T04:26:19.463Z",
     "first_seen_at": "2026-05-01T17:45:34.498095+00:00",
-    "snapshot_at": "2026-05-01T20:23:52.418930+00:00",
+    "snapshot_at": "2026-05-01T20:51:18.772382+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5250,7 +5342,7 @@
     "last_updated": "2026-04-28T14:29:27.241Z",
     "contact_updated_at": "2026-04-28T04:26:20.354Z",
     "first_seen_at": "2026-05-01T17:45:34.940305+00:00",
-    "snapshot_at": "2026-05-01T20:23:52.974486+00:00",
+    "snapshot_at": "2026-05-01T20:51:19.447081+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5297,7 +5389,7 @@
     "last_updated": "2026-04-28T14:29:29.618Z",
     "contact_updated_at": "2026-04-28T04:26:21.182Z",
     "first_seen_at": "2026-05-01T17:45:35.677527+00:00",
-    "snapshot_at": "2026-05-01T20:23:53.676822+00:00",
+    "snapshot_at": "2026-05-01T20:51:20.161434+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5344,7 +5436,7 @@
     "last_updated": "2026-04-28T14:29:32.246Z",
     "contact_updated_at": "2026-04-28T04:26:22.027Z",
     "first_seen_at": "2026-05-01T17:45:36.382531+00:00",
-    "snapshot_at": "2026-05-01T20:23:54.319271+00:00",
+    "snapshot_at": "2026-05-01T20:51:20.850791+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5391,7 +5483,7 @@
     "last_updated": "2026-04-28T14:29:35.011Z",
     "contact_updated_at": "2026-04-28T04:26:22.852Z",
     "first_seen_at": "2026-05-01T17:45:36.847734+00:00",
-    "snapshot_at": "2026-05-01T20:23:55.366338+00:00",
+    "snapshot_at": "2026-05-01T20:51:21.524731+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5438,7 +5530,7 @@
     "last_updated": "2026-04-28T17:11:26.648Z",
     "contact_updated_at": "2026-04-28T17:11:25.710Z",
     "first_seen_at": "2026-05-01T17:45:37.387314+00:00",
-    "snapshot_at": "2026-05-01T20:23:55.942663+00:00",
+    "snapshot_at": "2026-05-01T20:51:22.449896+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5485,7 +5577,7 @@
     "last_updated": "2026-04-30T21:49:50.627Z",
     "contact_updated_at": "2026-04-30T21:49:51.409Z",
     "first_seen_at": "2026-05-01T17:45:37.833750+00:00",
-    "snapshot_at": "2026-05-01T20:23:56.798095+00:00",
+    "snapshot_at": "2026-05-01T20:51:27.228145+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -5532,7 +5624,7 @@
     "last_updated": "2026-04-28T14:29:42.658Z",
     "contact_updated_at": "2026-04-28T04:26:24.597Z",
     "first_seen_at": "2026-05-01T17:45:38.554150+00:00",
-    "snapshot_at": "2026-05-01T20:23:57.386381+00:00",
+    "snapshot_at": "2026-05-01T20:51:27.899610+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5579,7 +5671,7 @@
     "last_updated": "2026-04-28T14:29:45.210Z",
     "contact_updated_at": "2026-04-28T04:26:25.454Z",
     "first_seen_at": "2026-05-01T17:45:38.985954+00:00",
-    "snapshot_at": "2026-05-01T20:23:57.919591+00:00",
+    "snapshot_at": "2026-05-01T20:51:28.688424+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5626,7 +5718,7 @@
     "last_updated": "2026-04-28T14:29:47.585Z",
     "contact_updated_at": "2026-04-28T04:26:26.264Z",
     "first_seen_at": "2026-05-01T17:45:39.420799+00:00",
-    "snapshot_at": "2026-05-01T20:23:58.521511+00:00",
+    "snapshot_at": "2026-05-01T20:51:29.390764+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5673,7 +5765,7 @@
     "last_updated": "2026-04-28T14:29:49.959Z",
     "contact_updated_at": "2026-04-28T04:26:27.100Z",
     "first_seen_at": "2026-05-01T17:45:39.990635+00:00",
-    "snapshot_at": "2026-05-01T20:23:59.066912+00:00",
+    "snapshot_at": "2026-05-01T20:51:30.216921+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5720,7 +5812,7 @@
     "last_updated": "2026-04-28T14:29:52.479Z",
     "contact_updated_at": "2026-04-28T04:26:27.915Z",
     "first_seen_at": "2026-05-01T17:45:40.510867+00:00",
-    "snapshot_at": "2026-05-01T20:23:59.676771+00:00",
+    "snapshot_at": "2026-05-01T20:51:30.898706+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5767,7 +5859,7 @@
     "last_updated": "2026-04-28T14:29:54.968Z",
     "contact_updated_at": "2026-04-28T04:26:28.735Z",
     "first_seen_at": "2026-05-01T17:45:41.029545+00:00",
-    "snapshot_at": "2026-05-01T20:24:00.304866+00:00",
+    "snapshot_at": "2026-05-01T20:51:31.578152+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5814,7 +5906,7 @@
     "last_updated": "2026-04-28T14:29:57.672Z",
     "contact_updated_at": "2026-04-28T04:26:29.640Z",
     "first_seen_at": "2026-05-01T17:45:41.459234+00:00",
-    "snapshot_at": "2026-05-01T20:24:00.876105+00:00",
+    "snapshot_at": "2026-05-01T20:51:32.239908+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5861,7 +5953,7 @@
     "last_updated": "2026-04-28T14:30:00.399Z",
     "contact_updated_at": "2026-04-28T04:26:30.522Z",
     "first_seen_at": "2026-05-01T17:45:41.956126+00:00",
-    "snapshot_at": "2026-05-01T20:24:01.476281+00:00",
+    "snapshot_at": "2026-05-01T20:51:32.956653+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5908,7 +6000,7 @@
     "last_updated": "2026-04-28T14:30:03.492Z",
     "contact_updated_at": "2026-04-28T04:26:31.998Z",
     "first_seen_at": "2026-05-01T17:45:42.458794+00:00",
-    "snapshot_at": "2026-05-01T20:24:02.063028+00:00",
+    "snapshot_at": "2026-05-01T20:51:33.621800+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -5955,7 +6047,7 @@
     "last_updated": "2026-04-28T14:30:06.374Z",
     "contact_updated_at": "2026-04-28T04:26:32.851Z",
     "first_seen_at": "2026-05-01T17:45:42.924175+00:00",
-    "snapshot_at": "2026-05-01T20:24:02.660928+00:00",
+    "snapshot_at": "2026-05-01T20:51:34.580417+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6002,7 +6094,7 @@
     "last_updated": "2026-04-28T14:30:09.046Z",
     "contact_updated_at": "2026-04-28T04:26:33.684Z",
     "first_seen_at": "2026-05-01T17:45:44.220818+00:00",
-    "snapshot_at": "2026-05-01T20:24:03.256497+00:00",
+    "snapshot_at": "2026-05-01T20:51:35.281481+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6049,7 +6141,7 @@
     "last_updated": "2026-04-28T14:30:11.805Z",
     "contact_updated_at": "2026-04-28T04:26:34.517Z",
     "first_seen_at": "2026-05-01T17:45:44.801376+00:00",
-    "snapshot_at": "2026-05-01T20:24:03.789054+00:00",
+    "snapshot_at": "2026-05-01T20:51:35.953295+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6096,7 +6188,7 @@
     "last_updated": "2026-04-28T14:30:14.391Z",
     "contact_updated_at": "2026-04-28T04:26:35.349Z",
     "first_seen_at": "2026-05-01T17:45:45.354371+00:00",
-    "snapshot_at": "2026-05-01T20:24:04.395546+00:00",
+    "snapshot_at": "2026-05-01T20:51:36.655136+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6143,7 +6235,7 @@
     "last_updated": "2026-05-01T19:54:41.914Z",
     "contact_updated_at": "2026-05-01T19:54:42.344Z",
     "first_seen_at": "2026-05-01T17:48:06.947202+00:00",
-    "snapshot_at": "2026-05-01T20:24:05.090935+00:00",
+    "snapshot_at": "2026-05-01T20:51:37.343890+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 3,
     "_activity": {
@@ -6190,7 +6282,7 @@
     "last_updated": "2026-03-30T17:35:26.107Z",
     "contact_updated_at": "2026-03-30T17:37:25.700Z",
     "first_seen_at": "2026-05-01T17:45:45.903105+00:00",
-    "snapshot_at": "2026-05-01T20:24:08.843863+00:00",
+    "snapshot_at": "2026-05-01T20:51:38.105927+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6237,7 +6329,7 @@
     "last_updated": "2026-04-28T14:30:21.372Z",
     "contact_updated_at": "2026-04-28T04:26:37.033Z",
     "first_seen_at": "2026-05-01T17:45:46.863564+00:00",
-    "snapshot_at": "2026-05-01T20:24:09.482693+00:00",
+    "snapshot_at": "2026-05-01T20:51:39.188358+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6284,7 +6376,7 @@
     "last_updated": "2026-04-28T14:30:24.015Z",
     "contact_updated_at": "2026-04-28T04:26:37.861Z",
     "first_seen_at": "2026-05-01T17:45:47.295061+00:00",
-    "snapshot_at": "2026-05-01T20:24:10.225716+00:00",
+    "snapshot_at": "2026-05-01T20:51:39.832602+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6331,7 +6423,7 @@
     "last_updated": "2026-04-28T14:30:26.644Z",
     "contact_updated_at": "2026-04-28T04:26:38.725Z",
     "first_seen_at": "2026-05-01T17:45:48.004301+00:00",
-    "snapshot_at": "2026-05-01T20:24:10.811100+00:00",
+    "snapshot_at": "2026-05-01T20:51:40.502200+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6378,7 +6470,7 @@
     "last_updated": "2026-04-28T14:30:29.059Z",
     "contact_updated_at": "2026-04-28T04:26:39.536Z",
     "first_seen_at": "2026-05-01T17:45:48.423029+00:00",
-    "snapshot_at": "2026-05-01T20:24:11.637946+00:00",
+    "snapshot_at": "2026-05-01T20:51:41.198828+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6425,7 +6517,7 @@
     "last_updated": "2026-04-28T14:30:34.453Z",
     "contact_updated_at": "2026-04-28T04:26:41.210Z",
     "first_seen_at": "2026-05-01T17:45:48.898557+00:00",
-    "snapshot_at": "2026-05-01T20:24:12.249862+00:00",
+    "snapshot_at": "2026-05-01T20:51:42.120658+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6472,7 +6564,7 @@
     "last_updated": "2026-04-28T14:30:37.026Z",
     "contact_updated_at": "2026-04-28T04:26:42.079Z",
     "first_seen_at": "2026-05-01T17:45:49.441183+00:00",
-    "snapshot_at": "2026-05-01T20:24:12.838141+00:00",
+    "snapshot_at": "2026-05-01T20:51:43.209231+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6519,7 +6611,7 @@
     "last_updated": "2026-04-28T14:30:39.621Z",
     "contact_updated_at": "2026-04-28T04:26:42.927Z",
     "first_seen_at": "2026-05-01T17:45:50.612276+00:00",
-    "snapshot_at": "2026-05-01T20:24:13.425732+00:00",
+    "snapshot_at": "2026-05-01T20:51:43.936798+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6566,7 +6658,7 @@
     "last_updated": "2026-04-28T14:30:42.327Z",
     "contact_updated_at": "2026-04-28T04:26:43.758Z",
     "first_seen_at": "2026-05-01T17:45:51.316370+00:00",
-    "snapshot_at": "2026-05-01T20:24:13.966313+00:00",
+    "snapshot_at": "2026-05-01T20:51:44.770912+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6613,7 +6705,7 @@
     "last_updated": "2026-04-28T14:30:44.883Z",
     "contact_updated_at": "2026-04-28T04:26:44.560Z",
     "first_seen_at": "2026-05-01T17:45:51.776057+00:00",
-    "snapshot_at": "2026-05-01T20:24:14.535281+00:00",
+    "snapshot_at": "2026-05-01T20:51:45.451840+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6660,7 +6752,7 @@
     "last_updated": "2026-04-28T14:30:47.577Z",
     "contact_updated_at": "2026-04-28T04:26:45.377Z",
     "first_seen_at": "2026-05-01T17:45:52.904912+00:00",
-    "snapshot_at": "2026-05-01T20:24:15.137988+00:00",
+    "snapshot_at": "2026-05-01T20:51:46.428556+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6707,7 +6799,7 @@
     "last_updated": "2026-04-28T14:30:50.386Z",
     "contact_updated_at": "2026-04-28T04:26:46.221Z",
     "first_seen_at": "2026-05-01T17:45:53.339201+00:00",
-    "snapshot_at": "2026-05-01T20:24:15.742888+00:00",
+    "snapshot_at": "2026-05-01T20:51:47.060601+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6754,7 +6846,7 @@
     "last_updated": "2026-04-28T18:27:25.646Z",
     "contact_updated_at": "2026-04-28T17:12:23.283Z",
     "first_seen_at": "2026-05-01T17:45:53.778864+00:00",
-    "snapshot_at": "2026-05-01T20:24:16.341294+00:00",
+    "snapshot_at": "2026-05-01T20:51:47.715916+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6801,7 +6893,7 @@
     "last_updated": "2026-04-28T14:30:55.516Z",
     "contact_updated_at": "2026-04-28T04:26:48.220Z",
     "first_seen_at": "2026-05-01T17:45:54.264816+00:00",
-    "snapshot_at": "2026-05-01T20:24:16.982796+00:00",
+    "snapshot_at": "2026-05-01T20:51:48.376493+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6844,11 +6936,11 @@
     "dnd": false,
     "phone": "+1 (216) 543-2769",
     "phone_e164": "+12165432769",
-    "last_call_summary": "Seller Justin owns a fully renovated 3bed/1.5bath property at 5910 Wilbur Avenue, Parma OH 44129. Property is vacant, 1,338 sqft plus fully finished basement. All systems updated within last 1.5 years including plumbing, electrical, paint. Only item needed is roof replacement (25 years old, currently not leaking). Seller asking $225k cash only, has it listed on Facebook Marketplace for $240k. Investor mentioned relaying options but seller firmly stated cash offers only. Agreed to exchange proper",
-    "last_updated": "2026-05-01T19:52:57.985Z",
-    "contact_updated_at": "2026-05-01T19:55:33.204Z",
+    "last_call_summary": "Justin owns a vacant, recently renovated 3-bed/1.5-bath property at 5910 Wilbur Avenue in Parma, OH. The house is turnkey with all systems updated (plumbing, electrical, paint, finishes) and a fully finished basement completed within the last 1.5 years. Only item needed is roof replacement (25 years old but not leaking). Listed on Facebook Marketplace at $240k, but seller will take $225k cash. Seller is only interested in cash offers and declined creative financing options. Jeff agreed to exchan",
+    "last_updated": "2026-05-01T20:40:50.754Z",
+    "contact_updated_at": "2026-05-01T20:40:50.368Z",
     "first_seen_at": "2026-05-01T17:48:17.292195+00:00",
-    "snapshot_at": "2026-05-01T20:27:39.842731+00:00",
+    "snapshot_at": "2026-05-01T20:55:05.354717+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 4,
     "_activity": {
@@ -6895,7 +6987,7 @@
     "last_updated": "2026-04-28T18:27:37.981Z",
     "contact_updated_at": "2026-04-28T17:12:43.891Z",
     "first_seen_at": "2026-05-01T17:45:55.751876+00:00",
-    "snapshot_at": "2026-05-01T20:24:18.314768+00:00",
+    "snapshot_at": "2026-05-01T20:51:49.836240+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6942,7 +7034,7 @@
     "last_updated": "2026-04-28T14:31:03.719Z",
     "contact_updated_at": "2026-04-28T04:26:49.944Z",
     "first_seen_at": "2026-05-01T17:45:56.278796+00:00",
-    "snapshot_at": "2026-05-01T20:24:18.913540+00:00",
+    "snapshot_at": "2026-05-01T20:51:50.750634+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -6989,7 +7081,7 @@
     "last_updated": "2026-04-28T14:31:06.282Z",
     "contact_updated_at": "2026-04-28T04:26:50.776Z",
     "first_seen_at": "2026-05-01T17:45:56.766958+00:00",
-    "snapshot_at": "2026-05-01T20:24:19.536347+00:00",
+    "snapshot_at": "2026-05-01T20:51:51.441076+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7036,7 +7128,7 @@
     "last_updated": "2026-04-28T14:31:08.742Z",
     "contact_updated_at": "2026-04-28T04:26:51.644Z",
     "first_seen_at": "2026-05-01T17:45:57.335761+00:00",
-    "snapshot_at": "2026-05-01T20:24:20.453631+00:00",
+    "snapshot_at": "2026-05-01T20:51:52.144545+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7083,7 +7175,7 @@
     "last_updated": "2026-04-28T14:31:11.237Z",
     "contact_updated_at": "2026-04-28T04:26:52.515Z",
     "first_seen_at": "2026-05-01T17:45:57.813592+00:00",
-    "snapshot_at": "2026-05-01T20:24:21.088590+00:00",
+    "snapshot_at": "2026-05-01T20:51:52.825691+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7130,7 +7222,7 @@
     "last_updated": "2026-04-28T14:31:13.795Z",
     "contact_updated_at": "2026-04-28T04:26:53.330Z",
     "first_seen_at": "2026-05-01T17:45:58.353324+00:00",
-    "snapshot_at": "2026-05-01T20:24:21.700606+00:00",
+    "snapshot_at": "2026-05-01T20:51:53.581218+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7177,7 +7269,7 @@
     "last_updated": "2026-04-28T14:31:16.645Z",
     "contact_updated_at": "2026-04-28T04:26:54.163Z",
     "first_seen_at": "2026-05-01T17:45:58.870414+00:00",
-    "snapshot_at": "2026-05-01T20:24:22.394176+00:00",
+    "snapshot_at": "2026-05-01T20:51:54.227484+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7224,7 +7316,7 @@
     "last_updated": "2026-04-28T14:31:19.554Z",
     "contact_updated_at": "2026-04-28T04:26:54.996Z",
     "first_seen_at": "2026-05-01T17:45:59.285072+00:00",
-    "snapshot_at": "2026-05-01T20:24:22.981440+00:00",
+    "snapshot_at": "2026-05-01T20:51:54.852934+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7271,7 +7363,7 @@
     "last_updated": "2026-04-28T14:31:24.647Z",
     "contact_updated_at": "2026-04-28T04:26:56.696Z",
     "first_seen_at": "2026-05-01T17:45:59.797254+00:00",
-    "snapshot_at": "2026-05-01T20:24:23.770753+00:00",
+    "snapshot_at": "2026-05-01T20:51:55.537153+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7318,7 +7410,7 @@
     "last_updated": "2026-04-28T14:31:27.443Z",
     "contact_updated_at": "2026-04-28T04:26:57.506Z",
     "first_seen_at": "2026-05-01T17:46:00.893116+00:00",
-    "snapshot_at": "2026-05-01T20:24:24.685651+00:00",
+    "snapshot_at": "2026-05-01T20:51:56.232770+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7365,7 +7457,7 @@
     "last_updated": "2026-04-28T14:31:30.435Z",
     "contact_updated_at": "2026-04-28T04:26:58.442Z",
     "first_seen_at": "2026-05-01T17:46:01.739047+00:00",
-    "snapshot_at": "2026-05-01T20:24:25.232845+00:00",
+    "snapshot_at": "2026-05-01T20:51:56.895413+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7412,7 +7504,7 @@
     "last_updated": "2026-03-27T17:48:04.774Z",
     "contact_updated_at": "2026-03-27T18:40:42.074Z",
     "first_seen_at": "2026-05-01T17:46:02.439251+00:00",
-    "snapshot_at": "2026-05-01T20:24:25.921729+00:00",
+    "snapshot_at": "2026-05-01T20:51:57.590668+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7459,7 +7551,7 @@
     "last_updated": "2026-04-28T14:31:34.690Z",
     "contact_updated_at": "2026-04-28T04:26:59.269Z",
     "first_seen_at": "2026-05-01T17:46:02.983056+00:00",
-    "snapshot_at": "2026-05-01T20:24:26.724994+00:00",
+    "snapshot_at": "2026-05-01T20:51:58.227586+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7506,7 +7598,7 @@
     "last_updated": "2026-04-28T14:31:37.861Z",
     "contact_updated_at": "2026-04-28T04:27:00.111Z",
     "first_seen_at": "2026-05-01T17:46:03.411299+00:00",
-    "snapshot_at": "2026-05-01T20:24:27.306032+00:00",
+    "snapshot_at": "2026-05-01T20:51:58.912820+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7553,7 +7645,7 @@
     "last_updated": "2026-04-28T14:31:40.433Z",
     "contact_updated_at": "2026-04-28T04:27:00.936Z",
     "first_seen_at": "2026-05-01T17:46:04.062162+00:00",
-    "snapshot_at": "2026-05-01T20:24:27.923725+00:00",
+    "snapshot_at": "2026-05-01T20:51:59.584265+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7600,7 +7692,7 @@
     "last_updated": "2026-04-28T14:31:42.937Z",
     "contact_updated_at": "2026-04-28T04:27:01.851Z",
     "first_seen_at": "2026-05-01T17:46:04.494684+00:00",
-    "snapshot_at": "2026-05-01T20:24:28.526374+00:00",
+    "snapshot_at": "2026-05-01T20:52:01.023373+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7647,7 +7739,7 @@
     "last_updated": "2026-04-28T04:31:57.099Z",
     "contact_updated_at": "2026-04-28T04:27:02.721Z",
     "first_seen_at": "2026-05-01T17:46:06.095218+00:00",
-    "snapshot_at": "2026-05-01T20:24:29.228756+00:00",
+    "snapshot_at": "2026-05-01T20:52:02.016929+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7694,7 +7786,7 @@
     "last_updated": "2026-04-28T14:31:47.121Z",
     "contact_updated_at": "2026-04-28T04:27:03.568Z",
     "first_seen_at": "2026-05-01T17:46:06.568624+00:00",
-    "snapshot_at": "2026-05-01T20:24:33.938273+00:00",
+    "snapshot_at": "2026-05-01T20:52:02.655247+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7741,7 +7833,7 @@
     "last_updated": "2026-04-28T04:31:59.540Z",
     "contact_updated_at": "2026-04-28T04:27:04.409Z",
     "first_seen_at": "2026-05-01T17:46:06.999506+00:00",
-    "snapshot_at": "2026-05-01T20:24:34.570784+00:00",
+    "snapshot_at": "2026-05-01T20:52:03.313250+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7788,7 +7880,7 @@
     "last_updated": "2026-04-28T18:27:59.577Z",
     "contact_updated_at": "2026-04-28T17:13:10.089Z",
     "first_seen_at": "2026-05-01T17:46:07.461600+00:00",
-    "snapshot_at": "2026-05-01T20:24:35.176647+00:00",
+    "snapshot_at": "2026-05-01T20:52:03.987372+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7835,7 +7927,7 @@
     "last_updated": "2026-04-28T18:28:06.602Z",
     "contact_updated_at": "2026-04-28T17:13:22.525Z",
     "first_seen_at": "2026-05-01T17:46:07.874258+00:00",
-    "snapshot_at": "2026-05-01T20:24:35.714332+00:00",
+    "snapshot_at": "2026-05-01T20:52:04.640760+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7882,7 +7974,7 @@
     "last_updated": "2026-04-28T18:28:24.459Z",
     "contact_updated_at": "2026-04-28T17:14:00.939Z",
     "first_seen_at": "2026-05-01T17:46:08.278888+00:00",
-    "snapshot_at": "2026-05-01T20:24:36.380829+00:00",
+    "snapshot_at": "2026-05-01T20:52:05.306230+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7929,7 +8021,7 @@
     "last_updated": "2026-04-28T18:28:32.547Z",
     "contact_updated_at": "2026-04-28T17:14:14.090Z",
     "first_seen_at": "2026-05-01T17:46:08.706175+00:00",
-    "snapshot_at": "2026-05-01T20:24:36.931011+00:00",
+    "snapshot_at": "2026-05-01T20:52:05.965554+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -7976,7 +8068,7 @@
     "last_updated": "2026-04-28T14:32:05.759Z",
     "contact_updated_at": "2026-04-28T04:27:09.728Z",
     "first_seen_at": "2026-05-01T17:46:10.117097+00:00",
-    "snapshot_at": "2026-05-01T20:24:37.510313+00:00",
+    "snapshot_at": "2026-05-01T20:52:06.638006+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8023,7 +8115,7 @@
     "last_updated": "2026-04-28T14:32:08.377Z",
     "contact_updated_at": "2026-04-28T04:27:10.625Z",
     "first_seen_at": "2026-05-01T17:46:10.628112+00:00",
-    "snapshot_at": "2026-05-01T20:24:38.261617+00:00",
+    "snapshot_at": "2026-05-01T20:52:07.295101+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8070,7 +8162,7 @@
     "last_updated": "2026-04-28T18:28:39.738Z",
     "contact_updated_at": "2026-04-28T17:14:36.550Z",
     "first_seen_at": "2026-05-01T17:46:11.176650+00:00",
-    "snapshot_at": "2026-05-01T20:24:38.881941+00:00",
+    "snapshot_at": "2026-05-01T20:52:07.998322+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8117,7 +8209,7 @@
     "last_updated": "2026-04-14T16:23:53.624Z",
     "contact_updated_at": "2026-04-14T16:23:53.899Z",
     "first_seen_at": "2026-05-01T17:46:12.143912+00:00",
-    "snapshot_at": "2026-05-01T20:24:40.095670+00:00",
+    "snapshot_at": "2026-05-01T20:52:08.961150+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8164,7 +8256,7 @@
     "last_updated": "2026-04-28T14:32:17.414Z",
     "contact_updated_at": "2026-04-28T04:27:12.454Z",
     "first_seen_at": "2026-05-01T17:46:12.574670+00:00",
-    "snapshot_at": "2026-05-01T20:24:40.721046+00:00",
+    "snapshot_at": "2026-05-01T20:52:10.015205+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8211,7 +8303,7 @@
     "last_updated": "2026-04-28T04:32:11.677Z",
     "contact_updated_at": "2026-04-28T04:27:13.326Z",
     "first_seen_at": "2026-05-01T17:46:13.023133+00:00",
-    "snapshot_at": "2026-05-01T20:24:41.300979+00:00",
+    "snapshot_at": "2026-05-01T20:52:10.702901+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8258,7 +8350,7 @@
     "last_updated": "2026-04-28T14:32:21.948Z",
     "contact_updated_at": "2026-04-28T04:27:14.146Z",
     "first_seen_at": "2026-05-01T17:46:13.586171+00:00",
-    "snapshot_at": "2026-05-01T20:24:41.896822+00:00",
+    "snapshot_at": "2026-05-01T20:52:11.358101+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8305,7 +8397,7 @@
     "last_updated": "2026-04-28T14:32:24.482Z",
     "contact_updated_at": "2026-04-28T04:27:14.954Z",
     "first_seen_at": "2026-05-01T17:46:14.017232+00:00",
-    "snapshot_at": "2026-05-01T20:24:42.475443+00:00",
+    "snapshot_at": "2026-05-01T20:52:12.051133+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8352,7 +8444,7 @@
     "last_updated": "2026-04-28T14:32:26.933Z",
     "contact_updated_at": "2026-04-28T04:27:15.837Z",
     "first_seen_at": "2026-05-01T17:46:14.695223+00:00",
-    "snapshot_at": "2026-05-01T20:24:43.110548+00:00",
+    "snapshot_at": "2026-05-01T20:52:12.948603+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8399,7 +8491,7 @@
     "last_updated": "2026-04-28T14:32:29.218Z",
     "contact_updated_at": "2026-04-28T04:27:16.647Z",
     "first_seen_at": "2026-05-01T17:46:15.142481+00:00",
-    "snapshot_at": "2026-05-01T20:24:43.806564+00:00",
+    "snapshot_at": "2026-05-01T20:52:13.641687+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8446,7 +8538,7 @@
     "last_updated": "2026-04-28T14:32:31.603Z",
     "contact_updated_at": "2026-04-28T04:27:17.478Z",
     "first_seen_at": "2026-05-01T17:46:15.579147+00:00",
-    "snapshot_at": "2026-05-01T20:24:44.388284+00:00",
+    "snapshot_at": "2026-05-01T20:52:14.695466+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8493,7 +8585,7 @@
     "last_updated": "2026-04-28T14:32:33.951Z",
     "contact_updated_at": "2026-04-28T04:27:18.301Z",
     "first_seen_at": "2026-05-01T17:46:16.068479+00:00",
-    "snapshot_at": "2026-05-01T20:24:45.365617+00:00",
+    "snapshot_at": "2026-05-01T20:52:15.368760+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8540,7 +8632,7 @@
     "last_updated": "2026-04-28T14:32:37.938Z",
     "contact_updated_at": "2026-04-28T04:27:19.984Z",
     "first_seen_at": "2026-05-01T17:46:16.558291+00:00",
-    "snapshot_at": "2026-05-01T20:24:46.013001+00:00",
+    "snapshot_at": "2026-05-01T20:52:16.117616+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8587,7 +8679,7 @@
     "last_updated": "2026-04-28T18:28:59.962Z",
     "contact_updated_at": "2026-04-28T17:15:09.831Z",
     "first_seen_at": "2026-05-01T17:46:16.995926+00:00",
-    "snapshot_at": "2026-05-01T20:24:46.585974+00:00",
+    "snapshot_at": "2026-05-01T20:52:16.767008+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8634,7 +8726,7 @@
     "last_updated": "2026-04-28T18:29:05.532Z",
     "contact_updated_at": "2026-04-28T17:15:18.270Z",
     "first_seen_at": "2026-05-01T17:46:17.416386+00:00",
-    "snapshot_at": "2026-05-01T20:24:47.149348+00:00",
+    "snapshot_at": "2026-05-01T20:52:17.516640+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8681,7 +8773,7 @@
     "last_updated": "2026-04-28T14:32:46.556Z",
     "contact_updated_at": "2026-04-28T17:15:25.619Z",
     "first_seen_at": "2026-05-01T17:46:17.919567+00:00",
-    "snapshot_at": "2026-05-01T20:24:47.719503+00:00",
+    "snapshot_at": "2026-05-01T20:52:18.155367+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8728,7 +8820,7 @@
     "last_updated": "2026-04-30T23:37:24.201Z",
     "contact_updated_at": "2026-04-30T23:37:24.636Z",
     "first_seen_at": "2026-05-01T17:46:18.417079+00:00",
-    "snapshot_at": "2026-05-01T20:24:48.666915+00:00",
+    "snapshot_at": "2026-05-01T20:52:18.811518+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -8775,7 +8867,7 @@
     "last_updated": "2026-04-28T14:32:53.800Z",
     "contact_updated_at": "2026-04-28T04:27:25.621Z",
     "first_seen_at": "2026-05-01T17:46:19.047792+00:00",
-    "snapshot_at": "2026-05-01T20:24:49.246688+00:00",
+    "snapshot_at": "2026-05-01T20:52:19.490729+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8822,7 +8914,7 @@
     "last_updated": "2026-04-28T14:32:56.381Z",
     "contact_updated_at": "2026-04-28T04:27:26.494Z",
     "first_seen_at": "2026-05-01T17:46:19.504750+00:00",
-    "snapshot_at": "2026-05-01T20:24:50.029078+00:00",
+    "snapshot_at": "2026-05-01T20:52:20.185168+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8869,7 +8961,7 @@
     "last_updated": "2026-04-14T15:57:53.865Z",
     "contact_updated_at": "2026-04-14T17:04:47.973Z",
     "first_seen_at": "2026-05-01T17:46:19.913095+00:00",
-    "snapshot_at": "2026-05-01T20:24:50.649821+00:00",
+    "snapshot_at": "2026-05-01T20:52:20.898399+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8916,7 +9008,7 @@
     "last_updated": "2026-04-28T18:29:26.751Z",
     "contact_updated_at": "2026-04-28T17:16:04.354Z",
     "first_seen_at": "2026-05-01T17:46:20.350463+00:00",
-    "snapshot_at": "2026-05-01T20:24:51.539851+00:00",
+    "snapshot_at": "2026-05-01T20:52:21.732798+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -8963,7 +9055,7 @@
     "last_updated": "2026-04-28T14:33:04.743Z",
     "contact_updated_at": "2026-04-28T04:27:28.167Z",
     "first_seen_at": "2026-05-01T17:46:20.895547+00:00",
-    "snapshot_at": "2026-05-01T20:24:52.159150+00:00",
+    "snapshot_at": "2026-05-01T20:52:22.368220+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9010,7 +9102,7 @@
     "last_updated": "2026-04-28T18:29:39.484Z",
     "contact_updated_at": "2026-04-28T17:16:29.679Z",
     "first_seen_at": "2026-05-01T17:46:21.304381+00:00",
-    "snapshot_at": "2026-05-01T20:24:52.762560+00:00",
+    "snapshot_at": "2026-05-01T20:52:24.293427+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9057,7 +9149,7 @@
     "last_updated": "2026-04-28T14:33:10.008Z",
     "contact_updated_at": "2026-04-28T04:27:29.878Z",
     "first_seen_at": "2026-05-01T17:46:21.909886+00:00",
-    "snapshot_at": "2026-05-01T20:24:53.313782+00:00",
+    "snapshot_at": "2026-05-01T20:52:25.017900+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9104,7 +9196,7 @@
     "last_updated": "2026-04-28T14:33:12.254Z",
     "contact_updated_at": "2026-04-28T04:27:30.694Z",
     "first_seen_at": "2026-05-01T17:46:22.378546+00:00",
-    "snapshot_at": "2026-05-01T20:24:53.989064+00:00",
+    "snapshot_at": "2026-05-01T20:52:25.674047+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9151,7 +9243,7 @@
     "last_updated": "2026-04-28T14:33:14.800Z",
     "contact_updated_at": "2026-04-28T04:27:31.535Z",
     "first_seen_at": "2026-05-01T17:46:22.902599+00:00",
-    "snapshot_at": "2026-05-01T20:24:54.586658+00:00",
+    "snapshot_at": "2026-05-01T20:52:26.409197+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9198,7 +9290,7 @@
     "last_updated": "2026-04-28T14:33:17.594Z",
     "contact_updated_at": "2026-04-28T04:27:32.412Z",
     "first_seen_at": "2026-05-01T17:46:23.700842+00:00",
-    "snapshot_at": "2026-05-01T20:24:55.172655+00:00",
+    "snapshot_at": "2026-05-01T20:52:27.079858+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9245,7 +9337,7 @@
     "last_updated": "2026-04-28T14:33:20.108Z",
     "contact_updated_at": "2026-04-28T04:27:33.272Z",
     "first_seen_at": "2026-05-01T17:46:24.146665+00:00",
-    "snapshot_at": "2026-05-01T20:24:55.735252+00:00",
+    "snapshot_at": "2026-05-01T20:52:28.762675+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9292,7 +9384,7 @@
     "last_updated": "2026-04-28T14:33:22.647Z",
     "contact_updated_at": "2026-04-29T00:05:21.565Z",
     "first_seen_at": "2026-05-01T17:46:24.880228+00:00",
-    "snapshot_at": "2026-05-01T20:24:56.333934+00:00",
+    "snapshot_at": "2026-05-01T20:52:29.421192+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9339,7 +9431,7 @@
     "last_updated": "2026-04-28T14:33:25.267Z",
     "contact_updated_at": "2026-04-28T04:27:34.949Z",
     "first_seen_at": "2026-05-01T17:46:25.630833+00:00",
-    "snapshot_at": "2026-05-01T20:24:56.969254+00:00",
+    "snapshot_at": "2026-05-01T20:52:30.111639+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9386,7 +9478,7 @@
     "last_updated": "2026-04-28T18:29:57.154Z",
     "contact_updated_at": "2026-04-28T17:17:08.247Z",
     "first_seen_at": "2026-05-01T17:46:26.115055+00:00",
-    "snapshot_at": "2026-05-01T20:24:57.530161+00:00",
+    "snapshot_at": "2026-05-01T20:52:30.780707+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9433,7 +9525,7 @@
     "last_updated": "2026-04-28T18:30:15.007Z",
     "contact_updated_at": "2026-04-28T17:17:36.451Z",
     "first_seen_at": "2026-05-01T17:46:26.838193+00:00",
-    "snapshot_at": "2026-05-01T20:24:58.148501+00:00",
+    "snapshot_at": "2026-05-01T20:52:31.535405+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9480,7 +9572,7 @@
     "last_updated": "2026-05-01T10:53:25.306Z",
     "contact_updated_at": "2026-05-01T10:53:25.811Z",
     "first_seen_at": "2026-05-01T17:46:27.311479+00:00",
-    "snapshot_at": "2026-05-01T20:24:58.787901+00:00",
+    "snapshot_at": "2026-05-01T20:52:32.235624+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -9527,7 +9619,7 @@
     "last_updated": "2026-04-14T16:26:53.738Z",
     "contact_updated_at": "2026-04-14T16:26:54.617Z",
     "first_seen_at": "2026-05-01T17:46:28.143146+00:00",
-    "snapshot_at": "2026-05-01T20:24:59.814175+00:00",
+    "snapshot_at": "2026-05-01T20:52:32.913851+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9574,7 +9666,7 @@
     "last_updated": "2026-04-14T16:25:54.522Z",
     "contact_updated_at": "2026-04-14T16:25:54.612Z",
     "first_seen_at": "2026-05-01T17:46:28.674063+00:00",
-    "snapshot_at": "2026-05-01T20:25:00.596868+00:00",
+    "snapshot_at": "2026-05-01T20:52:33.611396+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9621,7 +9713,7 @@
     "last_updated": "2026-04-28T14:33:52.375Z",
     "contact_updated_at": "2026-04-28T04:27:39.142Z",
     "first_seen_at": "2026-05-01T17:46:29.126290+00:00",
-    "snapshot_at": "2026-05-01T20:25:01.287045+00:00",
+    "snapshot_at": "2026-05-01T20:52:38.604571+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9668,7 +9760,7 @@
     "last_updated": "2026-04-28T14:33:54.896Z",
     "contact_updated_at": "2026-04-28T04:27:39.982Z",
     "first_seen_at": "2026-05-01T17:46:29.555707+00:00",
-    "snapshot_at": "2026-05-01T20:25:01.894066+00:00",
+    "snapshot_at": "2026-05-01T20:52:39.289895+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9715,7 +9807,7 @@
     "last_updated": "2026-04-28T14:34:00.582Z",
     "contact_updated_at": "2026-04-28T04:27:40.829Z",
     "first_seen_at": "2026-05-01T17:46:29.996651+00:00",
-    "snapshot_at": "2026-05-01T20:25:02.548093+00:00",
+    "snapshot_at": "2026-05-01T20:52:40.303250+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9762,7 +9854,7 @@
     "last_updated": "2026-04-28T14:34:04.892Z",
     "contact_updated_at": "2026-04-28T04:27:41.683Z",
     "first_seen_at": "2026-05-01T17:46:30.425299+00:00",
-    "snapshot_at": "2026-05-01T20:25:03.098062+00:00",
+    "snapshot_at": "2026-05-01T20:52:40.951307+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9809,7 +9901,7 @@
     "last_updated": "2026-04-30T22:45:06.990Z",
     "contact_updated_at": "2026-04-30T22:45:07.221Z",
     "first_seen_at": "2026-05-01T17:46:30.910068+00:00",
-    "snapshot_at": "2026-05-01T20:25:03.678405+00:00",
+    "snapshot_at": "2026-05-01T20:52:41.600159+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -9856,7 +9948,7 @@
     "last_updated": "2026-04-28T14:34:10.195Z",
     "contact_updated_at": "2026-04-28T04:27:43.379Z",
     "first_seen_at": "2026-05-01T17:46:31.371436+00:00",
-    "snapshot_at": "2026-05-01T20:25:04.541026+00:00",
+    "snapshot_at": "2026-05-01T20:52:42.255390+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9903,7 +9995,7 @@
     "last_updated": "2026-04-28T14:34:17.430Z",
     "contact_updated_at": "2026-04-28T04:27:45.902Z",
     "first_seen_at": "2026-05-01T17:46:31.900717+00:00",
-    "snapshot_at": "2026-05-01T20:25:05.136103+00:00",
+    "snapshot_at": "2026-05-01T20:52:42.896156+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9950,7 +10042,7 @@
     "last_updated": "2026-04-28T14:34:23.276Z",
     "contact_updated_at": "2026-04-28T04:27:46.728Z",
     "first_seen_at": "2026-05-01T17:46:32.353818+00:00",
-    "snapshot_at": "2026-05-01T20:25:05.733670+00:00",
+    "snapshot_at": "2026-05-01T20:52:43.571995+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -9997,7 +10089,7 @@
     "last_updated": "2026-04-28T14:34:25.883Z",
     "contact_updated_at": "2026-04-28T04:27:47.587Z",
     "first_seen_at": "2026-05-01T17:46:33.020022+00:00",
-    "snapshot_at": "2026-05-01T20:25:06.325601+00:00",
+    "snapshot_at": "2026-05-01T20:52:44.261575+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10044,7 +10136,7 @@
     "last_updated": "2026-04-28T14:34:28.431Z",
     "contact_updated_at": "2026-04-28T04:27:48.446Z",
     "first_seen_at": "2026-05-01T17:46:33.455101+00:00",
-    "snapshot_at": "2026-05-01T20:25:06.886348+00:00",
+    "snapshot_at": "2026-05-01T20:52:44.958103+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10091,7 +10183,7 @@
     "last_updated": "2026-04-14T16:42:53.703Z",
     "contact_updated_at": "2026-04-14T16:42:54.439Z",
     "first_seen_at": "2026-05-01T17:46:33.896234+00:00",
-    "snapshot_at": "2026-05-01T20:25:07.462518+00:00",
+    "snapshot_at": "2026-05-01T20:52:45.656775+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10138,7 +10230,7 @@
     "last_updated": "2026-04-28T04:32:59.079Z",
     "contact_updated_at": "2026-04-28T04:27:49.307Z",
     "first_seen_at": "2026-05-01T17:46:34.484358+00:00",
-    "snapshot_at": "2026-05-01T20:25:08.064533+00:00",
+    "snapshot_at": "2026-05-01T20:52:46.301941+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10185,7 +10277,7 @@
     "last_updated": "2026-04-28T14:34:34.051Z",
     "contact_updated_at": "2026-04-28T04:27:50.111Z",
     "first_seen_at": "2026-05-01T17:46:34.972619+00:00",
-    "snapshot_at": "2026-05-01T20:25:09.012187+00:00",
+    "snapshot_at": "2026-05-01T20:52:47.082406+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10232,7 +10324,7 @@
     "last_updated": "2026-04-28T14:34:36.351Z",
     "contact_updated_at": "2026-04-28T04:27:50.934Z",
     "first_seen_at": "2026-05-01T17:46:35.452933+00:00",
-    "snapshot_at": "2026-05-01T20:25:09.973834+00:00",
+    "snapshot_at": "2026-05-01T20:52:47.752185+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10279,7 +10371,7 @@
     "last_updated": "2026-04-14T16:44:53.459Z",
     "contact_updated_at": "2026-04-14T16:44:54.412Z",
     "first_seen_at": "2026-05-01T17:46:35.879683+00:00",
-    "snapshot_at": "2026-05-01T20:25:10.731297+00:00",
+    "snapshot_at": "2026-05-01T20:52:48.457204+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10326,7 +10418,7 @@
     "last_updated": "2026-04-28T14:34:40.461Z",
     "contact_updated_at": "2026-04-28T04:27:51.837Z",
     "first_seen_at": "2026-05-01T17:46:36.321538+00:00",
-    "snapshot_at": "2026-05-01T20:25:11.310221+00:00",
+    "snapshot_at": "2026-05-01T20:52:49.188187+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10373,7 +10465,7 @@
     "last_updated": "2026-04-28T14:34:42.997Z",
     "contact_updated_at": "2026-04-28T04:27:52.671Z",
     "first_seen_at": "2026-05-01T17:46:36.934203+00:00",
-    "snapshot_at": "2026-05-01T20:25:12.027221+00:00",
+    "snapshot_at": "2026-05-01T20:52:49.852160+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10420,7 +10512,7 @@
     "last_updated": "2026-04-28T14:34:45.571Z",
     "contact_updated_at": "2026-04-28T04:27:53.493Z",
     "first_seen_at": "2026-05-01T17:46:37.658148+00:00",
-    "snapshot_at": "2026-05-01T20:25:12.621267+00:00",
+    "snapshot_at": "2026-05-01T20:52:50.576605+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10467,7 +10559,7 @@
     "last_updated": "2026-05-01T18:46:23.576Z",
     "contact_updated_at": "2026-04-29T22:25:36.015Z",
     "first_seen_at": "2026-05-01T17:48:04.641344+00:00",
-    "snapshot_at": "2026-05-01T20:28:06.724860+00:00",
+    "snapshot_at": "2026-05-01T20:55:30.350053+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -10514,7 +10606,7 @@
     "last_updated": "2026-04-28T14:34:50.674Z",
     "contact_updated_at": "2026-04-28T04:27:55.153Z",
     "first_seen_at": "2026-05-01T17:46:38.523539+00:00",
-    "snapshot_at": "2026-05-01T20:25:13.842798+00:00",
+    "snapshot_at": "2026-05-01T20:52:51.919149+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10561,7 +10653,7 @@
     "last_updated": "2026-04-28T14:34:53.245Z",
     "contact_updated_at": "2026-04-28T04:27:55.998Z",
     "first_seen_at": "2026-05-01T17:46:38.976651+00:00",
-    "snapshot_at": "2026-05-01T20:25:14.622553+00:00",
+    "snapshot_at": "2026-05-01T20:52:52.625979+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10608,7 +10700,7 @@
     "last_updated": "2026-04-28T14:34:55.892Z",
     "contact_updated_at": "2026-04-28T04:27:56.830Z",
     "first_seen_at": "2026-05-01T17:46:39.758394+00:00",
-    "snapshot_at": "2026-05-01T20:25:15.233912+00:00",
+    "snapshot_at": "2026-05-01T20:52:53.276215+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10655,7 +10747,7 @@
     "last_updated": "2026-04-28T14:34:58.433Z",
     "contact_updated_at": "2026-04-28T04:27:58.279Z",
     "first_seen_at": "2026-05-01T17:46:40.358035+00:00",
-    "snapshot_at": "2026-05-01T20:25:15.841701+00:00",
+    "snapshot_at": "2026-05-01T20:52:53.988988+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10702,7 +10794,7 @@
     "last_updated": "2026-04-28T14:35:01.150Z",
     "contact_updated_at": "2026-04-28T04:28:00.163Z",
     "first_seen_at": "2026-05-01T17:46:40.812964+00:00",
-    "snapshot_at": "2026-05-01T20:25:16.545286+00:00",
+    "snapshot_at": "2026-05-01T20:52:54.835778+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10749,7 +10841,7 @@
     "last_updated": "2026-04-28T14:35:03.772Z",
     "contact_updated_at": "2026-04-28T04:28:00.977Z",
     "first_seen_at": "2026-05-01T17:46:41.318790+00:00",
-    "snapshot_at": "2026-05-01T20:25:17.164064+00:00",
+    "snapshot_at": "2026-05-01T20:52:55.549397+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10796,7 +10888,7 @@
     "last_updated": "2026-04-28T14:35:06.291Z",
     "contact_updated_at": "2026-04-28T04:28:01.881Z",
     "first_seen_at": "2026-05-01T17:46:41.781150+00:00",
-    "snapshot_at": "2026-05-01T20:25:17.738857+00:00",
+    "snapshot_at": "2026-05-01T20:52:56.206040+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10843,7 +10935,7 @@
     "last_updated": "2026-04-28T18:31:09.642Z",
     "contact_updated_at": "2026-04-28T17:19:07.048Z",
     "first_seen_at": "2026-05-01T17:46:42.233116+00:00",
-    "snapshot_at": "2026-05-01T20:25:18.397717+00:00",
+    "snapshot_at": "2026-05-01T20:52:56.866841+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10890,7 +10982,7 @@
     "last_updated": "2026-04-28T14:35:14.193Z",
     "contact_updated_at": "2026-04-28T04:28:04.474Z",
     "first_seen_at": "2026-05-01T17:46:43.101088+00:00",
-    "snapshot_at": "2026-05-01T20:25:18.991827+00:00",
+    "snapshot_at": "2026-05-01T20:52:57.550716+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10937,7 +11029,7 @@
     "last_updated": "2026-04-28T04:33:17.737Z",
     "contact_updated_at": "2026-04-28T04:28:05.373Z",
     "first_seen_at": "2026-05-01T17:46:43.572258+00:00",
-    "snapshot_at": "2026-05-01T20:25:19.560533+00:00",
+    "snapshot_at": "2026-05-01T20:52:58.815148+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -10984,7 +11076,7 @@
     "last_updated": "2026-04-28T04:33:18.877Z",
     "contact_updated_at": "2026-04-28T04:28:06.218Z",
     "first_seen_at": "2026-05-01T17:46:44.017640+00:00",
-    "snapshot_at": "2026-05-01T20:25:20.105638+00:00",
+    "snapshot_at": "2026-05-01T20:52:59.609495+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11031,7 +11123,7 @@
     "last_updated": "2026-04-28T14:35:19.856Z",
     "contact_updated_at": "2026-04-28T04:28:07.236Z",
     "first_seen_at": "2026-05-01T17:46:44.433077+00:00",
-    "snapshot_at": "2026-05-01T20:25:20.702051+00:00",
+    "snapshot_at": "2026-05-01T20:53:00.289684+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11078,7 +11170,7 @@
     "last_updated": "2026-04-28T04:33:21.277Z",
     "contact_updated_at": "2026-04-28T04:28:08.834Z",
     "first_seen_at": "2026-05-01T17:46:44.879333+00:00",
-    "snapshot_at": "2026-05-01T20:25:21.467684+00:00",
+    "snapshot_at": "2026-05-01T20:53:01.125888+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11125,7 +11217,7 @@
     "last_updated": "2026-04-28T14:35:23.888Z",
     "contact_updated_at": "2026-04-28T04:28:09.696Z",
     "first_seen_at": "2026-05-01T17:46:45.317446+00:00",
-    "snapshot_at": "2026-05-01T20:25:22.103078+00:00",
+    "snapshot_at": "2026-05-01T20:53:01.818986+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11172,7 +11264,7 @@
     "last_updated": "2026-04-28T14:35:26.298Z",
     "contact_updated_at": "2026-04-28T04:28:10.537Z",
     "first_seen_at": "2026-05-01T17:46:45.866019+00:00",
-    "snapshot_at": "2026-05-01T20:25:22.716812+00:00",
+    "snapshot_at": "2026-05-01T20:53:02.517227+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11219,7 +11311,7 @@
     "last_updated": "2026-04-28T14:35:28.615Z",
     "contact_updated_at": "2026-04-28T04:28:11.423Z",
     "first_seen_at": "2026-05-01T17:46:46.315137+00:00",
-    "snapshot_at": "2026-05-01T20:25:23.282541+00:00",
+    "snapshot_at": "2026-05-01T20:53:03.198712+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11266,7 +11358,7 @@
     "last_updated": "2026-04-28T14:35:31.165Z",
     "contact_updated_at": "2026-04-28T04:28:12.552Z",
     "first_seen_at": "2026-05-01T17:46:46.788783+00:00",
-    "snapshot_at": "2026-05-01T20:25:28.819857+00:00",
+    "snapshot_at": "2026-05-01T20:53:03.889825+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11313,7 +11405,7 @@
     "last_updated": "2026-04-28T14:35:33.630Z",
     "contact_updated_at": "2026-04-28T04:28:13.582Z",
     "first_seen_at": "2026-05-01T17:46:47.260460+00:00",
-    "snapshot_at": "2026-05-01T20:25:29.428115+00:00",
+    "snapshot_at": "2026-05-01T20:53:04.540138+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11360,7 +11452,7 @@
     "last_updated": "2026-04-28T14:35:36.155Z",
     "contact_updated_at": "2026-04-28T04:28:14.539Z",
     "first_seen_at": "2026-05-01T17:46:47.720901+00:00",
-    "snapshot_at": "2026-05-01T20:25:30.075500+00:00",
+    "snapshot_at": "2026-05-01T20:53:05.375608+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11407,7 +11499,7 @@
     "last_updated": "2026-04-28T14:35:38.711Z",
     "contact_updated_at": "2026-04-28T04:28:15.382Z",
     "first_seen_at": "2026-05-01T17:46:48.163175+00:00",
-    "snapshot_at": "2026-05-01T20:25:30.983668+00:00",
+    "snapshot_at": "2026-05-01T20:53:06.052044+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11454,7 +11546,7 @@
     "last_updated": "2026-04-28T14:35:41.246Z",
     "contact_updated_at": "2026-04-28T04:28:16.283Z",
     "first_seen_at": "2026-05-01T17:46:48.816469+00:00",
-    "snapshot_at": "2026-05-01T20:25:31.569273+00:00",
+    "snapshot_at": "2026-05-01T20:53:06.984186+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11501,7 +11593,7 @@
     "last_updated": "2026-04-28T14:35:43.761Z",
     "contact_updated_at": "2026-04-28T04:28:18.146Z",
     "first_seen_at": "2026-05-01T17:46:49.377866+00:00",
-    "snapshot_at": "2026-05-01T20:25:32.330677+00:00",
+    "snapshot_at": "2026-05-01T20:53:07.691342+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11548,7 +11640,7 @@
     "last_updated": "2026-04-28T04:33:32.828Z",
     "contact_updated_at": "2026-04-28T04:28:19.304Z",
     "first_seen_at": "2026-05-01T17:46:49.822162+00:00",
-    "snapshot_at": "2026-05-01T20:25:32.899441+00:00",
+    "snapshot_at": "2026-05-01T20:53:08.427788+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11595,7 +11687,7 @@
     "last_updated": "2026-04-28T14:35:48.581Z",
     "contact_updated_at": "2026-04-28T04:28:20.147Z",
     "first_seen_at": "2026-05-01T17:46:50.263575+00:00",
-    "snapshot_at": "2026-05-01T20:25:33.500446+00:00",
+    "snapshot_at": "2026-05-01T20:53:09.085882+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11642,7 +11734,7 @@
     "last_updated": "2026-04-28T14:35:51.118Z",
     "contact_updated_at": "2026-04-28T04:28:21.093Z",
     "first_seen_at": "2026-05-01T17:46:50.718895+00:00",
-    "snapshot_at": "2026-05-01T20:25:34.935747+00:00",
+    "snapshot_at": "2026-05-01T20:53:09.731616+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11689,7 +11781,7 @@
     "last_updated": "2026-04-28T14:35:53.668Z",
     "contact_updated_at": "2026-04-28T04:28:21.988Z",
     "first_seen_at": "2026-05-01T17:46:51.198967+00:00",
-    "snapshot_at": "2026-05-01T20:25:35.521744+00:00",
+    "snapshot_at": "2026-05-01T20:53:10.411480+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11736,7 +11828,7 @@
     "last_updated": "2026-04-28T14:35:56.170Z",
     "contact_updated_at": "2026-04-28T04:28:22.833Z",
     "first_seen_at": "2026-05-01T17:46:51.626385+00:00",
-    "snapshot_at": "2026-05-01T20:25:37.015118+00:00",
+    "snapshot_at": "2026-05-01T20:53:11.317343+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11783,7 +11875,7 @@
     "last_updated": "2026-04-28T04:33:38.346Z",
     "contact_updated_at": "2026-04-28T04:28:23.749Z",
     "first_seen_at": "2026-05-01T17:46:52.083754+00:00",
-    "snapshot_at": "2026-05-01T20:25:37.607941+00:00",
+    "snapshot_at": "2026-05-01T20:53:11.981048+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11830,7 +11922,7 @@
     "last_updated": "2026-04-28T14:36:00.226Z",
     "contact_updated_at": "2026-04-28T04:28:24.588Z",
     "first_seen_at": "2026-05-01T17:46:52.516717+00:00",
-    "snapshot_at": "2026-05-01T20:25:38.176795+00:00",
+    "snapshot_at": "2026-05-01T20:53:12.619838+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11877,7 +11969,7 @@
     "last_updated": "2026-04-28T14:36:05.016Z",
     "contact_updated_at": "2026-04-28T04:28:26.263Z",
     "first_seen_at": "2026-05-01T17:46:52.934552+00:00",
-    "snapshot_at": "2026-05-01T20:25:38.866939+00:00",
+    "snapshot_at": "2026-05-01T20:53:13.301314+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11924,7 +12016,7 @@
     "last_updated": "2026-04-28T14:36:07.598Z",
     "contact_updated_at": "2026-04-28T04:28:28.061Z",
     "first_seen_at": "2026-05-01T17:46:53.359880+00:00",
-    "snapshot_at": "2026-05-01T20:25:39.474055+00:00",
+    "snapshot_at": "2026-05-01T20:53:14.276466+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -11971,7 +12063,7 @@
     "last_updated": "2026-04-28T14:36:10.103Z",
     "contact_updated_at": "2026-04-28T04:28:28.967Z",
     "first_seen_at": "2026-05-01T17:46:53.788591+00:00",
-    "snapshot_at": "2026-05-01T20:25:40.065666+00:00",
+    "snapshot_at": "2026-05-01T20:53:14.965699+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12018,7 +12110,7 @@
     "last_updated": "2026-04-28T14:36:12.652Z",
     "contact_updated_at": "2026-04-28T04:28:29.785Z",
     "first_seen_at": "2026-05-01T17:46:54.229787+00:00",
-    "snapshot_at": "2026-05-01T20:25:40.679650+00:00",
+    "snapshot_at": "2026-05-01T20:53:15.615672+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12065,7 +12157,7 @@
     "last_updated": "2026-04-28T14:36:15.174Z",
     "contact_updated_at": "2026-04-28T04:28:30.639Z",
     "first_seen_at": "2026-05-01T17:46:54.685461+00:00",
-    "snapshot_at": "2026-05-01T20:25:41.247960+00:00",
+    "snapshot_at": "2026-05-01T20:53:16.503012+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12112,7 +12204,7 @@
     "last_updated": "2026-04-30T21:51:59.699Z",
     "contact_updated_at": "2026-04-30T21:52:00.129Z",
     "first_seen_at": "2026-05-01T17:46:55.210670+00:00",
-    "snapshot_at": "2026-05-01T20:25:42.025066+00:00",
+    "snapshot_at": "2026-05-01T20:53:17.671125+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -12159,7 +12251,7 @@
     "last_updated": "2026-04-28T04:33:48.045Z",
     "contact_updated_at": "2026-04-28T04:28:32.387Z",
     "first_seen_at": "2026-05-01T17:46:55.675306+00:00",
-    "snapshot_at": "2026-05-01T20:25:42.619412+00:00",
+    "snapshot_at": "2026-05-01T20:53:18.363365+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12206,7 +12298,7 @@
     "last_updated": "2026-04-28T14:36:21.659Z",
     "contact_updated_at": "2026-04-28T04:28:33.265Z",
     "first_seen_at": "2026-05-01T17:46:56.122501+00:00",
-    "snapshot_at": "2026-05-01T20:25:43.224379+00:00",
+    "snapshot_at": "2026-05-01T20:53:19.024007+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12253,7 +12345,7 @@
     "last_updated": "2026-04-28T04:33:50.282Z",
     "contact_updated_at": "2026-04-28T04:28:34.166Z",
     "first_seen_at": "2026-05-01T17:46:56.581597+00:00",
-    "snapshot_at": "2026-05-01T20:25:43.878040+00:00",
+    "snapshot_at": "2026-05-01T20:53:19.717711+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12300,7 +12392,7 @@
     "last_updated": "2026-04-28T14:36:25.841Z",
     "contact_updated_at": "2026-04-28T04:28:34.986Z",
     "first_seen_at": "2026-05-01T17:46:57.028585+00:00",
-    "snapshot_at": "2026-05-01T20:25:44.629183+00:00",
+    "snapshot_at": "2026-05-01T20:53:20.663753+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12347,7 +12439,7 @@
     "last_updated": "2026-04-28T14:36:28.458Z",
     "contact_updated_at": "2026-04-28T04:28:35.798Z",
     "first_seen_at": "2026-05-01T17:46:57.459860+00:00",
-    "snapshot_at": "2026-05-01T20:25:45.238739+00:00",
+    "snapshot_at": "2026-05-01T20:53:21.868355+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12394,7 +12486,7 @@
     "last_updated": "2026-04-28T14:36:30.986Z",
     "contact_updated_at": "2026-04-28T04:28:36.608Z",
     "first_seen_at": "2026-05-01T17:46:57.916202+00:00",
-    "snapshot_at": "2026-05-01T20:25:45.876856+00:00",
+    "snapshot_at": "2026-05-01T20:53:22.558143+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12441,7 +12533,7 @@
     "last_updated": "2026-04-28T14:36:33.527Z",
     "contact_updated_at": "2026-04-28T04:28:37.834Z",
     "first_seen_at": "2026-05-01T17:46:58.426739+00:00",
-    "snapshot_at": "2026-05-01T20:25:46.452445+00:00",
+    "snapshot_at": "2026-05-01T20:53:24.380149+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12488,7 +12580,7 @@
     "last_updated": "2026-04-28T14:36:35.833Z",
     "contact_updated_at": "2026-04-28T04:28:38.736Z",
     "first_seen_at": "2026-05-01T17:46:58.876450+00:00",
-    "snapshot_at": "2026-05-01T20:25:47.118684+00:00",
+    "snapshot_at": "2026-05-01T20:53:25.061926+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12535,7 +12627,7 @@
     "last_updated": "2026-04-28T14:36:38.543Z",
     "contact_updated_at": "2026-04-28T04:28:39.574Z",
     "first_seen_at": "2026-05-01T17:46:59.464332+00:00",
-    "snapshot_at": "2026-05-01T20:25:47.701134+00:00",
+    "snapshot_at": "2026-05-01T20:53:25.701949+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12582,7 +12674,7 @@
     "last_updated": "2026-04-28T14:36:41.181Z",
     "contact_updated_at": "2026-04-28T04:28:40.382Z",
     "first_seen_at": "2026-05-01T17:47:00.390043+00:00",
-    "snapshot_at": "2026-05-01T20:25:48.254602+00:00",
+    "snapshot_at": "2026-05-01T20:53:26.370124+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12629,7 +12721,7 @@
     "last_updated": "2026-04-28T14:36:43.813Z",
     "contact_updated_at": "2026-04-28T04:28:41.234Z",
     "first_seen_at": "2026-05-01T17:47:00.844067+00:00",
-    "snapshot_at": "2026-05-01T20:25:48.853810+00:00",
+    "snapshot_at": "2026-05-01T20:53:27.035051+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12676,7 +12768,7 @@
     "last_updated": "2026-04-28T14:36:46.492Z",
     "contact_updated_at": "2026-04-28T04:28:42.078Z",
     "first_seen_at": "2026-05-01T17:47:01.323066+00:00",
-    "snapshot_at": "2026-05-01T20:25:49.480279+00:00",
+    "snapshot_at": "2026-05-01T20:53:27.708739+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12723,7 +12815,7 @@
     "last_updated": "2026-04-28T14:36:49.064Z",
     "contact_updated_at": "2026-04-28T04:28:42.943Z",
     "first_seen_at": "2026-05-01T17:47:01.800085+00:00",
-    "snapshot_at": "2026-05-01T20:25:50.191088+00:00",
+    "snapshot_at": "2026-05-01T20:53:28.391047+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12770,7 +12862,7 @@
     "last_updated": "2026-04-30T21:52:23.094Z",
     "contact_updated_at": "2026-04-30T21:52:23.541Z",
     "first_seen_at": "2026-05-01T17:47:02.285783+00:00",
-    "snapshot_at": "2026-05-01T20:25:50.762347+00:00",
+    "snapshot_at": "2026-05-01T20:53:29.129098+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -12817,7 +12909,7 @@
     "last_updated": "2026-03-10T20:49:02.724Z",
     "contact_updated_at": "2026-03-10T20:51:03.655Z",
     "first_seen_at": "2026-05-01T17:47:02.721703+00:00",
-    "snapshot_at": "2026-05-01T20:25:51.357534+00:00",
+    "snapshot_at": "2026-05-01T20:53:29.814762+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12864,7 +12956,7 @@
     "last_updated": "2026-04-28T14:36:55.950Z",
     "contact_updated_at": "2026-04-28T04:28:44.561Z",
     "first_seen_at": "2026-05-01T17:47:03.173467+00:00",
-    "snapshot_at": "2026-05-01T20:25:51.959645+00:00",
+    "snapshot_at": "2026-05-01T20:53:30.455824+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12911,7 +13003,7 @@
     "last_updated": "2026-04-28T14:36:58.618Z",
     "contact_updated_at": "2026-04-28T04:28:45.382Z",
     "first_seen_at": "2026-05-01T17:47:03.794584+00:00",
-    "snapshot_at": "2026-05-01T20:25:52.660665+00:00",
+    "snapshot_at": "2026-05-01T20:53:31.148184+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -12958,7 +13050,7 @@
     "last_updated": "2026-04-28T14:37:01.263Z",
     "contact_updated_at": "2026-04-28T04:28:46.207Z",
     "first_seen_at": "2026-05-01T17:47:04.297228+00:00",
-    "snapshot_at": "2026-05-01T20:25:53.578543+00:00",
+    "snapshot_at": "2026-05-01T20:53:31.885461+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13005,7 +13097,7 @@
     "last_updated": "2026-04-28T14:37:06.458Z",
     "contact_updated_at": "2026-04-28T04:28:47.870Z",
     "first_seen_at": "2026-05-01T17:47:04.879947+00:00",
-    "snapshot_at": "2026-05-01T20:25:54.261224+00:00",
+    "snapshot_at": "2026-05-01T20:53:32.531443+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13052,7 +13144,7 @@
     "last_updated": "2026-04-28T14:37:09.105Z",
     "contact_updated_at": "2026-04-28T04:28:48.678Z",
     "first_seen_at": "2026-05-01T17:47:05.321696+00:00",
-    "snapshot_at": "2026-05-01T20:25:55.057718+00:00",
+    "snapshot_at": "2026-05-01T20:53:33.188407+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13099,7 +13191,7 @@
     "last_updated": "2026-04-28T14:37:13.455Z",
     "contact_updated_at": "2026-04-28T04:28:50.327Z",
     "first_seen_at": "2026-05-01T17:47:06.345593+00:00",
-    "snapshot_at": "2026-05-01T20:25:55.671776+00:00",
+    "snapshot_at": "2026-05-01T20:53:36.223671+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13146,7 +13238,7 @@
     "last_updated": "2026-04-28T14:37:16.081Z",
     "contact_updated_at": "2026-04-28T04:28:51.172Z",
     "first_seen_at": "2026-05-01T17:47:11.878127+00:00",
-    "snapshot_at": "2026-05-01T20:25:59.929751+00:00",
+    "snapshot_at": "2026-05-01T20:53:36.890269+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13193,7 +13285,7 @@
     "last_updated": "2026-04-28T14:37:18.626Z",
     "contact_updated_at": "2026-04-28T04:28:52.080Z",
     "first_seen_at": "2026-05-01T17:47:12.320422+00:00",
-    "snapshot_at": "2026-05-01T20:26:00.569473+00:00",
+    "snapshot_at": "2026-05-01T20:53:37.735987+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13240,7 +13332,7 @@
     "last_updated": "2026-04-28T14:37:21.325Z",
     "contact_updated_at": "2026-04-28T04:28:52.946Z",
     "first_seen_at": "2026-05-01T17:47:12.804334+00:00",
-    "snapshot_at": "2026-05-01T20:26:01.210917+00:00",
+    "snapshot_at": "2026-05-01T20:53:38.486438+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13287,7 +13379,7 @@
     "last_updated": "2026-04-28T14:37:23.989Z",
     "contact_updated_at": "2026-04-28T04:28:53.784Z",
     "first_seen_at": "2026-05-01T17:47:13.229215+00:00",
-    "snapshot_at": "2026-05-01T20:26:01.775509+00:00",
+    "snapshot_at": "2026-05-01T20:53:39.150407+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13334,7 +13426,7 @@
     "last_updated": "2026-04-28T17:20:41.085Z",
     "contact_updated_at": "2026-04-28T17:20:40.189Z",
     "first_seen_at": "2026-05-01T17:47:13.684375+00:00",
-    "snapshot_at": "2026-05-01T20:26:02.330294+00:00",
+    "snapshot_at": "2026-05-01T20:53:39.792856+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13381,7 +13473,7 @@
     "last_updated": "2026-04-28T14:37:28.083Z",
     "contact_updated_at": "2026-04-28T04:28:55.441Z",
     "first_seen_at": "2026-05-01T17:47:14.128249+00:00",
-    "snapshot_at": "2026-05-01T20:26:02.913632+00:00",
+    "snapshot_at": "2026-05-01T20:53:40.436108+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13428,7 +13520,7 @@
     "last_updated": "2026-04-28T14:37:32.114Z",
     "contact_updated_at": "2026-04-28T04:28:57.097Z",
     "first_seen_at": "2026-05-01T17:47:14.540830+00:00",
-    "snapshot_at": "2026-05-01T20:26:03.955611+00:00",
+    "snapshot_at": "2026-05-01T20:53:41.071083+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13475,7 +13567,7 @@
     "last_updated": "2026-04-28T14:37:34.791Z",
     "contact_updated_at": "2026-04-28T04:28:57.932Z",
     "first_seen_at": "2026-05-01T17:47:14.996093+00:00",
-    "snapshot_at": "2026-05-01T20:26:04.491671+00:00",
+    "snapshot_at": "2026-05-01T20:53:41.940393+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13522,7 +13614,7 @@
     "last_updated": "2026-04-28T04:34:24.536Z",
     "contact_updated_at": "2026-04-28T04:28:58.778Z",
     "first_seen_at": "2026-05-01T17:47:15.447488+00:00",
-    "snapshot_at": "2026-05-01T20:26:05.560721+00:00",
+    "snapshot_at": "2026-05-01T20:53:42.603246+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13569,7 +13661,7 @@
     "last_updated": "2026-04-28T14:37:38.809Z",
     "contact_updated_at": "2026-04-28T04:28:59.606Z",
     "first_seen_at": "2026-05-01T17:47:15.894898+00:00",
-    "snapshot_at": "2026-05-01T20:26:06.163598+00:00",
+    "snapshot_at": "2026-05-01T20:53:43.419489+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13616,7 +13708,7 @@
     "last_updated": "2026-04-28T14:37:41.290Z",
     "contact_updated_at": "2026-04-28T04:29:00.411Z",
     "first_seen_at": "2026-05-01T17:47:16.351141+00:00",
-    "snapshot_at": "2026-05-01T20:26:09.010776+00:00",
+    "snapshot_at": "2026-05-01T20:53:44.338494+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13663,7 +13755,7 @@
     "last_updated": "2026-04-28T14:37:43.850Z",
     "contact_updated_at": "2026-04-28T04:29:01.272Z",
     "first_seen_at": "2026-05-01T17:47:16.767851+00:00",
-    "snapshot_at": "2026-05-01T20:26:09.635445+00:00",
+    "snapshot_at": "2026-05-01T20:53:45.007930+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13710,7 +13802,7 @@
     "last_updated": "2026-04-28T14:37:46.841Z",
     "contact_updated_at": "2026-04-28T04:29:02.112Z",
     "first_seen_at": "2026-05-01T17:47:17.182282+00:00",
-    "snapshot_at": "2026-05-01T20:26:10.332013+00:00",
+    "snapshot_at": "2026-05-01T20:53:45.685140+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13757,7 +13849,7 @@
     "last_updated": "2026-04-28T14:37:49.395Z",
     "contact_updated_at": "2026-04-28T04:29:02.985Z",
     "first_seen_at": "2026-05-01T17:47:17.609457+00:00",
-    "snapshot_at": "2026-05-01T20:26:10.916235+00:00",
+    "snapshot_at": "2026-05-01T20:53:46.362919+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13804,7 +13896,7 @@
     "last_updated": "2026-04-28T14:37:52.085Z",
     "contact_updated_at": "2026-04-28T04:29:03.869Z",
     "first_seen_at": "2026-05-01T17:47:20.941720+00:00",
-    "snapshot_at": "2026-05-01T20:26:11.524071+00:00",
+    "snapshot_at": "2026-05-01T20:53:47.055138+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13851,7 +13943,7 @@
     "last_updated": "2026-04-28T14:37:54.463Z",
     "contact_updated_at": "2026-04-28T04:29:04.696Z",
     "first_seen_at": "2026-05-01T17:47:21.385395+00:00",
-    "snapshot_at": "2026-05-01T20:26:12.835304+00:00",
+    "snapshot_at": "2026-05-01T20:53:47.702431+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13898,7 +13990,7 @@
     "last_updated": "2026-04-28T14:37:59.605Z",
     "contact_updated_at": "2026-04-28T04:29:06.340Z",
     "first_seen_at": "2026-05-01T17:47:21.789664+00:00",
-    "snapshot_at": "2026-05-01T20:26:13.406074+00:00",
+    "snapshot_at": "2026-05-01T20:53:48.350206+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13945,7 +14037,7 @@
     "last_updated": "2026-04-28T18:32:28.882Z",
     "contact_updated_at": "2026-04-28T17:21:05.169Z",
     "first_seen_at": "2026-05-01T17:47:22.212273+00:00",
-    "snapshot_at": "2026-05-01T20:26:13.907143+00:00",
+    "snapshot_at": "2026-05-01T20:53:49.023056+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -13992,7 +14084,7 @@
     "last_updated": "2026-04-28T14:38:07.658Z",
     "contact_updated_at": "2026-04-28T04:29:07.962Z",
     "first_seen_at": "2026-05-01T17:47:22.647283+00:00",
-    "snapshot_at": "2026-05-01T20:26:14.528001+00:00",
+    "snapshot_at": "2026-05-01T20:53:49.665419+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14039,7 +14131,7 @@
     "last_updated": "2026-04-14T16:53:54.353Z",
     "contact_updated_at": "2026-04-14T16:53:54.355Z",
     "first_seen_at": "2026-05-01T17:47:23.085846+00:00",
-    "snapshot_at": "2026-05-01T20:26:15.194882+00:00",
+    "snapshot_at": "2026-05-01T20:53:50.388105+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14086,7 +14178,7 @@
     "last_updated": "2026-04-28T14:38:11.615Z",
     "contact_updated_at": "2026-04-28T04:29:08.824Z",
     "first_seen_at": "2026-05-01T17:47:23.540785+00:00",
-    "snapshot_at": "2026-05-01T20:26:15.780023+00:00",
+    "snapshot_at": "2026-05-01T20:53:51.054704+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14133,7 +14225,7 @@
     "last_updated": "2026-03-06T20:03:55.520Z",
     "contact_updated_at": "2026-03-06T21:41:11.072Z",
     "first_seen_at": "2026-05-01T17:47:23.993562+00:00",
-    "snapshot_at": "2026-05-01T20:26:16.355104+00:00",
+    "snapshot_at": "2026-05-01T20:53:51.709001+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14180,7 +14272,7 @@
     "last_updated": "2026-04-28T14:38:17.717Z",
     "contact_updated_at": "2026-04-28T04:29:09.676Z",
     "first_seen_at": "2026-05-01T17:47:24.435878+00:00",
-    "snapshot_at": "2026-05-01T20:26:16.960405+00:00",
+    "snapshot_at": "2026-05-01T20:53:52.378816+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14227,7 +14319,7 @@
     "last_updated": "2026-04-28T14:38:20.291Z",
     "contact_updated_at": "2026-04-28T04:29:10.478Z",
     "first_seen_at": "2026-05-01T17:47:25.222966+00:00",
-    "snapshot_at": "2026-05-01T20:26:17.568026+00:00",
+    "snapshot_at": "2026-05-01T20:53:53.280045+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14274,7 +14366,7 @@
     "last_updated": "2026-03-06T19:01:38.044Z",
     "contact_updated_at": "2026-03-06T21:22:31.259Z",
     "first_seen_at": "2026-05-01T17:47:26.078062+00:00",
-    "snapshot_at": "2026-05-01T20:26:18.464309+00:00",
+    "snapshot_at": "2026-05-01T20:53:53.914799+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14321,7 +14413,7 @@
     "last_updated": "2026-04-28T14:38:24.054Z",
     "contact_updated_at": "2026-04-28T04:29:11.327Z",
     "first_seen_at": "2026-05-01T17:47:26.509540+00:00",
-    "snapshot_at": "2026-05-01T20:26:19.058112+00:00",
+    "snapshot_at": "2026-05-01T20:53:54.573598+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14368,7 +14460,7 @@
     "last_updated": "2026-04-28T14:38:26.566Z",
     "contact_updated_at": "2026-04-28T04:29:12.202Z",
     "first_seen_at": "2026-05-01T17:47:26.947603+00:00",
-    "snapshot_at": "2026-05-01T20:26:19.790375+00:00",
+    "snapshot_at": "2026-05-01T20:53:55.230096+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14415,7 +14507,7 @@
     "last_updated": "2026-04-28T14:38:28.966Z",
     "contact_updated_at": "2026-04-28T04:29:13.024Z",
     "first_seen_at": "2026-05-01T17:47:27.382704+00:00",
-    "snapshot_at": "2026-05-01T20:26:20.826066+00:00",
+    "snapshot_at": "2026-05-01T20:53:56.311133+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14462,7 +14554,7 @@
     "last_updated": "2026-04-28T14:38:31.866Z",
     "contact_updated_at": "2026-04-28T04:29:13.851Z",
     "first_seen_at": "2026-05-01T17:47:27.897467+00:00",
-    "snapshot_at": "2026-05-01T20:26:21.422014+00:00",
+    "snapshot_at": "2026-05-01T20:53:57.023625+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14509,7 +14601,7 @@
     "last_updated": "2026-04-28T14:38:34.612Z",
     "contact_updated_at": "2026-04-28T04:29:14.666Z",
     "first_seen_at": "2026-05-01T17:47:28.576721+00:00",
-    "snapshot_at": "2026-05-01T20:26:22.009171+00:00",
+    "snapshot_at": "2026-05-01T20:53:57.676136+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14556,7 +14648,7 @@
     "last_updated": "2026-04-28T14:38:37.445Z",
     "contact_updated_at": "2026-04-28T04:29:15.471Z",
     "first_seen_at": "2026-05-01T17:47:28.991126+00:00",
-    "snapshot_at": "2026-05-01T20:26:22.939043+00:00",
+    "snapshot_at": "2026-05-01T20:53:58.749231+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14603,7 +14695,7 @@
     "last_updated": "2026-04-28T14:38:40.261Z",
     "contact_updated_at": "2026-04-28T04:29:16.288Z",
     "first_seen_at": "2026-05-01T17:47:29.404531+00:00",
-    "snapshot_at": "2026-05-01T20:26:23.698954+00:00",
+    "snapshot_at": "2026-05-01T20:53:59.780419+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14650,7 +14742,7 @@
     "last_updated": "2026-04-28T14:38:42.876Z",
     "contact_updated_at": "2026-04-28T04:29:17.109Z",
     "first_seen_at": "2026-05-01T17:47:29.834244+00:00",
-    "snapshot_at": "2026-05-01T20:26:24.317564+00:00",
+    "snapshot_at": "2026-05-01T20:54:00.419963+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14697,7 +14789,7 @@
     "last_updated": "2026-04-28T14:38:45.303Z",
     "contact_updated_at": "2026-04-28T04:29:17.920Z",
     "first_seen_at": "2026-05-01T17:47:30.287316+00:00",
-    "snapshot_at": "2026-05-01T20:26:24.968770+00:00",
+    "snapshot_at": "2026-05-01T20:54:01.105867+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14744,7 +14836,7 @@
     "last_updated": "2026-04-28T18:32:58.326Z",
     "contact_updated_at": "2026-04-28T17:21:48.099Z",
     "first_seen_at": "2026-05-01T17:47:30.747814+00:00",
-    "snapshot_at": "2026-05-01T20:26:26.017989+00:00",
+    "snapshot_at": "2026-05-01T20:54:01.773168+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14791,7 +14883,7 @@
     "last_updated": "2026-04-28T14:38:57.681Z",
     "contact_updated_at": "2026-04-28T04:29:21.420Z",
     "first_seen_at": "2026-05-01T17:47:31.184848+00:00",
-    "snapshot_at": "2026-05-01T20:26:26.914335+00:00",
+    "snapshot_at": "2026-05-01T20:54:02.411103+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14838,7 +14930,7 @@
     "last_updated": "2026-03-05T20:59:39.013Z",
     "contact_updated_at": "2026-03-07T21:51:40.452Z",
     "first_seen_at": "2026-05-01T17:47:31.654768+00:00",
-    "snapshot_at": "2026-05-01T20:26:27.491180+00:00",
+    "snapshot_at": "2026-05-01T20:54:03.118417+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14885,7 +14977,7 @@
     "last_updated": "2026-04-28T14:39:06.936Z",
     "contact_updated_at": "2026-04-28T04:29:24.010Z",
     "first_seen_at": "2026-05-01T17:47:32.074164+00:00",
-    "snapshot_at": "2026-05-01T20:26:28.086116+00:00",
+    "snapshot_at": "2026-05-01T20:54:03.797396+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14932,7 +15024,7 @@
     "last_updated": "2026-04-28T14:39:09.567Z",
     "contact_updated_at": "2026-04-28T04:29:24.828Z",
     "first_seen_at": "2026-05-01T17:47:32.513972+00:00",
-    "snapshot_at": "2026-05-01T20:26:32.975182+00:00",
+    "snapshot_at": "2026-05-01T20:54:04.456122+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -14979,7 +15071,7 @@
     "last_updated": "2026-04-28T14:39:12.924Z",
     "contact_updated_at": "2026-04-28T04:29:25.650Z",
     "first_seen_at": "2026-05-01T17:47:34.244852+00:00",
-    "snapshot_at": "2026-05-01T20:26:33.588275+00:00",
+    "snapshot_at": "2026-05-01T20:54:05.146701+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15026,7 +15118,7 @@
     "last_updated": "2026-04-28T14:39:18.303Z",
     "contact_updated_at": "2026-04-28T04:29:27.308Z",
     "first_seen_at": "2026-05-01T17:47:34.693780+00:00",
-    "snapshot_at": "2026-05-01T20:26:34.293765+00:00",
+    "snapshot_at": "2026-05-01T20:54:05.784462+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15073,7 +15165,7 @@
     "last_updated": "2026-04-28T14:39:20.793Z",
     "contact_updated_at": "2026-04-28T04:29:28.168Z",
     "first_seen_at": "2026-05-01T17:47:35.755303+00:00",
-    "snapshot_at": "2026-05-01T20:26:34.926438+00:00",
+    "snapshot_at": "2026-05-01T20:54:06.417833+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15120,7 +15212,7 @@
     "last_updated": "2026-03-05T19:34:01.449Z",
     "contact_updated_at": "2026-04-14T16:20:28.178Z",
     "first_seen_at": "2026-05-01T17:47:36.203877+00:00",
-    "snapshot_at": "2026-05-01T20:26:35.494720+00:00",
+    "snapshot_at": "2026-05-01T20:54:07.221626+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15167,7 +15259,7 @@
     "last_updated": "2026-04-28T14:39:27.562Z",
     "contact_updated_at": "2026-04-28T04:29:30.015Z",
     "first_seen_at": "2026-05-01T17:47:36.697803+00:00",
-    "snapshot_at": "2026-05-01T20:26:36.053766+00:00",
+    "snapshot_at": "2026-05-01T20:54:07.903891+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15214,7 +15306,7 @@
     "last_updated": "2026-04-28T14:39:30.252Z",
     "contact_updated_at": "2026-04-28T04:29:30.859Z",
     "first_seen_at": "2026-05-01T17:47:37.164922+00:00",
-    "snapshot_at": "2026-05-01T20:26:36.662922+00:00",
+    "snapshot_at": "2026-05-01T20:54:08.596761+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15261,7 +15353,7 @@
     "last_updated": "2026-04-28T14:39:32.802Z",
     "contact_updated_at": "2026-04-28T04:29:31.739Z",
     "first_seen_at": "2026-05-01T17:47:37.587936+00:00",
-    "snapshot_at": "2026-05-01T20:26:37.236322+00:00",
+    "snapshot_at": "2026-05-01T20:54:09.291192+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15308,7 +15400,7 @@
     "last_updated": "2026-04-28T18:33:15.705Z",
     "contact_updated_at": "2026-04-28T17:22:18.541Z",
     "first_seen_at": "2026-05-01T17:47:38.159495+00:00",
-    "snapshot_at": "2026-05-01T20:26:37.832355+00:00",
+    "snapshot_at": "2026-05-01T20:54:09.981352+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15355,7 +15447,7 @@
     "last_updated": "2026-04-28T14:39:43.556Z",
     "contact_updated_at": "2026-04-28T04:29:34.256Z",
     "first_seen_at": "2026-05-01T17:47:38.620341+00:00",
-    "snapshot_at": "2026-05-01T20:26:38.392023+00:00",
+    "snapshot_at": "2026-05-01T20:54:10.652260+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15402,7 +15494,7 @@
     "last_updated": "2026-03-04T20:32:04.459Z",
     "contact_updated_at": "2026-03-04T20:47:23.354Z",
     "first_seen_at": "2026-05-01T17:47:39.071278+00:00",
-    "snapshot_at": "2026-05-01T20:26:39.108724+00:00",
+    "snapshot_at": "2026-05-01T20:54:11.319876+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15449,7 +15541,7 @@
     "last_updated": "2026-03-04T20:31:04.309Z",
     "contact_updated_at": "2026-03-04T23:25:22.758Z",
     "first_seen_at": "2026-05-01T17:47:39.531523+00:00",
-    "snapshot_at": "2026-05-01T20:26:39.824439+00:00",
+    "snapshot_at": "2026-05-01T20:54:12.052352+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15496,7 +15588,7 @@
     "last_updated": "2026-04-28T14:39:52.317Z",
     "contact_updated_at": "2026-04-28T04:29:35.938Z",
     "first_seen_at": "2026-05-01T17:47:40.101336+00:00",
-    "snapshot_at": "2026-05-01T20:26:40.452364+00:00",
+    "snapshot_at": "2026-05-01T20:54:12.697474+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15543,7 +15635,7 @@
     "last_updated": "2026-04-28T14:39:57.623Z",
     "contact_updated_at": "2026-04-28T04:29:37.590Z",
     "first_seen_at": "2026-05-01T17:47:40.596645+00:00",
-    "snapshot_at": "2026-05-01T20:26:41.249298+00:00",
+    "snapshot_at": "2026-05-01T20:54:13.385461+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15590,7 +15682,7 @@
     "last_updated": "2026-04-28T14:40:00.224Z",
     "contact_updated_at": "2026-04-28T04:29:38.414Z",
     "first_seen_at": "2026-05-01T17:47:41.083698+00:00",
-    "snapshot_at": "2026-05-01T20:26:41.888866+00:00",
+    "snapshot_at": "2026-05-01T20:54:14.069209+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15637,7 +15729,7 @@
     "last_updated": "2026-04-28T14:40:02.959Z",
     "contact_updated_at": "2026-04-28T04:29:39.236Z",
     "first_seen_at": "2026-05-01T17:47:41.533175+00:00",
-    "snapshot_at": "2026-05-01T20:26:42.574973+00:00",
+    "snapshot_at": "2026-05-01T20:54:15.245977+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15684,7 +15776,7 @@
     "last_updated": "2026-03-04T18:22:49.670Z",
     "contact_updated_at": "2026-03-04T23:35:30.287Z",
     "first_seen_at": "2026-05-01T17:47:41.997891+00:00",
-    "snapshot_at": "2026-05-01T20:26:43.210885+00:00",
+    "snapshot_at": "2026-05-01T20:54:15.929603+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15731,7 +15823,7 @@
     "last_updated": "2026-04-28T14:40:07.241Z",
     "contact_updated_at": "2026-04-28T04:29:40.079Z",
     "first_seen_at": "2026-05-01T17:47:42.485037+00:00",
-    "snapshot_at": "2026-05-01T20:26:43.988683+00:00",
+    "snapshot_at": "2026-05-01T20:54:16.615561+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15778,7 +15870,7 @@
     "last_updated": "2026-04-28T14:40:10.101Z",
     "contact_updated_at": "2026-04-28T04:29:40.998Z",
     "first_seen_at": "2026-05-01T17:47:42.924852+00:00",
-    "snapshot_at": "2026-05-01T20:26:49.599553+00:00",
+    "snapshot_at": "2026-05-01T20:54:17.609976+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15825,7 +15917,7 @@
     "last_updated": "2026-04-28T14:40:12.664Z",
     "contact_updated_at": "2026-04-28T04:29:41.958Z",
     "first_seen_at": "2026-05-01T17:47:43.815827+00:00",
-    "snapshot_at": "2026-05-01T20:26:50.229776+00:00",
+    "snapshot_at": "2026-05-01T20:54:18.278011+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15872,7 +15964,7 @@
     "last_updated": "2026-04-28T14:40:17.873Z",
     "contact_updated_at": "2026-04-28T04:29:43.756Z",
     "first_seen_at": "2026-05-01T17:47:44.222974+00:00",
-    "snapshot_at": "2026-05-01T20:26:50.813326+00:00",
+    "snapshot_at": "2026-05-01T20:54:19.061825+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15919,7 +16011,7 @@
     "last_updated": "2026-04-28T14:40:20.595Z",
     "contact_updated_at": "2026-04-28T04:29:44.562Z",
     "first_seen_at": "2026-05-01T17:47:44.655423+00:00",
-    "snapshot_at": "2026-05-01T20:26:51.626614+00:00",
+    "snapshot_at": "2026-05-01T20:54:19.737678+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -15966,7 +16058,7 @@
     "last_updated": "2026-04-28T14:40:23.338Z",
     "contact_updated_at": "2026-04-28T04:29:45.380Z",
     "first_seen_at": "2026-05-01T17:47:45.606632+00:00",
-    "snapshot_at": "2026-05-01T20:26:52.231501+00:00",
+    "snapshot_at": "2026-05-01T20:54:20.422722+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16013,7 +16105,7 @@
     "last_updated": "2026-04-28T14:40:26.122Z",
     "contact_updated_at": "2026-04-28T04:29:46.282Z",
     "first_seen_at": "2026-05-01T17:47:46.025638+00:00",
-    "snapshot_at": "2026-05-01T20:26:52.813483+00:00",
+    "snapshot_at": "2026-05-01T20:54:21.288792+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16060,7 +16152,7 @@
     "last_updated": "2026-04-28T14:40:28.697Z",
     "contact_updated_at": "2026-04-28T04:29:47.153Z",
     "first_seen_at": "2026-05-01T17:47:46.458968+00:00",
-    "snapshot_at": "2026-05-01T20:26:58.535459+00:00",
+    "snapshot_at": "2026-05-01T20:54:21.948689+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16107,7 +16199,7 @@
     "last_updated": "2026-04-28T14:40:31.093Z",
     "contact_updated_at": "2026-04-28T04:29:47.986Z",
     "first_seen_at": "2026-05-01T17:47:46.893899+00:00",
-    "snapshot_at": "2026-05-01T20:26:59.139460+00:00",
+    "snapshot_at": "2026-05-01T20:54:22.618431+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16154,7 +16246,7 @@
     "last_updated": "2026-04-28T14:40:35.051Z",
     "contact_updated_at": "2026-04-28T04:29:49.691Z",
     "first_seen_at": "2026-05-01T17:47:47.319142+00:00",
-    "snapshot_at": "2026-05-01T20:26:59.993598+00:00",
+    "snapshot_at": "2026-05-01T20:54:23.288599+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16201,7 +16293,7 @@
     "last_updated": "2026-04-28T14:40:37.436Z",
     "contact_updated_at": "2026-04-28T04:29:50.516Z",
     "first_seen_at": "2026-05-01T17:47:47.750521+00:00",
-    "snapshot_at": "2026-05-01T20:27:00.564933+00:00",
+    "snapshot_at": "2026-05-01T20:54:23.951025+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16248,7 +16340,7 @@
     "last_updated": "2026-04-28T14:40:40.325Z",
     "contact_updated_at": "2026-04-28T04:29:51.375Z",
     "first_seen_at": "2026-05-01T17:47:48.197392+00:00",
-    "snapshot_at": "2026-05-01T20:27:01.236685+00:00",
+    "snapshot_at": "2026-05-01T20:54:27.185630+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16295,7 +16387,7 @@
     "last_updated": "2026-04-28T14:40:43.308Z",
     "contact_updated_at": "2026-04-28T04:29:52.261Z",
     "first_seen_at": "2026-05-01T17:47:48.643614+00:00",
-    "snapshot_at": "2026-05-01T20:27:01.808560+00:00",
+    "snapshot_at": "2026-05-01T20:54:27.985027+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16342,7 +16434,7 @@
     "last_updated": "2026-04-28T14:40:45.780Z",
     "contact_updated_at": "2026-04-28T04:29:53.096Z",
     "first_seen_at": "2026-05-01T17:47:49.091494+00:00",
-    "snapshot_at": "2026-05-01T20:27:02.395895+00:00",
+    "snapshot_at": "2026-05-01T20:54:28.656716+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16389,7 +16481,7 @@
     "last_updated": "2026-04-28T14:40:58.094Z",
     "contact_updated_at": "2026-04-28T04:29:53.906Z",
     "first_seen_at": "2026-05-01T17:47:51.084596+00:00",
-    "snapshot_at": "2026-05-01T20:27:07.022868+00:00",
+    "snapshot_at": "2026-05-01T20:54:31.466742+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16436,7 +16528,7 @@
     "last_updated": "2026-03-03T21:11:50.519Z",
     "contact_updated_at": "2026-03-09T15:58:53.370Z",
     "first_seen_at": "2026-05-01T17:47:50.091589+00:00",
-    "snapshot_at": "2026-05-01T20:27:05.714187+00:00",
+    "snapshot_at": "2026-05-01T20:54:30.100669+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16483,7 +16575,7 @@
     "last_updated": "2026-04-14T16:06:53.148Z",
     "contact_updated_at": "2026-04-29T18:30:55.903Z",
     "first_seen_at": "2026-05-01T17:47:50.627940+00:00",
-    "snapshot_at": "2026-05-01T20:27:06.391988+00:00",
+    "snapshot_at": "2026-05-01T20:54:30.782633+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16530,7 +16622,7 @@
     "last_updated": "2026-03-03T20:56:58.093Z",
     "contact_updated_at": "2026-03-07T17:17:05.748Z",
     "first_seen_at": "2026-05-01T17:47:51.567357+00:00",
-    "snapshot_at": "2026-05-01T20:27:07.678421+00:00",
+    "snapshot_at": "2026-05-01T20:54:32.131123+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16577,7 +16669,7 @@
     "last_updated": "2026-03-03T20:02:35.642Z",
     "contact_updated_at": "2026-03-06T22:40:56.977Z",
     "first_seen_at": "2026-05-01T17:47:52.079068+00:00",
-    "snapshot_at": "2026-05-01T20:27:08.236869+00:00",
+    "snapshot_at": "2026-05-01T20:54:32.826145+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16624,7 +16716,7 @@
     "last_updated": "2026-03-03T19:00:38.647Z",
     "contact_updated_at": "2026-03-03T19:02:05.781Z",
     "first_seen_at": "2026-05-01T17:47:52.512873+00:00",
-    "snapshot_at": "2026-05-01T20:27:08.912114+00:00",
+    "snapshot_at": "2026-05-01T20:54:33.497351+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16671,7 +16763,7 @@
     "last_updated": "2026-04-30T23:38:22.987Z",
     "contact_updated_at": "2026-04-30T23:38:23.325Z",
     "first_seen_at": "2026-05-01T17:47:52.941872+00:00",
-    "snapshot_at": "2026-05-01T20:27:09.489032+00:00",
+    "snapshot_at": "2026-05-01T20:54:34.325589+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -16718,7 +16810,7 @@
     "last_updated": "2026-04-28T18:33:48.821Z",
     "contact_updated_at": "2026-04-28T17:23:16.770Z",
     "first_seen_at": "2026-05-01T17:47:53.445215+00:00",
-    "snapshot_at": "2026-05-01T20:27:10.045281+00:00",
+    "snapshot_at": "2026-05-01T20:54:35.076263+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16765,7 +16857,7 @@
     "last_updated": "2026-04-28T14:41:16.284Z",
     "contact_updated_at": "2026-04-29T14:25:08.473Z",
     "first_seen_at": "2026-05-01T17:47:54.183806+00:00",
-    "snapshot_at": "2026-05-01T20:27:10.628937+00:00",
+    "snapshot_at": "2026-05-01T20:54:36.232698+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16812,7 +16904,7 @@
     "last_updated": "2026-04-28T04:35:46.955Z",
     "contact_updated_at": "2026-04-29T14:22:27.760Z",
     "first_seen_at": "2026-05-01T17:47:54.645399+00:00",
-    "snapshot_at": "2026-05-01T20:27:11.220198+00:00",
+    "snapshot_at": "2026-05-01T20:54:36.898845+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16859,7 +16951,7 @@
     "last_updated": "2026-04-28T14:41:33.903Z",
     "contact_updated_at": "2026-04-28T04:30:03.482Z",
     "first_seen_at": "2026-05-01T17:47:55.064573+00:00",
-    "snapshot_at": "2026-05-01T20:27:11.883273+00:00",
+    "snapshot_at": "2026-05-01T20:54:37.562718+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16906,7 +16998,7 @@
     "last_updated": "2026-04-28T14:41:36.622Z",
     "contact_updated_at": "2026-04-29T14:34:11.036Z",
     "first_seen_at": "2026-05-01T17:47:55.498828+00:00",
-    "snapshot_at": "2026-05-01T20:27:12.471861+00:00",
+    "snapshot_at": "2026-05-01T20:54:38.587123+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -16953,7 +17045,7 @@
     "last_updated": "2026-04-28T14:41:39.322Z",
     "contact_updated_at": "2026-04-29T14:44:40.832Z",
     "first_seen_at": "2026-05-01T17:47:55.941380+00:00",
-    "snapshot_at": "2026-05-01T20:27:13.021337+00:00",
+    "snapshot_at": "2026-05-01T20:54:39.266247+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17000,7 +17092,7 @@
     "last_updated": "2026-04-28T14:41:41.920Z",
     "contact_updated_at": "2026-04-29T14:20:54.477Z",
     "first_seen_at": "2026-05-01T17:47:56.359215+00:00",
-    "snapshot_at": "2026-05-01T20:27:13.564502+00:00",
+    "snapshot_at": "2026-05-01T20:54:39.941979+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17047,7 +17139,7 @@
     "last_updated": "2026-04-28T14:41:44.604Z",
     "contact_updated_at": "2026-04-28T04:30:06.884Z",
     "first_seen_at": "2026-05-01T17:47:56.853056+00:00",
-    "snapshot_at": "2026-05-01T20:27:14.145070+00:00",
+    "snapshot_at": "2026-05-01T20:54:40.655230+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17094,7 +17186,7 @@
     "last_updated": "2026-04-28T14:41:47.892Z",
     "contact_updated_at": "2026-04-29T14:39:16.443Z",
     "first_seen_at": "2026-05-01T17:47:57.285731+00:00",
-    "snapshot_at": "2026-05-01T20:27:14.789259+00:00",
+    "snapshot_at": "2026-05-01T20:54:41.348974+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17141,7 +17233,7 @@
     "last_updated": "2026-04-28T14:41:55.601Z",
     "contact_updated_at": "2026-04-28T04:30:09.420Z",
     "first_seen_at": "2026-05-01T17:47:57.722436+00:00",
-    "snapshot_at": "2026-05-01T20:27:15.428269+00:00",
+    "snapshot_at": "2026-05-01T20:54:42.017501+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17188,7 +17280,7 @@
     "last_updated": "2026-04-28T14:41:58.053Z",
     "contact_updated_at": "2026-04-28T04:30:10.244Z",
     "first_seen_at": "2026-05-01T17:47:58.164121+00:00",
-    "snapshot_at": "2026-05-01T20:27:16.166234+00:00",
+    "snapshot_at": "2026-05-01T20:54:42.728497+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17235,7 +17327,7 @@
     "last_updated": "2026-04-28T14:42:00.797Z",
     "contact_updated_at": "2026-04-28T04:30:11.094Z",
     "first_seen_at": "2026-05-01T17:47:58.889770+00:00",
-    "snapshot_at": "2026-05-01T20:27:16.834977+00:00",
+    "snapshot_at": "2026-05-01T20:54:43.392219+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17282,7 +17374,7 @@
     "last_updated": "2026-04-28T14:42:03.802Z",
     "contact_updated_at": "2026-04-28T04:30:11.958Z",
     "first_seen_at": "2026-05-01T17:47:59.592929+00:00",
-    "snapshot_at": "2026-05-01T20:27:17.476526+00:00",
+    "snapshot_at": "2026-05-01T20:54:44.011445+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17329,7 +17421,7 @@
     "last_updated": "2026-04-28T14:42:06.882Z",
     "contact_updated_at": "2026-04-28T04:30:12.822Z",
     "first_seen_at": "2026-05-01T17:48:00.141244+00:00",
-    "snapshot_at": "2026-05-01T20:27:20.810087+00:00",
+    "snapshot_at": "2026-05-01T20:54:44.754036+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17376,7 +17468,7 @@
     "last_updated": "2026-04-28T14:42:16.310Z",
     "contact_updated_at": "2026-04-29T14:25:48.065Z",
     "first_seen_at": "2026-05-01T17:48:00.590200+00:00",
-    "snapshot_at": "2026-05-01T20:27:21.357494+00:00",
+    "snapshot_at": "2026-05-01T20:54:45.400098+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17423,7 +17515,7 @@
     "last_updated": "2026-04-28T14:42:19.128Z",
     "contact_updated_at": "2026-04-29T14:27:44.197Z",
     "first_seen_at": "2026-05-01T17:48:01.013628+00:00",
-    "snapshot_at": "2026-05-01T20:27:21.941644+00:00",
+    "snapshot_at": "2026-05-01T20:54:46.200565+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17470,7 +17562,7 @@
     "last_updated": "2026-04-28T04:36:09.313Z",
     "contact_updated_at": "2026-04-29T14:45:45.069Z",
     "first_seen_at": "2026-05-01T17:48:01.495022+00:00",
-    "snapshot_at": "2026-05-01T20:27:22.518614+00:00",
+    "snapshot_at": "2026-05-01T20:54:46.820489+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17517,7 +17609,7 @@
     "last_updated": "2026-04-28T14:42:23.411Z",
     "contact_updated_at": "2026-04-29T14:34:07.686Z",
     "first_seen_at": "2026-05-01T17:48:01.915338+00:00",
-    "snapshot_at": "2026-05-01T20:27:23.099485+00:00",
+    "snapshot_at": "2026-05-01T20:54:47.447610+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17564,7 +17656,7 @@
     "last_updated": "2026-04-29T22:24:50.755Z",
     "contact_updated_at": "2026-04-29T22:24:51.927Z",
     "first_seen_at": "2026-05-01T17:48:04.154343+00:00",
-    "snapshot_at": "2026-05-01T20:27:24.917101+00:00",
+    "snapshot_at": "2026-05-01T20:54:49.440171+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -17611,7 +17703,7 @@
     "last_updated": "2026-04-28T14:42:35.094Z",
     "contact_updated_at": "2026-04-28T04:30:19.578Z",
     "first_seen_at": "2026-05-01T17:48:03.686304+00:00",
-    "snapshot_at": "2026-05-01T20:27:24.288585+00:00",
+    "snapshot_at": "2026-05-01T20:54:48.781592+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17654,11 +17746,11 @@
     "dnd": false,
     "phone": "+1 (205) 253-2261",
     "phone_e164": "+12052532261",
-    "last_call_summary": "Seller Ivan owns three bare land parcels on Roosevelt Avenue in Forestdale area (35214): two at 0.14 acres each and one at 0.29 acres. County assessed value is $24k combined; seller asking $12k for all three. Properties are overgrown with trees/bushes, no road access (walk-in only), and no known utilities hookup. Inherited property with clear title, no liens. Seller motivated to liquidate for personal cash needs but no urgency. Jeff will follow up with land-focused partner and text website info.",
-    "last_updated": "2026-05-01T19:54:00.547Z",
-    "contact_updated_at": "2026-05-01T19:54:01.310Z",
+    "last_call_summary": "Seller Avan owns three bare land parcels on Roosevelt Avenue in Forestdale (35214): two at 0.14 acres each and one at 0.29 acres. Properties are adjacent with one non-owned parcel in between. Jefferson County assessed value totals ~$24k; seller asking $12k for all three. No road access currently, must walk through bushes/trees. Deeds are clear, no liens, inherited through death. Seller motivated to liquidate for cash but no immediate urgency. Call ended with Jeff agreeing to consult his land-foc",
+    "last_updated": "2026-05-01T20:41:48.373Z",
+    "contact_updated_at": "2026-05-01T20:41:49.143Z",
     "first_seen_at": "2026-05-01T17:48:05.559365+00:00",
-    "snapshot_at": "2026-05-01T20:27:25.535137+00:00",
+    "snapshot_at": "2026-05-01T20:54:50.126102+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -17701,11 +17793,11 @@
     "dnd": false,
     "phone": "+1 (908) 616-3081",
     "phone_e164": "+19086163081",
-    "last_call_summary": "Chris owns 58 Morris Lane in Piscataway, NJ \u2014 3 bed/3 bath, ~1,800 sqft on half-acre with one-car garage. Property is in average/good shape with newer mechanicals (roof, furnace, AC, hot water all ~5 years old) and updated kitchen. Bathrooms are older (late 90s/early 2000s). Seller is moving to West Trenton to be closer to family and plans to list in 30-40 days after doing minor paint/cosmetic work. Asking around $700k. VA explained savings on commission and repairs if selling to investor, and s",
-    "last_updated": "2026-05-01T19:54:20.360Z",
-    "contact_updated_at": "2026-05-01T19:54:21.156Z",
+    "last_call_summary": "Chris owns 58 Morris Lane in Piscataway, NJ \u2014 3 bed/3 bath, ~1,800 sqft, half-acre lot, one-car garage. Property is in average/good condition with newer mechanicals (roof, furnace, AC, hot water all ~5 years old), kitchen updated 5 years ago, bathrooms from late 90s/early 2000s. Siding is older. Seller is relocating to West Trenton in about 30-40 days to be closer to family. Was planning to list with realtor after doing minor cosmetic work but open to direct offer around $700k. VA will consult p",
+    "last_updated": "2026-05-01T20:42:07.482Z",
+    "contact_updated_at": "2026-05-01T20:42:08.148Z",
     "first_seen_at": "2026-05-01T17:48:06.440723+00:00",
-    "snapshot_at": "2026-05-01T20:27:26.800671+00:00",
+    "snapshot_at": "2026-05-01T20:54:50.787067+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -17752,7 +17844,7 @@
     "last_updated": "2026-04-29T22:34:57.575Z",
     "contact_updated_at": "2026-04-28T04:26:55.863Z",
     "first_seen_at": "2026-05-01T17:48:07.515465+00:00",
-    "snapshot_at": "2026-05-01T20:27:27.373545+00:00",
+    "snapshot_at": "2026-05-01T20:54:51.470719+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17795,11 +17887,11 @@
     "dnd": false,
     "phone": "+1 (267) 228-1175",
     "phone_e164": "+12672281175",
-    "last_call_summary": "Seller Alicia Reese owns 3322 Hope Street in Philadelphia, a fixer-upper she purchased and began rehabbing but abandoned due to cash tied up in other projects. She removed the ceiling to start electrical work but the property is not in great shape. She wants to sell ASAP but did not state a price. VA collected email (masimas75@gmail.com) and will send pictures, agreed to follow up after discussing with business partners.",
-    "last_updated": "2026-05-01T19:54:59.349Z",
-    "contact_updated_at": "2026-05-01T19:55:00.129Z",
+    "last_call_summary": "Seller owns 3322 Hope Street in Philadelphia and describes it as a fixer-upper that needs major work. They started demo work including removing ceiling for electrical but got caught up with other projects and now have capital tied up elsewhere. Seller is motivated to sell ASAP but did not provide an asking price during the call. VA successfully obtained email (masimas75@gmail.com) and seller agreed to send photos. Call ended with VA promising to loop in business partners and call back.",
+    "last_updated": "2026-05-01T20:42:25.711Z",
+    "contact_updated_at": "2026-05-01T20:42:26.339Z",
     "first_seen_at": "2026-05-01T17:48:08.002720+00:00",
-    "snapshot_at": "2026-05-01T20:27:27.982639+00:00",
+    "snapshot_at": "2026-05-01T20:54:52.162233+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -17842,11 +17934,11 @@
     "dnd": false,
     "phone": "+1 (205) 584-9391",
     "phone_e164": "+12055849391",
-    "last_call_summary": "Jimmy Lee owns 2823 29th Place West Birmingham, vacant since 2002 purchase. Originally bought for son to rehab and move into but son got married and went different direction. Property needs new roof, new windows, and full interior work but no structural damage per seller. Free and clear, no mortgage or liens. Asking $75,000. Seller lives 10 minutes away, has flip phone, agreed to text interior photos after call. Call ended with VA promising to text direct line and website.",
-    "last_updated": "2026-05-01T19:55:20.163Z",
-    "contact_updated_at": "2026-05-01T19:55:20.937Z",
+    "last_call_summary": "Jimmy Lee owns vacant SFR at 2823 29th Place West Birmingham, purchased in 2002, vacant for 20+ years. Property needs new roof, windows, and full interior gut. No structural damage reported. Free and clear, no mortgage or liens. Asking $75k. Lives 10 minutes away. Seller has old flip phone but provided cell (205) 584-9391. VA arranged to text seller from direct line to receive interior photos and website info. Seller was cooperative but no urgency to sell expressed.",
+    "last_updated": "2026-05-01T20:42:42.986Z",
+    "contact_updated_at": "2026-05-01T20:42:43.515Z",
     "first_seen_at": "2026-05-01T17:48:08.472025+00:00",
-    "snapshot_at": "2026-05-01T20:27:28.586158+00:00",
+    "snapshot_at": "2026-05-01T20:54:53.039391+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -17893,7 +17985,7 @@
     "last_updated": "2026-04-29T22:35:30.124Z",
     "contact_updated_at": "2026-04-28T04:29:22.328Z",
     "first_seen_at": "2026-05-01T17:48:08.935834+00:00",
-    "snapshot_at": "2026-05-01T20:27:29.256180+00:00",
+    "snapshot_at": "2026-05-01T20:54:53.730312+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17940,7 +18032,7 @@
     "last_updated": "2026-04-29T22:35:34.041Z",
     "contact_updated_at": "2026-03-17T18:30:50.168Z",
     "first_seen_at": "2026-05-01T17:48:09.486549+00:00",
-    "snapshot_at": "2026-05-01T20:27:29.886314+00:00",
+    "snapshot_at": "2026-05-01T20:54:54.417774+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -17987,7 +18079,7 @@
     "last_updated": "2026-04-29T22:35:42.259Z",
     "contact_updated_at": "2026-04-28T04:29:57.553Z",
     "first_seen_at": "2026-05-01T17:48:10.028806+00:00",
-    "snapshot_at": "2026-05-01T20:27:30.510865+00:00",
+    "snapshot_at": "2026-05-01T20:54:55.106654+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18034,7 +18126,7 @@
     "last_updated": "2026-04-29T22:35:46.302Z",
     "contact_updated_at": "2026-04-29T14:38:54.170Z",
     "first_seen_at": "2026-05-01T17:48:10.871377+00:00",
-    "snapshot_at": "2026-05-01T20:27:31.210939+00:00",
+    "snapshot_at": "2026-05-01T20:54:55.857129+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18081,7 +18173,7 @@
     "last_updated": "2026-04-29T22:35:50.216Z",
     "contact_updated_at": "2026-04-29T14:38:55.045Z",
     "first_seen_at": "2026-05-01T17:48:11.323731+00:00",
-    "snapshot_at": "2026-05-01T20:27:31.958635+00:00",
+    "snapshot_at": "2026-05-01T20:54:56.890088+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18128,7 +18220,7 @@
     "last_updated": "2026-04-29T22:26:11.141Z",
     "contact_updated_at": "2026-04-29T22:26:12.096Z",
     "first_seen_at": "2026-05-01T17:48:12.069394+00:00",
-    "snapshot_at": "2026-05-01T20:27:32.566286+00:00",
+    "snapshot_at": "2026-05-01T20:54:57.548447+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18175,7 +18267,7 @@
     "last_updated": "2026-04-29T22:26:23.217Z",
     "contact_updated_at": "2026-04-29T22:26:24.314Z",
     "first_seen_at": "2026-05-01T17:48:12.497910+00:00",
-    "snapshot_at": "2026-05-01T20:27:33.112635+00:00",
+    "snapshot_at": "2026-05-01T20:54:58.197477+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18222,7 +18314,7 @@
     "last_updated": "2026-04-29T22:26:35.548Z",
     "contact_updated_at": "2026-04-29T22:26:36.420Z",
     "first_seen_at": "2026-05-01T17:48:12.929100+00:00",
-    "snapshot_at": "2026-05-01T20:27:33.695486+00:00",
+    "snapshot_at": "2026-05-01T20:55:00.320469+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18269,7 +18361,7 @@
     "last_updated": "2026-04-29T22:26:59.906Z",
     "contact_updated_at": "2026-04-29T22:27:00.923Z",
     "first_seen_at": "2026-05-01T17:48:13.835127+00:00",
-    "snapshot_at": "2026-05-01T20:27:36.189755+00:00",
+    "snapshot_at": "2026-05-01T20:55:00.982558+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18316,7 +18408,7 @@
     "last_updated": "2026-04-29T22:27:12.480Z",
     "contact_updated_at": "2026-04-29T22:27:13.407Z",
     "first_seen_at": "2026-05-01T17:48:14.297341+00:00",
-    "snapshot_at": "2026-05-01T20:27:36.871656+00:00",
+    "snapshot_at": "2026-05-01T20:55:01.649700+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18363,7 +18455,7 @@
     "last_updated": "2026-04-29T22:27:24.362Z",
     "contact_updated_at": "2026-04-29T22:27:25.342Z",
     "first_seen_at": "2026-05-01T17:48:14.761311+00:00",
-    "snapshot_at": "2026-05-01T20:27:37.494761+00:00",
+    "snapshot_at": "2026-05-01T20:55:02.433609+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 2,
     "_activity": {
@@ -18410,7 +18502,7 @@
     "last_updated": "2026-04-29T22:27:36.519Z",
     "contact_updated_at": "2026-04-29T22:27:37.265Z",
     "first_seen_at": "2026-05-01T17:48:15.215181+00:00",
-    "snapshot_at": "2026-05-01T20:27:38.099000+00:00",
+    "snapshot_at": "2026-05-01T20:55:03.209365+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18457,7 +18549,7 @@
     "last_updated": "2026-04-29T22:27:51.643Z",
     "contact_updated_at": "2026-04-29T22:27:52.652Z",
     "first_seen_at": "2026-05-01T17:48:16.087271+00:00",
-    "snapshot_at": "2026-05-01T20:27:38.648322+00:00",
+    "snapshot_at": "2026-05-01T20:55:04.654254+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -18468,53 +18560,6 @@
       "opp_update_week": true,
       "contact_update_week": true,
       "notes_this_week": 1,
-      "had_activity": false
-    }
-  },
-  "6v9iRQrjltiFI85lx0NP": {
-    "cid": "6v9iRQrjltiFI85lx0NP",
-    "oid": "2Fe0Ynf0yoh5rvqGAu2h",
-    "name": "Raymond Bowman Sr",
-    "addr": "118 SHIP AVE",
-    "place": "beachwood, NJ",
-    "state": "NJ",
-    "stage_id": "d43fddd8-3a17-46b2-a193-cf18619f654f",
-    "stage_label": "2. Prequalified Offer (LAO)",
-    "stage_pos": 2,
-    "asking": 450000,
-    "arv": 475000,
-    "mao": 332500,
-    "spread": -117500,
-    "rating": 4,
-    "temp": "nurture",
-    "motivation": "price",
-    "timeline": "ANY TIME",
-    "last_sms_at": "",
-    "sms_count": 0,
-    "replied": false,
-    "replied_at": "",
-    "reply_text": "",
-    "reply_class": "",
-    "last_from_number": "",
-    "dormant": false,
-    "dnd": false,
-    "phone": "+1 (732) 267-0748",
-    "phone_e164": "+17322670748",
-    "last_call_summary": "Raymond owns a rental property on Chip Avenue that has been rented for 20 years on month-to-month lease. Property has new roof, new windows, and 10-year-old garage with additional rent. He's asking $450k but is open to negotiation and said to come back with a number. Not actively motivated to sell \u2014 mentioned he has other properties he's considering selling as well. Call quality was poor with frequent audio issues making communication difficult.",
-    "last_updated": "2026-05-01T19:52:39.453Z",
-    "contact_updated_at": "2026-05-01T19:52:39.164Z",
-    "first_seen_at": "2026-05-01T17:48:16.541922+00:00",
-    "snapshot_at": "2026-05-01T20:27:39.261803+00:00",
-    "slack_this_week": [],
-    "notes_added_this_week": 2,
-    "_activity": {
-      "sms_this_week": false,
-      "reply_this_week": false,
-      "slack_this_week": false,
-      "slack_count": 0,
-      "opp_update_week": true,
-      "contact_update_week": true,
-      "notes_this_week": 2,
       "had_activity": false
     }
   },
@@ -18547,13 +18592,13 @@
     "dnd": false,
     "phone": "+1 (216) 556-1114",
     "phone_e164": "+12165561114",
-    "last_call_summary": "Seller Mike owns 445 Cleveland Road in Cleveland, OH \u2014 a 2-bed, 1.5-bath property with basement and 3-car garage. He began demo work (bathroom, kitchen, floors torn out) but hasn't started putting anything back. Property has brand new furnace and hot water heater (gas), copper plumbing, Romex wiring, non-vinyl siding (wood-like, needs paint), and functional windows/doors. Roof needs replacement and garage roof has damage on one side. Seller originally planned to flip or rent but is open to selli",
-    "last_updated": "2026-05-01T19:53:21.482Z",
-    "contact_updated_at": "2026-05-01T19:55:34.154Z",
+    "last_call_summary": "Mike is an investor who owns 445 Cleveland Road, Cleveland, OH \u2014 a 2-bed, 1.5-bath property with basement and 3-car garage. He started a flip: gutted kitchen and bathroom, tore up floors in living/dining, but hasn't rebuilt anything yet. Property needs roof replacement, garage roof repair, paint, and finish work. He installed new furnace and hot water heater (gas). Plumbing is copper, wiring is Romex (not knob-and-tube), vinyl-less siding (possibly wood) in decent shape. Mike is asking around $5",
+    "last_updated": "2026-05-01T20:41:09.789Z",
+    "contact_updated_at": "2026-05-01T20:41:09.479Z",
     "first_seen_at": "2026-05-01T17:48:17.796337+00:00",
-    "snapshot_at": "2026-05-01T20:27:40.579640+00:00",
+    "snapshot_at": "2026-05-01T20:55:06.109560+00:00",
     "slack_this_week": [],
-    "notes_added_this_week": 3,
+    "notes_added_this_week": 5,
     "_activity": {
       "sms_this_week": false,
       "reply_this_week": false,
@@ -18561,7 +18606,7 @@
       "slack_count": 0,
       "opp_update_week": true,
       "contact_update_week": true,
-      "notes_this_week": 3,
+      "notes_this_week": 5,
       "had_activity": false
     }
   },
@@ -18579,7 +18624,7 @@
     "arv": 300000,
     "mao": 210000,
     "spread": 209700,
-    "rating": 6,
+    "rating": 7,
     "temp": "warm",
     "motivation": "Sister passed away in Nov. Was going to live in it",
     "timeline": "Dependent on Price - Soon",
@@ -18594,11 +18639,11 @@
     "dnd": false,
     "phone": "+1 (248) 326-8850",
     "phone_e164": "+12483268850",
-    "last_call_summary": "Seller owns a two-family property at 2903-2905 Taylor Street, Detroit MI 48206 (3bed/2bath up, 3bed/2bath down, fireplaces both units). Property is gutted to the studs and needs full rehab. Sister was going to live there but passed away in November, prompting the sale decision. Seller previously rehabbed and sold a similar property for just over $300k and expects similar pricing here. Has a sitter in the property to prevent squatters during construction pause. Call ended with agreement to reconn",
-    "last_updated": "2026-05-01T19:53:40.117Z",
-    "contact_updated_at": "2026-05-01T19:55:35.039Z",
+    "last_call_summary": "Seller owns a 2-unit property at 2903-2905 Taylor St, Detroit 48206 \u2014 3bed/2bath up and 3bed/2bath down, both units with fireplaces. Property is gutted to studs and needs full rehab. Sister passed away in November and was going to live there, so seller decided to sell. Seller previously completed and sold a similar property for just over $300k. Has a house sitter on-site to prevent break-ins. Also mentioned possible commercial property interest. Call ended with follow-up scheduled for Friday aro",
+    "last_updated": "2026-05-01T20:41:26.093Z",
+    "contact_updated_at": "2026-05-01T20:41:25.798Z",
     "first_seen_at": "2026-05-01T17:48:18.992652+00:00",
-    "snapshot_at": "2026-05-01T20:27:41.187862+00:00",
+    "snapshot_at": "2026-05-01T20:55:07.243335+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -18645,7 +18690,7 @@
     "last_updated": "2026-04-29T22:32:58.039Z",
     "contact_updated_at": "2026-03-18T20:54:44.299Z",
     "first_seen_at": "2026-05-01T17:48:26.084334+00:00",
-    "snapshot_at": "2026-05-01T20:27:41.827824+00:00",
+    "snapshot_at": "2026-05-01T20:55:07.991389+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18692,7 +18737,7 @@
     "last_updated": "2026-04-29T22:33:02.012Z",
     "contact_updated_at": "2026-04-28T04:29:29.043Z",
     "first_seen_at": "2026-05-01T17:48:26.598718+00:00",
-    "snapshot_at": "2026-05-01T20:27:42.561186+00:00",
+    "snapshot_at": "2026-05-01T20:55:09.018398+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18739,7 +18784,7 @@
     "last_updated": "2026-05-01T16:52:28.508Z",
     "contact_updated_at": "2026-04-29T14:32:56.346Z",
     "first_seen_at": "2026-05-01T17:48:36.069409+00:00",
-    "snapshot_at": "2026-05-01T20:27:43.146308+00:00",
+    "snapshot_at": "2026-05-01T20:55:09.725010+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18786,7 +18831,7 @@
     "last_updated": "2026-04-29T22:33:14.138Z",
     "contact_updated_at": "2026-04-28T04:30:14.533Z",
     "first_seen_at": "2026-05-01T17:48:36.602976+00:00",
-    "snapshot_at": "2026-05-01T20:27:43.860240+00:00",
+    "snapshot_at": "2026-05-01T20:55:10.456526+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 2,
     "_activity": {
@@ -18833,7 +18878,7 @@
     "last_updated": "2026-04-29T22:32:21.284Z",
     "contact_updated_at": "2026-05-01T15:20:15.212Z",
     "first_seen_at": "2026-05-01T17:48:37.122258+00:00",
-    "snapshot_at": "2026-05-01T20:27:44.566484+00:00",
+    "snapshot_at": "2026-05-01T20:55:11.210181+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -18880,7 +18925,7 @@
     "last_updated": "2026-04-29T22:32:25.847Z",
     "contact_updated_at": "2026-05-01T15:22:18.180Z",
     "first_seen_at": "2026-05-01T17:48:37.609725+00:00",
-    "snapshot_at": "2026-05-01T20:27:45.210980+00:00",
+    "snapshot_at": "2026-05-01T20:55:11.925570+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -18927,7 +18972,7 @@
     "last_updated": "2026-04-29T22:32:30.035Z",
     "contact_updated_at": "2026-04-28T04:28:56.269Z",
     "first_seen_at": "2026-05-01T17:48:38.086068+00:00",
-    "snapshot_at": "2026-05-01T20:27:45.796532+00:00",
+    "snapshot_at": "2026-05-01T20:55:12.604755+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -18974,7 +19019,7 @@
     "last_updated": "2026-04-29T22:32:33.843Z",
     "contact_updated_at": "2026-05-01T15:23:31.243Z",
     "first_seen_at": "2026-05-01T17:48:38.599759+00:00",
-    "snapshot_at": "2026-05-01T20:27:46.451914+00:00",
+    "snapshot_at": "2026-05-01T20:55:13.319609+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19021,7 +19066,7 @@
     "last_updated": "2026-04-29T22:32:37.619Z",
     "contact_updated_at": "2026-04-17T23:20:11.829Z",
     "first_seen_at": "2026-05-01T17:48:39.014766+00:00",
-    "snapshot_at": "2026-05-01T20:27:47.016964+00:00",
+    "snapshot_at": "2026-05-01T20:55:14.237382+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19068,7 +19113,7 @@
     "last_updated": "2026-04-29T22:33:18.079Z",
     "contact_updated_at": "2026-05-01T15:13:39.740Z",
     "first_seen_at": "2026-05-01T17:48:39.503193+00:00",
-    "snapshot_at": "2026-05-01T20:27:47.626955+00:00",
+    "snapshot_at": "2026-05-01T20:55:14.914755+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19115,7 +19160,7 @@
     "last_updated": "2026-05-01T15:15:55.740Z",
     "contact_updated_at": "2026-05-01T15:15:57.359Z",
     "first_seen_at": "2026-05-01T17:48:40.199094+00:00",
-    "snapshot_at": "2026-05-01T20:27:48.277041+00:00",
+    "snapshot_at": "2026-05-01T20:55:15.656917+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19162,7 +19207,7 @@
     "last_updated": "2026-04-29T22:33:25.765Z",
     "contact_updated_at": "2026-05-01T15:17:55.588Z",
     "first_seen_at": "2026-05-01T17:48:41.445575+00:00",
-    "snapshot_at": "2026-05-01T20:27:48.966035+00:00",
+    "snapshot_at": "2026-05-01T20:55:16.836477+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19209,7 +19254,7 @@
     "last_updated": "2026-04-29T22:33:30.214Z",
     "contact_updated_at": "2026-05-01T15:19:08.680Z",
     "first_seen_at": "2026-05-01T17:48:41.960888+00:00",
-    "snapshot_at": "2026-05-01T20:27:51.479862+00:00",
+    "snapshot_at": "2026-05-01T20:55:17.616323+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19256,7 +19301,7 @@
     "last_updated": "2026-05-01T15:19:58.304Z",
     "contact_updated_at": "2026-04-28T04:29:54.721Z",
     "first_seen_at": "2026-05-01T17:48:42.498550+00:00",
-    "snapshot_at": "2026-05-01T20:27:52.185727+00:00",
+    "snapshot_at": "2026-05-01T20:55:18.419741+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 3,
     "_activity": {
@@ -19303,7 +19348,7 @@
     "last_updated": "2026-05-01T18:40:54.580Z",
     "contact_updated_at": "2026-04-29T22:26:48.649Z",
     "first_seen_at": "2026-05-01T17:48:13.397598+00:00",
-    "snapshot_at": "2026-05-01T20:27:53.148404+00:00",
+    "snapshot_at": "2026-05-01T20:55:19.104700+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19350,7 +19395,7 @@
     "last_updated": "2026-04-28T18:33:54.608Z",
     "contact_updated_at": "2026-04-28T17:23:33.765Z",
     "first_seen_at": "2026-05-01T17:48:42.995435+00:00",
-    "snapshot_at": "2026-05-01T20:27:53.813111+00:00",
+    "snapshot_at": "2026-05-01T20:55:19.873624+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19397,7 +19442,7 @@
     "last_updated": "2026-04-28T14:41:23.484Z",
     "contact_updated_at": "2026-04-29T15:54:57.742Z",
     "first_seen_at": "2026-05-01T17:48:43.653266+00:00",
-    "snapshot_at": "2026-05-01T20:27:54.481618+00:00",
+    "snapshot_at": "2026-05-01T20:55:20.773854+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -19444,7 +19489,7 @@
     "last_updated": "2026-04-28T14:39:04.141Z",
     "contact_updated_at": "2026-04-28T04:29:23.151Z",
     "first_seen_at": "2026-05-01T17:48:44.276075+00:00",
-    "snapshot_at": "2026-05-01T20:27:55.335831+00:00",
+    "snapshot_at": "2026-05-01T20:55:21.733331+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19491,7 +19536,7 @@
     "last_updated": "2026-05-01T15:18:25.221Z",
     "contact_updated_at": "2026-04-28T04:29:20.578Z",
     "first_seen_at": "2026-05-01T17:48:44.872800+00:00",
-    "snapshot_at": "2026-05-01T20:28:00.332612+00:00",
+    "snapshot_at": "2026-05-01T20:55:22.522039+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19502,6 +19547,53 @@
       "opp_update_week": true,
       "contact_update_week": true,
       "notes_this_week": 0,
+      "had_activity": false
+    }
+  },
+  "6v9iRQrjltiFI85lx0NP": {
+    "cid": "6v9iRQrjltiFI85lx0NP",
+    "oid": "2Fe0Ynf0yoh5rvqGAu2h",
+    "name": "Raymond Bowman Sr",
+    "addr": "118 SHIP AVE",
+    "place": "beachwood, NJ",
+    "state": "NJ",
+    "stage_id": "4aa78ab3-85dc-46d1-a683-d97b0c7a23ee",
+    "stage_label": "Follow Up (1.5 month)",
+    "stage_pos": 0.5,
+    "asking": 450000,
+    "arv": 475000,
+    "mao": 332500,
+    "spread": -117500,
+    "rating": 4,
+    "temp": "nurture",
+    "motivation": "price",
+    "timeline": "ANY TIME",
+    "last_sms_at": "",
+    "sms_count": 0,
+    "replied": false,
+    "replied_at": "",
+    "reply_text": "",
+    "reply_class": "",
+    "last_from_number": "",
+    "dormant": false,
+    "dnd": false,
+    "phone": "+1 (732) 267-0748",
+    "phone_e164": "+17322670748",
+    "last_call_summary": "Raymond owns a rental property on Chip Avenue that has been rented for 20 years on month-to-month lease. Property has new roof, new windows, and 10-year-old garage with additional rent. He's asking $450k but is open to negotiation and said to come back with a number. Not actively motivated to sell \u2014 mentioned he has other properties he's considering selling as well. Call quality was poor with frequent audio issues making communication difficult.",
+    "last_updated": "2026-05-01T20:39:56.345Z",
+    "contact_updated_at": "2026-05-01T19:52:39.164Z",
+    "first_seen_at": "2026-05-01T17:48:16.541922+00:00",
+    "snapshot_at": "2026-05-01T20:55:23.229148+00:00",
+    "slack_this_week": [],
+    "notes_added_this_week": 2,
+    "_activity": {
+      "sms_this_week": false,
+      "reply_this_week": false,
+      "slack_this_week": false,
+      "slack_count": 0,
+      "opp_update_week": true,
+      "contact_update_week": true,
+      "notes_this_week": 2,
       "had_activity": false
     }
   },
@@ -19538,7 +19630,7 @@
     "last_updated": "2026-04-28T14:28:21.990Z",
     "contact_updated_at": "2026-04-29T00:27:42.257Z",
     "first_seen_at": "2026-05-01T17:48:45.588795+00:00",
-    "snapshot_at": "2026-05-01T20:28:01.865028+00:00",
+    "snapshot_at": "2026-05-01T20:55:24.956904+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19585,7 +19677,7 @@
     "last_updated": "2026-04-28T18:29:51.010Z",
     "contact_updated_at": "2026-04-28T17:16:55.706Z",
     "first_seen_at": "2026-05-01T17:48:46.068586+00:00",
-    "snapshot_at": "2026-05-01T20:28:02.448078+00:00",
+    "snapshot_at": "2026-05-01T20:55:25.621845+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -19632,7 +19724,7 @@
     "last_updated": "2026-04-28T14:34:13.181Z",
     "contact_updated_at": "2026-04-28T04:27:44.241Z",
     "first_seen_at": "2026-05-01T17:48:46.523892+00:00",
-    "snapshot_at": "2026-05-01T20:28:03.035050+00:00",
+    "snapshot_at": "2026-05-01T20:55:26.290525+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19679,7 +19771,7 @@
     "last_updated": "2026-04-28T18:30:49.313Z",
     "contact_updated_at": "2026-04-28T17:18:34.651Z",
     "first_seen_at": "2026-05-01T17:48:46.941422+00:00",
-    "snapshot_at": "2026-05-01T20:28:03.660580+00:00",
+    "snapshot_at": "2026-05-01T20:55:26.923762+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19726,7 +19818,7 @@
     "last_updated": "2026-04-28T18:31:38.025Z",
     "contact_updated_at": "2026-04-28T17:19:40.096Z",
     "first_seen_at": "2026-05-01T17:48:47.362074+00:00",
-    "snapshot_at": "2026-05-01T20:28:04.403071+00:00",
+    "snapshot_at": "2026-05-01T20:55:27.598391+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19773,7 +19865,7 @@
     "last_updated": "2026-04-28T14:42:30.649Z",
     "contact_updated_at": "2026-04-28T04:30:18.743Z",
     "first_seen_at": "2026-05-01T17:48:47.811859+00:00",
-    "snapshot_at": "2026-05-01T20:28:04.972530+00:00",
+    "snapshot_at": "2026-05-01T20:55:28.269511+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19820,7 +19912,7 @@
     "last_updated": "2026-04-14T16:25:53.392Z",
     "contact_updated_at": "2026-04-14T16:25:53.593Z",
     "first_seen_at": "2026-05-01T17:48:48.359056+00:00",
-    "snapshot_at": "2026-05-01T20:28:05.546804+00:00",
+    "snapshot_at": "2026-05-01T20:55:28.958888+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19867,7 +19959,7 @@
     "last_updated": "2026-05-01T18:57:36.096Z",
     "contact_updated_at": "2026-05-01T18:54:55.793Z",
     "first_seen_at": "2026-05-01T17:46:42.668957+00:00",
-    "snapshot_at": "2026-05-01T20:28:06.161641+00:00",
+    "snapshot_at": "2026-05-01T20:55:29.629133+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 1,
     "_activity": {
@@ -19914,7 +20006,7 @@
     "last_updated": "2026-04-30T21:31:43.373Z",
     "contact_updated_at": "2026-04-29T22:25:59.798Z",
     "first_seen_at": "2026-05-01T17:48:48.973496+00:00",
-    "snapshot_at": "2026-05-01T20:28:07.399861+00:00",
+    "snapshot_at": "2026-05-01T20:55:31.049737+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -19961,7 +20053,7 @@
     "last_updated": "2026-04-29T00:16:23.246Z",
     "contact_updated_at": "2026-04-29T00:16:22.446Z",
     "first_seen_at": "2026-05-01T17:48:49.435329+00:00",
-    "snapshot_at": "2026-05-01T20:28:07.997507+00:00",
+    "snapshot_at": "2026-05-01T20:55:31.754252+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20008,7 +20100,7 @@
     "last_updated": "2026-04-30T22:43:13.016Z",
     "contact_updated_at": "2026-04-30T22:42:34.491Z",
     "first_seen_at": "2026-05-01T17:48:49.930774+00:00",
-    "snapshot_at": "2026-05-01T20:28:08.631190+00:00",
+    "snapshot_at": "2026-05-01T20:55:32.436674+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 3,
     "_activity": {
@@ -20055,7 +20147,7 @@
     "last_updated": "2026-04-29T00:28:37.565Z",
     "contact_updated_at": "2026-04-29T00:28:36.720Z",
     "first_seen_at": "2026-05-01T17:48:50.413591+00:00",
-    "snapshot_at": "2026-05-01T20:28:09.243946+00:00",
+    "snapshot_at": "2026-05-01T20:55:33.098179+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20102,7 +20194,7 @@
     "last_updated": "2026-04-28T18:30:02.774Z",
     "contact_updated_at": "2026-04-28T17:17:17.628Z",
     "first_seen_at": "2026-05-01T17:48:50.959624+00:00",
-    "snapshot_at": "2026-05-01T20:28:09.824755+00:00",
+    "snapshot_at": "2026-05-01T20:55:33.743378+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20149,7 +20241,7 @@
     "last_updated": "2026-04-28T18:30:08.936Z",
     "contact_updated_at": "2026-04-28T17:17:26.782Z",
     "first_seen_at": "2026-05-01T17:48:51.454950+00:00",
-    "snapshot_at": "2026-05-01T20:28:10.432002+00:00",
+    "snapshot_at": "2026-05-01T20:55:34.429215+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20196,7 +20288,7 @@
     "last_updated": "2026-04-28T04:32:53.264Z",
     "contact_updated_at": "2026-04-28T04:27:45.083Z",
     "first_seen_at": "2026-05-01T17:48:51.896599+00:00",
-    "snapshot_at": "2026-05-01T20:28:11.021131+00:00",
+    "snapshot_at": "2026-05-01T20:55:35.081534+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20243,7 +20335,7 @@
     "last_updated": "2026-04-28T14:37:03.919Z",
     "contact_updated_at": "2026-04-29T14:39:08.886Z",
     "first_seen_at": "2026-05-01T17:48:52.348801+00:00",
-    "snapshot_at": "2026-05-01T20:28:11.625025+00:00",
+    "snapshot_at": "2026-05-01T20:55:35.788131+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20290,7 +20382,7 @@
     "last_updated": "2026-04-28T04:34:11.252Z",
     "contact_updated_at": "2026-04-28T04:28:49.504Z",
     "first_seen_at": "2026-05-01T17:48:52.790451+00:00",
-    "snapshot_at": "2026-05-01T20:28:12.245629+00:00",
+    "snapshot_at": "2026-05-01T20:55:36.478231+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20337,7 +20429,7 @@
     "last_updated": "2026-04-28T14:37:57.089Z",
     "contact_updated_at": "2026-04-28T04:29:05.526Z",
     "first_seen_at": "2026-05-01T17:48:53.273932+00:00",
-    "snapshot_at": "2026-05-01T20:28:12.827769+00:00",
+    "snapshot_at": "2026-05-01T20:55:37.124510+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20384,7 +20476,7 @@
     "last_updated": "2026-04-28T18:32:52.518Z",
     "contact_updated_at": "2026-04-28T17:21:37.316Z",
     "first_seen_at": "2026-05-01T17:48:53.714130+00:00",
-    "snapshot_at": "2026-05-01T20:28:13.437784+00:00",
+    "snapshot_at": "2026-05-01T20:55:38.712376+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20431,7 +20523,7 @@
     "last_updated": "2026-03-10T19:13:15.752Z",
     "contact_updated_at": "2026-03-06T17:08:38.161Z",
     "first_seen_at": "2026-05-01T17:48:54.177280+00:00",
-    "snapshot_at": "2026-05-01T20:28:14.064994+00:00",
+    "snapshot_at": "2026-05-01T20:55:39.377497+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20478,9 +20570,9 @@
     "last_updated": "2026-04-28T14:39:15.661Z",
     "contact_updated_at": "2026-04-28T04:29:26.480Z",
     "first_seen_at": "2026-05-01T17:48:54.757442+00:00",
-    "snapshot_at": "2026-05-01T20:28:14.777370+00:00",
+    "snapshot_at": "2026-05-01T20:55:40.114684+00:00",
     "slack_this_week": [],
-    "notes_added_this_week": 1,
+    "notes_added_this_week": 0,
     "_activity": {
       "sms_this_week": false,
       "reply_this_week": false,
@@ -20488,7 +20580,7 @@
       "slack_count": 0,
       "opp_update_week": true,
       "contact_update_week": true,
-      "notes_this_week": 1,
+      "notes_this_week": 0,
       "had_activity": false
     }
   },
@@ -20525,7 +20617,7 @@
     "last_updated": "2026-04-28T14:39:37.827Z",
     "contact_updated_at": "2026-04-28T04:29:32.601Z",
     "first_seen_at": "2026-05-01T17:48:55.245027+00:00",
-    "snapshot_at": "2026-05-01T20:28:15.397234+00:00",
+    "snapshot_at": "2026-05-01T20:55:40.794084+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20572,7 +20664,7 @@
     "last_updated": "2026-04-28T14:39:40.335Z",
     "contact_updated_at": "2026-04-28T04:29:33.431Z",
     "first_seen_at": "2026-05-01T17:48:56.471974+00:00",
-    "snapshot_at": "2026-05-01T20:28:15.980010+00:00",
+    "snapshot_at": "2026-05-01T20:55:41.694102+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20619,7 +20711,7 @@
     "last_updated": "2026-04-28T14:39:48.127Z",
     "contact_updated_at": "2026-04-28T04:29:35.116Z",
     "first_seen_at": "2026-05-01T17:48:56.960852+00:00",
-    "snapshot_at": "2026-05-01T20:28:16.584994+00:00",
+    "snapshot_at": "2026-05-01T20:55:42.401997+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20666,7 +20758,7 @@
     "last_updated": "2026-04-28T14:40:15.319Z",
     "contact_updated_at": "2026-04-28T04:29:42.910Z",
     "first_seen_at": "2026-05-01T17:48:57.728401+00:00",
-    "snapshot_at": "2026-05-01T20:28:17.173914+00:00",
+    "snapshot_at": "2026-05-01T20:55:43.214891+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20713,7 +20805,7 @@
     "last_updated": "2026-04-14T16:08:55.194Z",
     "contact_updated_at": "2026-04-22T14:11:02.085Z",
     "first_seen_at": "2026-05-01T17:48:58.149038+00:00",
-    "snapshot_at": "2026-05-01T20:28:17.891230+00:00",
+    "snapshot_at": "2026-05-01T20:55:43.883981+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20760,7 +20852,7 @@
     "last_updated": "2026-04-28T14:41:19.335Z",
     "contact_updated_at": "2026-04-28T04:29:59.209Z",
     "first_seen_at": "2026-05-01T17:48:58.642558+00:00",
-    "snapshot_at": "2026-05-01T20:28:18.715609+00:00",
+    "snapshot_at": "2026-05-01T20:55:44.575081+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20807,7 +20899,7 @@
     "last_updated": "2026-04-28T14:41:28.662Z",
     "contact_updated_at": "2026-04-14T16:20:25.131Z",
     "first_seen_at": "2026-05-01T17:48:59.111307+00:00",
-    "snapshot_at": "2026-05-01T20:28:19.297798+00:00",
+    "snapshot_at": "2026-05-01T20:55:45.277588+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20854,7 +20946,7 @@
     "last_updated": "2026-04-28T14:41:31.365Z",
     "contact_updated_at": "2026-04-29T14:26:24.788Z",
     "first_seen_at": "2026-05-01T17:48:59.616360+00:00",
-    "snapshot_at": "2026-05-01T20:28:19.970681+00:00",
+    "snapshot_at": "2026-05-01T20:55:46.008053+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20901,7 +20993,7 @@
     "last_updated": "2026-04-28T14:42:10.103Z",
     "contact_updated_at": "2026-04-28T04:30:13.682Z",
     "first_seen_at": "2026-05-01T17:49:00.091156+00:00",
-    "snapshot_at": "2026-05-01T20:28:20.597964+00:00",
+    "snapshot_at": "2026-05-01T20:55:46.967614+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20948,7 +21040,7 @@
     "last_updated": "2026-04-28T14:42:26.159Z",
     "contact_updated_at": "2026-04-29T14:39:15.886Z",
     "first_seen_at": "2026-05-01T17:49:00.562758+00:00",
-    "snapshot_at": "2026-05-01T20:28:21.333171+00:00",
+    "snapshot_at": "2026-05-01T20:55:47.632721+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -20995,7 +21087,7 @@
     "last_updated": "2026-03-31T17:49:51.602Z",
     "contact_updated_at": "2026-03-31T17:24:23.226Z",
     "first_seen_at": "2026-05-01T17:49:01.011159+00:00",
-    "snapshot_at": "2026-05-01T20:28:21.890666+00:00",
+    "snapshot_at": "2026-05-01T20:55:48.326899+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -21042,7 +21134,7 @@
     "last_updated": "2026-04-28T14:42:37.530Z",
     "contact_updated_at": "2026-04-29T14:39:17.258Z",
     "first_seen_at": "2026-05-01T17:49:01.449761+00:00",
-    "snapshot_at": "2026-05-01T20:28:22.460789+00:00",
+    "snapshot_at": "2026-05-01T20:55:49.069152+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
@@ -21089,7 +21181,7 @@
     "last_updated": "2026-04-28T14:42:40.108Z",
     "contact_updated_at": "2026-04-28T04:30:21.221Z",
     "first_seen_at": "2026-05-01T17:49:01.913826+00:00",
-    "snapshot_at": "2026-05-01T20:28:23.071610+00:00",
+    "snapshot_at": "2026-05-01T20:55:50.118091+00:00",
     "slack_this_week": [],
     "notes_added_this_week": 0,
     "_activity": {
