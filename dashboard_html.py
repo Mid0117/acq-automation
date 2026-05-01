@@ -517,20 +517,9 @@ a:hover { color: var(--ink); }
   </div>
 
   <div class="logo-row">
-    <svg class="logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" aria-label="Atom Property Group">
-      <text x="50" y="70" font-family="Arial Black, Helvetica, sans-serif"
-            font-weight="900" font-size="64" class="brand-main">AT</text>
-      <g transform="translate(166, 40)">
-        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" />
-        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(60 28 28)" />
-        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(-60 28 28)" />
-        <circle  class="atom-core"  cx="28" cy="28" r="5" />
-      </g>
-      <text x="232" y="70" font-family="Arial Black, Helvetica, sans-serif"
-            font-weight="900" font-size="64" class="brand-main">M</text>
-      <text x="50" y="108" font-family="Arial, Helvetica, sans-serif"
-            font-weight="700" font-size="14" class="brand-sub">PROPERTY GROUP</text>
-    </svg>
+    <img class="logo-svg" src="logo.png"
+         onerror="this.onerror=null; this.src='logo.svg';"
+         alt="Atom Property Group" />
     <div class="nav">
       <a href="index.html" class="active">Follow-Ups</a>
       <a href="deals.html">Deals</a>
