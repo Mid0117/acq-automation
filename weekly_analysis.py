@@ -314,16 +314,36 @@ def build_lead_record(lead, sms_state):
         'phone':       phone_display,
         'phone_e164':  phone_e164,
         'last_call_summary': (cf.get(CF_VA_NOTES) or '')[:500],
-        'last_updated': lead.get('updated', ''),
+        'last_updated':       lead.get('updated', ''),
+        'contact_updated_at': c.get('dateUpdated') or c.get('updatedAt') or '',
     }
 
 
-def categorize(curr, prev_map, week_start_iso, slack_mention_count):
+def count_recent_notes(cid, since_iso):
+    """Count notes added to this contact since the given ISO timestamp.
+    Captures Slack mentions, manual notes Adam/Jeff add post-meeting, APG
+    Lead Summary updates — anything that signals attention this week."""
+    try:
+        r = http('GET', f'https://services.leadconnectorhq.com/contacts/{cid}/notes', headers=GHL_H)
+        if r.status_code != 200:
+            return 0
+        n = 0
+        for note in r.json().get('notes', []):
+            ts = note.get('dateAdded') or note.get('createdAt') or ''
+            if ts and ts >= since_iso:
+                n += 1
+        return n
+    except Exception:
+        return 0
+
+
+def categorize(curr, prev_map, week_start_iso, slack_mention_count, recent_notes_count):
     """Bucket a single lead based on this-week vs last-week diff.
 
     Weekly view focuses on what's CHANGED or had ACTIVITY this week.
-    Stagnant-no-activity leads are still categorized but rendered separately
-    (collapsed by default) so the team isn't drowning in pipeline noise.
+    Activity = SMS sent / reply received / Slack mention captured / contact
+    or opp updated in GHL / new note added (any note, including manual
+    notes Adam or Jeff add after a meeting or call).
     """
     cid = curr['cid']
     prev = prev_map.get(cid)
@@ -332,11 +352,15 @@ def categorize(curr, prev_map, week_start_iso, slack_mention_count):
     last_sms_at  = curr.get('last_sms_at') or ''
     replied_at   = curr.get('replied_at') or ''
     last_updated = curr.get('last_updated') or ''
+    contact_updated = curr.get('contact_updated_at') or ''
     sms_this_week    = bool(last_sms_at  and last_sms_at  >= week_start_iso)
     reply_this_week  = bool(replied_at   and replied_at   >= week_start_iso)
-    update_this_week = bool(last_updated and last_updated >= week_start_iso)
+    opp_update_week  = bool(last_updated and last_updated >= week_start_iso)
+    contact_update_week = bool(contact_updated and contact_updated >= week_start_iso)
     slack_this_week  = slack_mention_count > 0
-    had_activity = sms_this_week or reply_this_week or slack_this_week
+    notes_this_week  = recent_notes_count > 0
+    had_activity = (sms_this_week or reply_this_week or slack_this_week or
+                    opp_update_week or contact_update_week or notes_this_week)
 
     # Movement bucket
     if not prev:
@@ -366,13 +390,16 @@ def categorize(curr, prev_map, week_start_iso, slack_mention_count):
             and movement == 'quiet'):
         action_tags.append('drop_suggest')
 
-    # Activity flags exposed for the modal
+    # Activity flags exposed for the inline-expand detail
     curr['_activity'] = {
-        'sms_this_week':    sms_this_week,
-        'reply_this_week':  reply_this_week,
-        'slack_this_week':  slack_this_week,
-        'slack_count':      slack_mention_count,
-        'had_activity':     had_activity,
+        'sms_this_week':       sms_this_week,
+        'reply_this_week':     reply_this_week,
+        'slack_this_week':     slack_this_week,
+        'slack_count':         slack_mention_count,
+        'opp_update_week':     opp_update_week,
+        'contact_update_week': contact_update_week,
+        'notes_this_week':     recent_notes_count,
+        'had_activity':        had_activity,
     }
 
     return movement, movement_meta, action_tags
@@ -395,505 +422,432 @@ WEEKLY_HTML = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>APG ACQ — Weekly Analysis</title>
+<title>Atom Property Group — Weekly Docket</title>
 <style>
 :root {
-  --bg: #FBF8F0;
-  --paper: #FFFCF4;
-  --ink: #1A2840;
-  --ink-soft: #455066;
-  --ink-mute: #6B7591;
-  --gold: #FFC72C;
-  --gold-deep: #C99500;
-  --gold-soft: #FFF6CC;
-  --rule: rgba(26,40,64,0.12);
-  --rule-strong: rgba(26,40,64,0.22);
-  --green: #2F7D5B;
-  --hot:   #C5443A;
-  --warm:  #B57A1A;
+  --ink: #0A1F44;
+  --ink-deep: #061331;
+  --ink-soft: #1A3A7A;
+  --ink-mist: #2E4A82;
+  --gold: #F5C518;
+  --gold-soft: #FFE58A;
+  --gold-wash: #FFF6D0;
+  --cream: #FAF7EC;
+  --cream-deep: #F3EED8;
+  --paper: #FFFFFF;
+  --rule: #C9C2A8;
+  --rule-soft: #E5E0C8;
+  --muted: #5A6786;
+  --muted-soft: #8A93AA;
+  --text: #101827;
+  --s-uc:   #B91C1C;
+  --s-live: #10B981;
+  --s-warm: #EA580C;
+  --s-hold: #EAB308;
+  --s-dead: #6B625A;
 }
 * { box-sizing: border-box; }
-body {
-  margin: 0; padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  background: var(--bg); color: var(--ink); line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
+html, body {
+  margin: 0; padding: 0; background: var(--cream); color: var(--text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
 }
-.container { max-width: 1200px; margin: 0 auto; padding: 28px 36px 80px; }
+.shell {
+  max-width: 1240px; margin: 0 auto;
+  padding: 40px 64px 120px;
+  background: var(--paper); min-height: 100vh;
+}
+@media (max-width: 820px) { .shell { padding: 32px 24px 80px; } }
 
-.meta-bar {
-  display: flex; justify-content: space-between; align-items: center;
-  border-top: 4px solid var(--ink); padding: 14px 0 0;
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-soft);
+/* ── MASTHEAD ──────────────────────────────────────── */
+.masthead {
+  border-top: 5px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 28px 0 24px; margin-bottom: 24px; position: relative;
 }
-
-.logo-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; margin: 24px 0 12px; flex-wrap: wrap;
+.masthead::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: 160px; height: 5px; background: var(--gold);
 }
-.logo-svg { width: 200px; height: auto; }
-.logo-svg .atom-orbit { stroke: var(--gold-deep); stroke-width: 2.6; fill: none; }
-.logo-svg .atom-core  { fill: var(--gold-deep); }
-.logo-svg .brand-main { fill: var(--ink); }
-.logo-svg .brand-sub  { fill: var(--ink-soft); letter-spacing: 4px; }
-.nav { display: flex; gap: 6px; flex-wrap: wrap; }
-.nav a {
-  padding: 6px 12px; border-radius: 3px;
-  background: transparent; border: 1px solid var(--rule);
-  color: var(--ink-soft); font-size: 11px; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
-  transition: all .12s;
+.brandrow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
 }
-.nav a:hover { color: var(--ink); border-color: var(--ink); }
-.nav a.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
-
-.doc-header { padding: 28px 0 18px; }
-.doc-header h1 {
-  font-family: "Iowan Old Style", Palatino, Georgia, serif;
-  font-weight: 600; font-size: 48px; line-height: 1.05;
-  margin: 0 0 12px; color: var(--ink); letter-spacing: -0.01em;
+.brand { color: var(--ink); font-weight: 700; }
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 54px; line-height: 1.04; letter-spacing: -0.015em;
+  margin: 0 0 14px; color: var(--ink); font-weight: 700;
 }
-.doc-header h1 .accent { font-style: italic; color: var(--gold-deep); }
-.doc-header .lede {
-  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
-  font-size: 16px; color: var(--ink-soft); max-width: 680px; margin: 0;
+h1 .accent { color: var(--gold); font-style: italic; }
+.dek {
+  font-family: Georgia, serif; font-style: italic; font-size: 18px;
+  line-height: 1.5; color: var(--ink-soft); max-width: 780px; margin: 10px 0 0;
 }
 
-.week-picker {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  margin-top: 20px; padding: 12px 16px;
-  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px;
+/* ── NAV BAR (sticky) ──────────────────────────────── */
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 236, 0.96); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 -64px 28px; padding: 10px 64px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  display: flex; gap: 18px; overflow-x: auto; white-space: nowrap;
+  align-items: center;
 }
-.week-picker label {
-  font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--ink-mute);
+@media (max-width: 820px) { .topnav { margin: 0 -24px 24px; padding: 10px 24px; } }
+.topnav a {
+  color: var(--ink-soft); text-decoration: none; font-weight: 700; padding: 4px 0;
+  border-bottom: 2px solid transparent; transition: border-color .15s, color .15s;
 }
-.week-picker select {
-  padding: 8px 12px; border: 1px solid var(--rule);
-  background: var(--bg); color: var(--ink); border-radius: 3px;
-  font-size: 13px; font-weight: 700; cursor: pointer;
-  font-family: ui-monospace, monospace;
-}
-.week-picker .meta { color: var(--ink-soft); font-size: 12px; margin-left: auto; }
+.topnav a:hover, .topnav a.active { color: var(--ink); border-bottom: 2px solid var(--gold); }
 
+.topnav .spacer { flex: 1; }
+.topnav .week-pick { display: inline-flex; align-items: center; gap: 8px; }
+.topnav .week-pick select {
+  padding: 4px 10px; border: 1px solid var(--rule); background: var(--paper);
+  color: var(--ink); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; font-family: inherit; cursor: pointer;
+}
+.topnav .refresh-btn {
+  padding: 5px 12px; background: var(--ink); color: var(--gold);
+  border: 1px solid var(--ink); cursor: pointer;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.10em;
+  text-transform: uppercase; transition: all 0.12s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.topnav .refresh-btn:hover { background: var(--gold); color: var(--ink); }
+.topnav .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.topnav .refresh-btn .spin {
+  display: inline-block; width: 10px; height: 10px;
+  border: 2px solid currentColor; border-right-color: transparent;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.refresh-status { font-size: 11px; color: var(--muted); margin-left: 8px; }
+
+/* ── SECTION HEADINGS ──────────────────────────────── */
+section { margin: 48px 0; }
+h2 {
+  font-family: Georgia, serif; font-size: 26px; color: var(--ink);
+  margin: 0 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--ink);
+  letter-spacing: -0.01em; display: flex; align-items: center; gap: 14px;
+  flex-wrap: wrap;
+}
+h2 .num {
+  display: inline-block; min-width: 34px; padding: 4px 10px;
+  background: var(--gold); color: var(--ink);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px; font-weight: 700; text-align: center; letter-spacing: 0.04em;
+}
+h2 .sec-count {
+  margin-left: auto;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700;
+}
+
+.lede {
+  font-family: Georgia, serif; font-size: 19px; line-height: 1.6;
+  color: #1a2540; border-left: 4px solid var(--gold); padding: 6px 0 6px 22px;
+  margin: 14px 0 4px; max-width: 880px;
+}
+
+/* ── KPI CRIT-GRID ─────────────────────────────────── */
+.crit-grid {
+  display: grid; gap: 14px; grid-template-columns: repeat(6, 1fr);
+  margin-top: 24px;
+}
+@media (max-width: 1100px) { .crit-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px)  { .crit-grid { grid-template-columns: repeat(2, 1fr); } }
+.crit {
+  background: var(--cream); border-top: 4px solid var(--gold);
+  border-bottom: 1px solid var(--rule); padding: 18px 20px 22px;
+}
+.crit .kicker {
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px; font-weight: 700;
+}
+.crit .num-big {
+  font-family: Georgia, serif; font-size: 38px; font-weight: 700;
+  color: var(--ink); line-height: 1; margin: 0;
+}
+.crit .sub {
+  font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4;
+}
+.crit.uc   { border-top-color: var(--s-uc); }
+.crit.uc   .num-big { color: var(--s-uc); }
+.crit.live { border-top-color: var(--s-live); }
+.crit.live .num-big { color: var(--s-live); }
+.crit.warm { border-top-color: var(--s-warm); }
+.crit.warm .num-big { color: var(--s-warm); }
+.crit.dead { border-top-color: var(--muted); }
+.crit.dead .num-big { color: var(--muted); }
+
+/* ── DEAL CARDS (inline-expand) ────────────────────── */
+.deal-grid { display: grid; gap: 14px; margin-top: 18px; }
+.deal {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 5px solid var(--gold); transition: box-shadow .2s ease;
+}
+.deal:hover { box-shadow: 0 8px 28px -18px rgba(10,31,68,0.25); }
+.deal.uc   { border-top-color: var(--s-uc); }
+.deal.live { border-top-color: var(--s-live); }
+.deal.warm { border-top-color: var(--s-warm); }
+.deal.hold { border-top-color: var(--s-hold); }
+.deal.dead { border-top-color: var(--muted); }
+
+.deal-head {
+  padding: 16px 22px; display: grid; grid-template-columns: auto 1fr auto;
+  gap: 14px; align-items: center; cursor: pointer; user-select: none;
+}
+@media (max-width: 820px) {
+  .deal-head { grid-template-columns: auto 1fr; }
+  .deal-head .deal-status { grid-column: 1/-1; }
+}
+.deal-num {
+  font-family: Georgia, serif; font-size: 16px; font-weight: 700;
+  color: var(--ink); background: var(--gold); padding: 6px 11px;
+  letter-spacing: 0.02em; line-height: 1;
+}
+.deal.uc   .deal-num { background: var(--s-uc);   color: #fff; }
+.deal.live .deal-num { background: var(--s-live); color: #fff; }
+.deal.warm .deal-num { background: var(--s-warm); color: #fff; }
+
+.deal-title h3 {
+  font-family: Georgia, serif; font-size: 19px; margin: 0 0 4px; color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.deal-title p.tagline {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px; color: var(--muted); margin: 0; line-height: 1.4;
+  letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700;
+}
+.deal-title p.tagline .signal-set { display: inline-flex; gap: 6px; margin-left: 8px; }
+.signal-set .sg {
+  font-size: 10px; padding: 2px 7px; background: var(--cream-deep);
+  color: var(--ink); border-radius: 2px; letter-spacing: 0.06em;
+  text-transform: uppercase; font-weight: 700;
+}
+.signal-set .sg.green { background: rgba(16,185,129,0.18); color: #065F46; }
+.signal-set .sg.red   { background: rgba(185,28,28,0.16);  color: #7F1D1D; }
+.signal-set .sg.warm  { background: rgba(234,88,12,0.18);  color: #7C2D12; }
+.signal-set .sg.hold  { background: rgba(234,179,8,0.20);  color: #713F12; }
+.signal-set .sg.gray  { background: rgba(91,103,134,0.18); color: #334155; }
+
+.deal-status {
+  background: var(--ink); color: var(--paper); padding: 8px 12px;
+  font-size: 11px; line-height: 1.3; border-left: 3px solid var(--gold);
+  white-space: nowrap; letter-spacing: 0.08em; text-transform: uppercase;
+  font-weight: 700;
+}
+.deal-status .lbl {
+  display: block; font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--gold); margin-bottom: 3px; font-weight: 700;
+}
+.deal-status.uc { background: var(--s-uc); }
+.deal-status.live { background: var(--s-live); }
+.deal-status.warm { background: var(--s-warm); }
+.deal-status.hold { background: var(--s-hold); color: var(--ink); }
+.deal-status.hold .lbl { color: var(--ink); opacity: 0.75; }
+.deal-status.dead { background: var(--muted); }
+
+.deal-toggle {
+  grid-column: 1/-1; display: flex; justify-content: flex-end; margin-top: 4px;
+  font-size: 10px; letter-spacing: 0.18em; color: var(--muted); font-weight: 700;
+  text-transform: uppercase;
+}
+.deal-toggle::after { content: "▸ TAP TO EXPAND"; }
+.deal.open .deal-toggle::after { content: "▾ TAP TO COLLAPSE"; color: var(--ink); }
+
+.deal-body {
+  padding: 0; max-height: 0; overflow: hidden;
+  transition: max-height .45s ease, padding .45s ease;
+  border-top: 0;
+}
+.deal.open .deal-body {
+  padding: 22px 26px 28px;
+  max-height: 3000px;
+  border-top: 1px solid var(--rule);
+}
+.deal-body-inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+}
+@media (max-width: 820px) { .deal-body-inner { grid-template-columns: 1fr; } }
+.field h4 {
+  font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-soft); margin: 0 0 8px; font-weight: 700;
+}
+.field p { margin: 0 0 10px; color: #2b3856; font-size: 14px; line-height: 1.55; }
+.field p:last-child { margin-bottom: 0; }
+.field.full { grid-column: 1/-1; }
+
+.contact {
+  background: var(--cream); border: 1px solid var(--rule);
+  padding: 10px 14px; margin-top: 8px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px; line-height: 1.7; color: var(--ink);
+}
+.contact .c-lbl {
+  display: inline-block; width: 18px; color: var(--gold); font-weight: 700;
+}
+.contact a { color: var(--ink-soft); text-decoration: none; font-weight: 700; }
+.contact a:hover { color: var(--ink); text-decoration: underline; }
+
+.num-table {
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 13px;
+}
+.num-table .k {
+  font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; padding: 6px 0;
+  border-top: 1px dashed var(--rule);
+}
+.num-table .v {
+  color: var(--ink); font-weight: 700; padding: 6px 0;
+  border-top: 1px dashed var(--rule); font-variant-numeric: tabular-nums;
+}
+.num-table .v.green { color: var(--s-live); }
+.num-table .v.red   { color: var(--s-uc); }
+.num-table .k:first-of-type, .num-table .v:first-of-type { border-top: none; }
+
+.callout {
+  border-left: 3px solid var(--gold); background: var(--gold-wash);
+  padding: 12px 16px; font-size: 13px; color: #24314e; line-height: 1.5;
+  margin-top: 10px;
+}
+.callout.decision { border-left-color: var(--s-uc);  background: #FFF0F0; color: #450A0A; }
+.callout.appt     { border-left-color: var(--s-live); background: #ECFDF5; color: #064E3B; }
+.callout.revise   { border-left-color: var(--ink);   background: var(--cream-deep); color: var(--ink); }
+.callout strong {
+  display: block; color: var(--ink); font-size: 10.5px;
+  text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 4px;
+  font-weight: 700;
+}
+.callout.decision strong { color: #7F1D1D; }
+.callout.appt strong     { color: #065F46; }
+.callout.revise strong   { color: var(--ink); }
+
+/* ── STAGE FILTER CHIPS ────────────────────────────── */
 .stage-filter {
   display: flex; gap: 6px; flex-wrap: wrap;
-  margin-top: 14px; padding: 10px 14px;
-  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px;
+  margin: 14px 0 0; padding: 10px 14px;
+  background: var(--cream); border: 1px solid var(--rule);
 }
 .filter-chip {
-  padding: 6px 12px; border-radius: 3px;
-  background: transparent; border: 1px solid var(--rule);
-  color: var(--ink-soft); font-size: 11px; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 12px; background: transparent; border: 1px solid var(--rule);
+  color: var(--muted); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.10em; text-transform: uppercase;
   cursor: pointer; user-select: none; transition: all .12s;
 }
 .filter-chip:hover { color: var(--ink); border-color: var(--ink); }
 .filter-chip.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
 
-.slack-list .lead-line { grid-template-columns: 1fr auto auto; }
-.slack-list .lead-line .who .nm a { color: var(--ink); text-decoration: none; }
-.slack-list .lead-line .who .nm a:hover { color: var(--gold-deep); text-decoration: underline; }
-.slack-list .lead-line .excerpt {
-  font-style: italic; color: var(--ink-soft); margin-top: 4px;
-  font-size: 12px; line-height: 1.5;
-  border-left: 2px solid var(--rule); padding-left: 10px; max-width: 600px;
-}
-.slack-list .lead-line .channel-tag {
-  font-size: 10px; padding: 3px 8px; border-radius: 3px;
-  background: rgba(255,199,44,0.20); color: var(--ink);
-  font-weight: 700; letter-spacing: 0.04em;
-  font-family: ui-monospace, monospace;
-}
-
-.lead-line.clickable { cursor: pointer; }
-.lead-line.clickable:hover .nm { color: var(--gold-deep); }
-
-/* Description rows inside buckets */
-.lead-line.desc-row {
-  background: rgba(0,0,0,0.02); font-style: italic;
-  color: var(--ink-soft); grid-template-columns: 1fr;
-}
-
-/* Quiet bucket — collapsible details */
-details.quiet-block { background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 14px; overflow: hidden; }
-details.quiet-block > summary {
-  list-style: none; cursor: pointer;
-  padding: 14px 18px;
-  background: rgba(26,40,64,0.06);
-  display: flex; align-items: center; gap: 12px;
-}
-details.quiet-block > summary::-webkit-details-marker { display: none; }
-details.quiet-block > summary::after {
-  content: '▼'; margin-left: auto; color: var(--ink-mute);
-  transition: transform 0.2s ease;
-}
-details[open].quiet-block > summary::after { transform: rotate(180deg); }
-.quiet-summary-text { font-size: 14px; color: var(--ink); }
-.quiet-summary-text .ct { font-size: 12px; color: var(--ink-mute); margin-left: 6px; }
-
-/* In-page refresh button */
-.refresh-bar {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  margin: 12px 0 0;
-}
-.refresh-btn {
-  padding: 8px 14px; border-radius: 3px;
-  background: var(--ink); color: var(--gold);
-  border: 1px solid var(--ink); cursor: pointer;
-  font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
-  text-transform: uppercase; transition: all 0.15s;
-  display: inline-flex; align-items: center; gap: 8px;
-}
-.refresh-btn:hover { background: var(--gold-deep); color: var(--ink); }
-.refresh-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.refresh-btn .spin {
-  display: inline-block; width: 12px; height: 12px;
-  border: 2px solid currentColor; border-right-color: transparent;
-  border-radius: 50%; animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.refresh-status { font-size: 12px; color: var(--ink-soft); }
-
-/* Lead Detail Modal */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(26,40,64,0.55);
-  backdrop-filter: blur(4px);
-  display: none; align-items: flex-start; justify-content: center;
-  z-index: 1000; padding: 60px 20px 20px;
-  overflow-y: auto;
-  opacity: 0; transition: opacity 0.2s ease;
-}
-.modal-overlay.open {
-  display: flex; opacity: 1; animation: modal-fade-in 0.2s ease forwards;
-}
-@keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
-.modal {
-  background: var(--paper); border-radius: 8px;
-  border: 1px solid var(--rule);
-  width: 100%; max-width: 720px;
-  box-shadow: 0 20px 60px rgba(26,40,64,0.30);
-  transform: translateY(20px) scale(0.96);
-  opacity: 0;
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
-}
-.modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
-.modal-close {
-  position: absolute; top: 14px; right: 18px;
-  background: transparent; border: 0; font-size: 22px;
-  color: var(--ink-mute); cursor: pointer; line-height: 1;
-  padding: 4px 8px;
-}
-.modal-close:hover { color: var(--ink); }
-.modal-body { padding: 28px 32px 24px; position: relative; }
-.modal-header {
-  display: flex; justify-content: space-between; align-items: start; gap: 12px;
-  padding-bottom: 16px; margin-bottom: 14px;
-  border-bottom: 1px solid var(--rule);
-}
-.modal-header h2 {
-  font-family: "Iowan Old Style", Georgia, serif;
-  margin: 0 0 4px; font-size: 24px; font-weight: 600; color: var(--ink);
-  letter-spacing: -0.005em;
-}
-.modal-sub { font-size: 13px; color: var(--ink-soft); }
-.modal-row {
-  display: grid; grid-template-columns: 110px 1fr; gap: 16px;
-  padding: 12px 0; border-bottom: 1px solid var(--rule);
-}
-.modal-row:last-of-type { border-bottom: 0; }
-.modal-label {
-  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--ink-mute); padding-top: 4px;
-}
-.modal-value { font-size: 14px; color: var(--ink); line-height: 1.5; }
-.modal-value strong { font-weight: 700; }
-.modal-value .quote {
-  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
-  border-left: 2px solid var(--gold); padding: 2px 12px;
-  color: var(--ink-soft); margin: 4px 0;
-}
-.phone-link {
-  font-family: ui-monospace, monospace; font-size: 14px; font-weight: 700;
-  color: var(--gold-deep); text-decoration: none;
-}
-.phone-link:hover { color: var(--ink); text-decoration: underline; }
+/* ── SLACK MENTIONS ────────────────────────────────── */
 .slack-card {
-  background: rgba(255,199,44,0.08); border: 1px solid rgba(255,199,44,0.25);
-  border-radius: 4px; padding: 10px 12px; margin-bottom: 8px;
+  background: var(--gold-wash); border: 1px solid var(--gold-soft);
+  border-left: 3px solid var(--gold); padding: 12px 16px; margin-bottom: 8px;
 }
 .slack-card .slack-meta {
-  font-size: 11px; color: var(--ink-mute); margin-bottom: 4px;
+  font-size: 10px; color: var(--muted); margin-bottom: 6px;
+  letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700;
   font-family: ui-monospace, monospace;
 }
-.modal-actions {
-  display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;
-  margin-top: 16px; padding-top: 16px;
-  border-top: 1px solid var(--rule);
+.slack-card .lead-link {
+  font-family: Georgia, serif; font-size: 14px; font-weight: 700;
+  color: var(--ink); text-decoration: none; margin-right: 8px;
 }
-.modal-actions .btn {
-  padding: 8px 16px; border-radius: 3px;
-  font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
-  text-transform: uppercase; text-decoration: none; cursor: pointer;
-  border: 1px solid transparent; transition: all 0.15s;
+.slack-card .lead-link:hover { color: var(--gold); text-decoration: underline; }
+.slack-card .original {
+  font-family: Georgia, serif; font-style: italic; font-size: 13px;
+  color: #2b3856; padding: 4px 0 4px 12px; border-left: 2px solid var(--rule);
+  margin: 6px 0;
 }
-.modal-actions .btn.primary  { background: var(--ink); color: var(--gold); border-color: var(--ink); }
-.modal-actions .btn.primary:hover { background: var(--gold-deep); color: var(--ink); }
-.modal-actions .btn.secondary{ background: transparent; color: var(--ink); border-color: var(--rule-strong); }
-.modal-actions .btn.secondary:hover { border-color: var(--ink); }
-.modal-actions .btn.ghost    { background: transparent; color: var(--ink-mute); border-color: var(--rule); }
-.modal-actions .btn.ghost:hover { color: var(--ink); }
+.slack-card .summary { font-size: 12px; color: #475569; }
+.slack-card .actions { margin-top: 6px; display: flex; gap: 8px; }
+.slack-card .actions a {
+  font-size: 10px; padding: 3px 8px; background: var(--ink); color: var(--gold);
+  text-decoration: none; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.slack-card .actions a:hover { background: var(--gold); color: var(--ink); }
 
-hr.head { border: 0; border-top: 1px solid var(--rule); margin: 24px 0 0; }
+.empty {
+  text-align: center; color: var(--muted); padding: 36px;
+  font-style: italic; background: var(--cream); border: 1px dashed var(--rule);
+}
+.loading { text-align: center; color: var(--muted); padding: 60px; font-style: italic; }
 
-.sec { margin: 36px 0 18px; }
-.sec .tag-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
-.sec .num {
-  display: inline-block; background: var(--gold); color: var(--ink);
-  font-weight: 800; font-size: 12px; letter-spacing: 0.04em;
-  padding: 3px 8px; border-radius: 3px;
-  font-family: ui-monospace, monospace;
-}
-.sec h2 {
-  font-family: "Iowan Old Style", Georgia, serif; font-weight: 600;
-  font-size: 24px; letter-spacing: -0.005em; margin: 0; color: var(--ink);
-}
-.sec .count { font-size: 13px; color: var(--ink-mute); font-weight: 500; }
-.sec hr { border: 0; border-top: 1px solid var(--rule); margin: 0 0 16px; }
-
-.stat-row {
-  display: grid; gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  margin-top: 14px;
-}
-.stat {
-  background: var(--paper); border: 1px solid var(--rule);
-  border-top: 3px solid var(--gold);
-  border-radius: 3px; padding: 16px 18px;
-}
-.stat .lab {
-  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px;
-}
-.stat .v {
-  font-family: "Iowan Old Style", Georgia, serif;
-  font-size: 30px; font-weight: 600; color: var(--ink); line-height: 1.05;
-}
-.stat .sub { font-size: 12px; color: var(--ink-soft); margin-top: 6px; line-height: 1.4; }
-.stat.green { border-top-color: var(--green); }
-.stat.green .v { color: var(--green); }
-.stat.hot { border-top-color: var(--hot); }
-.stat.hot .v { color: var(--hot); }
-.stat.warm { border-top-color: var(--warm); }
-.stat.warm .v { color: var(--warm); }
-
-.bucket {
-  background: var(--paper); border: 1px solid var(--rule);
-  border-radius: 4px; margin-bottom: 14px; overflow: hidden;
-}
-.bucket .head {
-  padding: 14px 18px; border-bottom: 1px solid var(--rule);
-  background: var(--gold-soft); display: flex; align-items: center;
-  gap: 12px; flex-wrap: wrap;
-}
-.bucket .head .num-big {
-  font-family: ui-monospace, monospace; font-size: 18px;
-  color: var(--gold-deep); font-weight: 800;
-}
-.bucket .head h3 {
-  margin: 0; font-family: "Iowan Old Style", Georgia, serif;
-  font-weight: 600; font-size: 20px; color: var(--ink);
-  flex: 1; min-width: 0;
-}
-.bucket .head .ct {
-  font-size: 12px; color: var(--ink-mute); font-weight: 700;
-  font-family: ui-monospace, monospace;
-}
-.bucket.green .head { background: rgba(47,125,91,0.10); }
-.bucket.green .head .num-big { color: var(--green); }
-.bucket.hot   .head { background: rgba(197,68,58,0.10); }
-.bucket.hot   .head .num-big { color: var(--hot); }
-.bucket.warm  .head { background: rgba(181,122,26,0.12); }
-.bucket.warm  .head .num-big { color: var(--warm); }
-.bucket.gray  .head { background: rgba(26,40,64,0.06); }
-.bucket.gray  .head .num-big { color: var(--ink-soft); }
-.bucket .body { padding: 0; }
-.bucket .lead-line {
-  padding: 14px 18px; border-bottom: 1px solid var(--rule);
-  display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 12px;
-  align-items: center; font-size: 13px;
-}
-.bucket .lead-line:last-child { border-bottom: none; }
-.bucket .lead-line:hover { background: rgba(232,197,71,0.05); }
-@media (max-width: 760px) {
-  .bucket .lead-line { grid-template-columns: 1fr; gap: 4px; padding: 12px 14px; }
-}
-.bucket .lead-line .who {
-  display: flex; flex-direction: column; gap: 2px; min-width: 0;
-}
-.bucket .lead-line .who .nm {
-  font-family: "Iowan Old Style", Georgia, serif; font-weight: 600;
-  font-size: 15px; color: var(--ink);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.bucket .lead-line .who .pl { font-size: 11px; color: var(--ink-mute); }
-.bucket .lead-line .stage-pill {
-  font-size: 10px; padding: 3px 8px; border-radius: 3px;
-  font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
-  background: var(--gold-soft); color: var(--ink); white-space: nowrap;
-  font-family: ui-monospace, monospace;
-}
-.bucket .lead-line .move-arrow {
-  font-size: 11px; color: var(--ink-soft);
-  font-family: ui-monospace, monospace;
-}
-.bucket .lead-line .move-arrow .arrow { color: var(--gold-deep); margin: 0 4px; }
-.bucket .lead-line .move-arrow.demoted .arrow { color: var(--hot); }
-.bucket .lead-line .signal {
-  font-size: 11px; color: var(--ink-soft);
-  display: flex; gap: 6px; flex-wrap: wrap;
-}
-.bucket .lead-line .signal .tag {
-  display: inline-block; padding: 2px 6px; font-size: 10px; font-weight: 700;
-  border-radius: 3px; background: var(--gold-soft); color: var(--ink);
-  letter-spacing: 0.04em;
-}
-.bucket .lead-line .signal .tag.hot   { background: rgba(197,68,58,0.15); color: var(--hot); }
-.bucket .lead-line .signal .tag.warm  { background: rgba(181,122,26,0.15); color: var(--warm); }
-.bucket .lead-line .signal .tag.green { background: rgba(47,125,91,0.15);  color: var(--green); }
-.bucket .lead-line .ghl-link {
-  font-size: 10px; padding: 5px 10px; border-radius: 3px;
-  background: var(--ink); color: var(--gold);
-  text-decoration: none; font-weight: 800; letter-spacing: 0.06em;
-  text-transform: uppercase; white-space: nowrap;
-}
-.bucket .lead-line .ghl-link:hover { background: var(--gold-deep); color: var(--ink); }
-
-.empty { text-align: center; color: var(--ink-mute); padding: 30px; font-style: italic; }
-.loading { text-align: center; color: var(--ink-mute); padding: 60px; font-style: italic; }
-
-footer {
-  color: var(--ink-mute); font-size: 11px; text-align: center;
-  margin-top: 64px; padding-top: 18px;
-  border-top: 1px solid var(--rule); letter-spacing: 0.04em;
-}
-a { color: var(--gold-deep); }
+a { color: var(--ink-soft); }
 a:hover { color: var(--ink); }
 
-/* ── Animations & micro-interactions ─────────────────────── */
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+.footer {
+  margin-top: 56px; padding-top: 20px;
+  border-top: 3px double var(--ink);
+  display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; flex-wrap: wrap; gap: 12px;
 }
-@keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.footer .gold-stamp {
+  display: inline-block; padding: 4px 10px;
+  background: var(--gold); color: var(--ink); letter-spacing: 0.14em;
 }
-.fade-in-up { animation: fade-in-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
-.fade-in    { animation: fade-in 0.4s ease-out backwards; }
-
-/* Smooth filter transitions */
-.card, .lead-line, .stat, .bucket, .chart-card, .roadmap .item, .cron-card {
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.card.filtered-out, .lead-line.filtered-out {
-  opacity: 0; transform: scale(0.96) translateY(-4px); pointer-events: none;
-}
-
-/* Hover lift for clickable cards */
-.card { will-change: transform; }
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(26,40,64,0.08);
-}
-.bucket .lead-line { transition: background 0.15s ease, transform 0.15s ease; }
-.bucket .lead-line:hover { transform: translateX(2px); }
-
-/* Filter chip + button micro-interactions */
-.filter-chip, .nav a, .btn, .ghl-link {
-  transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.filter-chip:active { transform: scale(0.96); }
-.btn:active, .ghl-link:active { transform: scale(0.97); }
-
-/* Stat KPI value entrance */
-.stat .v { transition: color 0.3s ease; }
-
-/* Smooth section reveal (set via JS-applied stagger) */
-.bucket, .stat, .card { animation-fill-mode: backwards; }
-
 </style>
 </head>
 <body>
-<div class="container">
+<div class="shell">
 
-  <div class="meta-bar">
-    <div>APG · ACQ Operating Layer · Weekly Analysis</div>
-    <div id="metaWeek">Loading…</div>
-  </div>
-
-  <div class="logo-row">
-    <img class="logo-svg" src="logo.png"
-         onerror="this.onerror=null; this.src='logo.svg';"
-         alt="Atom Property Group" />
-    <div class="nav">
-      <a href="index.html">Follow-Ups</a>
-      <a href="deals.html">Deals</a>
-      <a href="weekly.html" class="active">Weekly</a>
-      <a href="about.html">About</a>
+  <header class="masthead">
+    <div class="brandrow">
+      <span class="brand">Atom Property Group · ACQ Operations</span>
+      <span id="metaWeek">Loading…</span>
     </div>
-  </div>
-
-  <header class="doc-header">
-    <h1>Weekly <span class="accent">Analysis</span></h1>
-    <p class="lede">Every Friday at 10 AM ET, the system snapshots all leads in the pipeline and compares against the previous Friday. Use the dropdown below to view past weeks. Lead movement, stagnation, and recommended actions are computed from real GHL data.</p>
-    <hr class="head">
+    <h1>The Weekly <span class="accent">Docket.</span></h1>
+    <p class="dek">A snapshot of every lead the team touched this week — what moved, what's ready for action, what went quiet. Click any deal to expand the full context.</p>
   </header>
 
-  <div class="week-picker">
-    <label for="weekSel">Week</label>
-    <select id="weekSel"><option>Loading…</option></select>
-    <span class="meta" id="weekMeta"></span>
-  </div>
-
-  <div class="refresh-bar">
+  <nav class="topnav">
+    <a href="index.html">Follow-Ups</a>
+    <a href="deals.html">Deals</a>
+    <a href="weekly.html" class="active">Weekly</a>
+    <a href="about.html">About</a>
+    <span class="spacer"></span>
+    <span class="week-pick">
+      <label for="weekSel">Week:</label>
+      <select id="weekSel"><option>Loading…</option></select>
+    </span>
     <button class="refresh-btn" id="refreshBtn">
-      <span id="refreshIcon">↻</span>
-      <span id="refreshLabel">Refresh Now</span>
+      <span id="refreshIcon">↻</span><span id="refreshLabel">Refresh</span>
     </button>
     <span class="refresh-status" id="refreshStatus"></span>
-  </div>
-
-  <div class="stage-filter" id="stageFilter">
-    <span class="filter-chip active" data-stage="all">All Stages</span>
-    <span class="filter-chip" data-stage="0. Unqualified Leads">Unqualified</span>
-    <span class="filter-chip" data-stage="1. Qualified Leads (Warm/Hot)">Qualified</span>
-    <span class="filter-chip" data-stage="2. Prequalified Offer (LAO)">LAO</span>
-    <span class="filter-chip" data-stage="3. Due Diligence (RR)">DD</span>
-    <span class="filter-chip" data-stage="4. Negotiate (MAO)">MAO</span>
-    <span class="filter-chip" data-stage="5. Contract Sent">Contract</span>
-    <span class="filter-chip" data-stage="Follow Up (1.5 month)">FU 1.5mo</span>
-    <span class="filter-chip" data-stage="Follow Up (3 months)">FU 3mo</span>
-    <span class="filter-chip" data-stage="Dead Deals">Dead</span>
-  </div>
+  </nav>
 
   <div id="content"><div class="loading">Loading analysis…</div></div>
 
-  <footer>Auto-generated each Friday 10 AM ET · APG ACQ Operating Layer</footer>
-</div>
-
-<!-- Lead detail modal — populated by openLeadModal(cid) -->
-<div class="modal-overlay" id="leadModal">
-  <div class="modal" role="dialog" aria-modal="true">
-    <button class="modal-close" onclick="closeLeadModal()" aria-label="Close">×</button>
-    <div class="modal-body" id="leadModalBody"></div>
+  <div class="footer">
+    <span>Auto-generated each Friday 10 AM ET · APG ACQ Operating Layer</span>
+    <span class="gold-stamp">Mido · Ops · Live</span>
   </div>
+
 </div>
 
 <script>
 const GHL_BASE = 'https://app.gohighlevel.com/v2/location/RCkiUmWqXX4BYQ39JXmm/contacts/detail';
-const ROOT     = 'weekly/';
+const ROOT = 'weekly/';
+const REPO = 'Mid0117/acq-automation';
+const PAT_KEY = 'apg_gh_pat_v1';
+
+let stageFilter = 'all';
+let _currentWeekData = null;
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
 
 function fmtMoney(v) {
   if (v == null || isNaN(v)) return '—';
@@ -903,339 +857,281 @@ function fmtMoney(v) {
   return '$' + v.toLocaleString();
 }
 
-function tempTag(t) {
-  if (!t) return '';
-  const cls = ({hot:'hot',warm:'warm',cold:'',nurture:''})[t] || '';
-  return '<span class="tag ' + cls + '">🌡 ' + t + '</span>';
-}
-
-function renderLead(l, opts={}) {
-  opts = opts || {};
-  const ghl = GHL_BASE + '/' + l.cid;
-  let move = '';
-  if (opts.showMove && l.movement_meta && l.movement_meta.from && l.movement_meta.to) {
-    const cls = (l.movement === 'demoted') ? 'demoted' : '';
-    move = '<div class="move-arrow ' + cls + '">' +
-           (l.movement_meta.from || '') + '<span class="arrow">→</span>' +
-           (l.movement_meta.to || '') + '</div>';
-  }
-  const signals = [];
-  if (l.temp)    signals.push(tempTag(l.temp));
-  if (l.rating != null) {
-    const cls = (l.rating >= 8 ? 'green' : l.rating >= 5 ? 'warm' : 'hot');
-    signals.push('<span class="tag ' + cls + '">★ ' + l.rating + '/10</span>');
-  }
-  if (l.spread != null && l.arv) {
-    const cls = l.spread >= 0 ? 'green' : 'hot';
-    signals.push('<span class="tag ' + cls + '">spread ' + (l.spread>=0?'+':'') + fmtMoney(l.spread) + '</span>');
-  }
-  if (l.replied) signals.push('<span class="tag green">replied</span>');
-  if (l.dormant && !l.dnd) signals.push('<span class="tag warm">dormant</span>');
-  if (l.dnd)     signals.push('<span class="tag gray">DND</span>');
-  // Activity flags drawn from the lead's _activity object
-  const a = l._activity || {};
-  if (a.sms_this_week)   signals.push('<span class="tag green">📱 SMS this wk</span>');
-  if (a.reply_this_week) signals.push('<span class="tag green">💬 reply this wk</span>');
-  if (a.slack_count > 0) signals.push('<span class="tag warm">📡 ' + a.slack_count + ' Slack</span>');
-
-  return '<div class="lead-line clickable" data-cid="' + escapeHtml(l.cid) + '" tabindex="0">' +
-    '<div class="who"><div class="nm">' + (l.name || '(no name)') + '</div>' +
-    '<div class="pl">' + (l.addr ? l.addr + ' · ' : '') + (l.place || '') + '</div></div>' +
-    '<span class="stage-pill">' + (l.stage_label || '?') + '</span>' +
-    move +
-    '<div class="signal">' + signals.join('') + '</div>' +
-    '<a class="ghl-link" href="' + ghl + '" target="_blank" onclick="event.stopPropagation()">Open</a>' +
-    '</div>';
-}
-
-// ─────────────── Lead Detail Modal ───────────────
-function findLeadByCid(cid) {
-  if (!_currentWeekData) return null;
-  const buckets = _currentWeekData.buckets || {};
-  for (const k of Object.keys(buckets)) {
-    const found = (buckets[k] || []).find(l => l && l.cid === cid);
-    if (found) return found;
-  }
-  return null;
-}
-
-function openLeadModal(cid) {
-  const l = findLeadByCid(cid);
-  if (!l) return;
-  const ghl = GHL_BASE + '/' + l.cid;
-  const modal = document.getElementById('leadModal');
-  const body  = document.getElementById('leadModalBody');
-
-  let html = '';
-  // Header
-  html += '<div class="modal-header">';
-  html += '<div><h2>' + escapeHtml(l.name || '(no name)') + '</h2>';
-  html += '<div class="modal-sub">' + escapeHtml((l.addr ? l.addr + ' · ' : '') + (l.place || '')) + '</div></div>';
-  html += '<span class="stage-pill">' + escapeHtml(l.stage_label || '?') + '</span>';
-  html += '</div>';
-
-  // Phone + quick contact
-  if (l.phone) {
-    html += '<div class="modal-row">';
-    html += '<div class="modal-label">Phone</div>';
-    html += '<div class="modal-value"><a href="tel:' + escapeHtml(l.phone_e164 || l.phone) + '" class="phone-link">📞 ' + escapeHtml(l.phone) + '</a>';
-    if (l.phone_e164) html += ' <a href="sms:' + escapeHtml(l.phone_e164) + '" class="phone-link" style="margin-left:8px">💬 Text</a>';
-    html += '</div></div>';
-  }
-
-  // Financials
-  if (l.asking || l.arv || l.mao) {
-    html += '<div class="modal-row">';
-    html += '<div class="modal-label">Numbers</div>';
-    html += '<div class="modal-value">';
-    if (l.asking) html += '<strong>Asking:</strong> ' + fmtMoney(l.asking) + '  ·  ';
-    if (l.arv)    html += '<strong>ARV:</strong> ' + fmtMoney(l.arv) + '  ·  ';
-    if (l.mao)    html += '<strong>70% MAO:</strong> ' + fmtMoney(l.mao);
-    if (l.spread != null) {
-      const sign = l.spread >= 0 ? '+' : '';
-      html += '  ·  <strong>Spread:</strong> <span style="color:' + (l.spread>=0?'var(--green)':'var(--hot)') + '">' + sign + fmtMoney(l.spread) + '</span>';
-    }
-    html += '</div></div>';
-  }
-
-  // Last call summary (from acq_automation Claude analysis)
-  if (l.last_call_summary) {
-    html += '<div class="modal-row">';
-    html += '<div class="modal-label">Last call</div>';
-    html += '<div class="modal-value"><div class="quote">' + escapeHtml(l.last_call_summary) + '</div>';
-    if (l.rating != null) html += '<div style="margin-top:6px;font-size:12px"><strong>Rating:</strong> ' + l.rating + '/10' + (l.temp ? ' · <strong>Temp:</strong> ' + l.temp : '') + '</div>';
-    html += '</div></div>';
-  }
-
-  // SMS history summary
-  if (l.sms_count || l.last_sms_at) {
-    html += '<div class="modal-row">';
-    html += '<div class="modal-label">SMS</div>';
-    html += '<div class="modal-value">';
-    html += '<strong>' + (l.sms_count || 0) + '</strong> sent';
-    if (l.last_sms_at) html += '  ·  Last: ' + escapeHtml(new Date(l.last_sms_at).toLocaleString('en-US', {timeZone:'America/New_York', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) + ' ET');
-    if (l.last_from_number) html += '  ·  From ' + escapeHtml(l.last_from_number);
-    html += '</div></div>';
-  }
-
-  // Last reply text (if there was one)
-  if (l.replied && l.reply_text) {
-    html += '<div class="modal-row">';
-    html += '<div class="modal-label">Last reply</div>';
-    html += '<div class="modal-value">';
-    if (l.reply_class) html += '<span class="tag ' + (l.reply_class==='POSITIVE'?'green':l.reply_class==='NEUTRAL'?'warm':'hot') + '">' + escapeHtml(l.reply_class) + '</span> ';
-    html += '<div class="quote">"' + escapeHtml(l.reply_text) + '"</div>';
-    html += '</div></div>';
-  }
-
-  // Slack mentions for this lead this week
-  if (l.slack_this_week && l.slack_this_week.length) {
-    html += '<div class="modal-row">';
-    html += '<div class="modal-label">Slack this week</div>';
-    html += '<div class="modal-value">';
-    for (const sm of l.slack_this_week) {
-      html += '<div class="slack-card">';
-      html += '<div class="slack-meta">#' + escapeHtml(sm.channel || '?') + ' · ' + escapeHtml(sm.ts_text || '');
-      if (sm.permalink) html += ' · <a href="' + escapeHtml(sm.permalink) + '" target="_blank">Open in Slack ↗</a>';
-      html += '</div>';
-      if (sm.original) html += '<div class="quote">"' + escapeHtml(sm.original) + '"</div>';
-      if (sm.summary)  html += '<div style="font-size:12px;color:var(--ink-soft);margin-top:4px"><strong>AI summary:</strong> ' + escapeHtml(sm.summary) + '</div>';
-      html += '</div>';
-    }
-    html += '</div></div>';
-  }
-
-  // Motivation, timeline, deal context
-  if (l.motivation || l.timeline) {
-    html += '<div class="modal-row">';
-    html += '<div class="modal-label">Context</div>';
-    html += '<div class="modal-value">';
-    if (l.motivation) html += '<strong>Motivation:</strong> ' + escapeHtml(l.motivation) + '<br>';
-    if (l.timeline)   html += '<strong>Timeline:</strong> ' + escapeHtml(l.timeline);
-    html += '</div></div>';
-  }
-
-  // Footer actions
-  html += '<div class="modal-actions">';
-  html += '<a class="btn primary" href="' + ghl + '" target="_blank">Open in GHL ↗</a>';
-  if (l.phone_e164) html += '<a class="btn secondary" href="tel:' + escapeHtml(l.phone_e164) + '">Call</a>';
-  html += '<button class="btn ghost" onclick="closeLeadModal()">Close</button>';
-  html += '</div>';
-
-  body.innerHTML = html;
-  modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeLeadModal() {
-  const m = document.getElementById('leadModal');
-  m.classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-// Click anywhere on a lead row → open modal (anchors inside row stop propagation)
-document.addEventListener('click', e => {
-  const row = e.target.closest('.lead-line.clickable');
-  if (row && row.dataset.cid) openLeadModal(row.dataset.cid);
-  if (e.target.matches('.modal-overlay')) closeLeadModal();
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeLeadModal();
-});
-
-// Buckets sorted by what mattered THIS WEEK. Quiet (no activity, no movement)
-// is at the bottom inside a collapsed details element so it doesn't bury the signal.
-const BUCKET_DEFS = [
-  {key:'ready_contract', title:'Ready for Contract',  tone:'green', num:'01', desc:'In MAO + Hot + ARV + positive spread. Send the contract.'},
-  {key:'ready_mao',      title:'Ready for MAO Offer', tone:'green', num:'02', desc:'In Due Diligence + Hot + ARV. Time to put a number on it.'},
-  {key:'advanced',       title:'Moved Forward',       tone:'green', num:'03', desc:'Stage advanced this week.', showMove: true},
-  {key:'new',            title:'New This Week',       tone:'warm',  num:'04', desc:'First appearance in the pipeline.'},
-  {key:'active_no_move', title:'Active — No Stage Move', tone:'warm', num:'05', desc:'Same stage, but had SMS / reply / Slack activity this week. Keep warm.'},
-  {key:'demoted',        title:'Moved Backward',      tone:'gray',  num:'06', desc:'Auto-routed to Unqualified or downgraded.', showMove: true},
-  {key:'drop_suggest',   title:'Drop Suggestions',    tone:'gray',  num:'07', desc:'Cold/Nurture sitting in active stages > 30 days.'},
-];
-// Quiet is rendered separately, inside a <details> collapsed by default
-const QUIET_DEF = {key:'quiet', title:'Quiet — No Activity This Week', tone:'gray', num:'∅',
-                   desc:'Leads in the pipeline but no SMS, reply, Slack mention, or stage move in the past 7 days. Click to expand.'};
-
-// Active stage filter (set by chip clicks). 'all' = no filter.
-let stageFilter = 'all';
-
 function leadMatchesStage(l) {
   if (stageFilter === 'all') return true;
   return (l.stage_label || '').trim() === stageFilter;
 }
 
-function escapeHtml(s) {
-  return (s || '').replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
+// ── Bucket definitions: which goes where, what color, what's the heading ──
+const BUCKET_DEFS = [
+  {key:'ready_contract', title:'Ready for Contract',  status:'uc',   num:'01', desc:'In MAO, Hot, ARV calculated, positive 70%-MAO spread. Send the contract.'},
+  {key:'ready_mao',      title:'Ready for MAO Offer', status:'live', num:'02', desc:'In Due Diligence with Hot temp + ARV calculated. Time to put a number on it.'},
+  {key:'advanced',       title:'Moved Forward',       status:'live', num:'03', desc:'Stage advanced this week.', showMove: true},
+  {key:'new',            title:'New This Week',       status:'warm', num:'04', desc:'First appearance in the pipeline.'},
+  {key:'active_no_move', title:'Active — No Stage Move', status:'warm', num:'05', desc:'Same stage, but had SMS / reply / Slack / note activity this week. Keep them warm.'},
+  {key:'demoted',        title:'Moved Backward',      status:'dead', num:'06', desc:'Auto-routed to Unqualified or downgraded.', showMove: true},
+  {key:'drop_suggest',   title:'Drop Suggestions',    status:'hold', num:'07', desc:'Cold/Nurture sitting in active stages > 30 days.'},
+];
+
+function statusForBucket(key) {
+  const d = BUCKET_DEFS.find(b => b.key === key);
+  return d ? d.status : 'gray';
 }
 
-function renderSlack(week) {
-  const items = week.slack_mentions || [];
-  if (!items.length) return '';
-  const filtered = items.filter(s => stageFilter === 'all' || s.lead_stage === stageFilter);
-  if (!filtered.length) return '';
-  let html = '<div class="bucket warm slack-list">';
-  html += '<div class="head"><span class="num-big">📡</span><h3>Slack Mentions This Week</h3>';
-  html += '<span class="ct">' + filtered.length + ' mention' + (filtered.length===1?'':'s') + '</span></div>';
-  html += '<div class="body">';
-  html += '<div class="lead-line" style="background:rgba(0,0,0,0.02);font-style:italic;color:var(--ink-soft);grid-template-columns:1fr;"><div>Lead mentions captured from APG Slack channels this week. Each card links to the GHL contact and to the original Slack message.</div></div>';
-  for (const s of filtered) {
-    const ghl = GHL_BASE + '/' + s.cid;
-    const slackBtn = s.permalink
-      ? '<a class="ghl-link" href="' + escapeHtml(s.permalink) + '" target="_blank">Open in Slack</a>'
-      : '<span class="channel-tag">#' + escapeHtml(s.channel || '?') + '</span>';
-    const ghlBtn = '<a class="ghl-link" href="' + ghl + '" target="_blank">Open GHL</a>';
-    html += '<div class="lead-line">' +
-      '<div class="who">' +
-      '<div class="nm"><a href="' + ghl + '" target="_blank">' + escapeHtml(s.lead_name || '(no name)') + '</a></div>' +
-      '<div class="pl">' + escapeHtml((s.lead_addr ? s.lead_addr + ' · ' : '') + (s.lead_place || '')) +
-        ' · <span class="channel-tag">#' + escapeHtml(s.channel || '?') + '</span></div>' +
-      (s.original ? '<div class="excerpt">"' + escapeHtml(s.original) + '"</div>' : '') +
-      (s.summary  ? '<div class="excerpt" style="border-left-color:var(--gold-deep)">' + escapeHtml(s.summary) + '</div>' : '') +
-      '</div>' +
-      slackBtn + ghlBtn + '</div>';
+function renderSignalSet(l) {
+  const a = l._activity || {};
+  const out = [];
+  if (a.sms_this_week)   out.push('<span class="sg green">SMS this wk</span>');
+  if (a.reply_this_week) out.push('<span class="sg green">Reply</span>');
+  if (a.slack_count > 0) out.push('<span class="sg warm">' + a.slack_count + ' Slack</span>');
+  if (a.notes_this_week) out.push('<span class="sg hold">' + a.notes_this_week + ' Notes</span>');
+  if (l.replied) out.push('<span class="sg green">Replied</span>');
+  if (l.dnd)     out.push('<span class="sg gray">DND</span>');
+  if (l.dormant && !l.dnd) out.push('<span class="sg hold">Dormant</span>');
+  if ((l.temp || '').toLowerCase() === 'hot') out.push('<span class="sg red">Hot</span>');
+  if (l.rating != null) {
+    const cls = (l.rating >= 8 ? 'green' : l.rating >= 5 ? 'warm' : 'red');
+    out.push('<span class="sg ' + cls + '">★' + l.rating + '/10</span>');
   }
+  return out.length ? '<span class="signal-set">' + out.join('') + '</span>' : '';
+}
+
+function statusBadge(l, def) {
+  const s = def.status;
+  let label = def.title;
+  if (def.key === 'advanced' && l.movement_meta && l.movement_meta.to)
+    label = '→ ' + l.movement_meta.to;
+  else if (def.key === 'demoted' && l.movement_meta && l.movement_meta.to)
+    label = '↘ ' + l.movement_meta.to;
+  return '<div class="deal-status ' + s + '"><span class="lbl">Status</span>' + escapeHtml(label) + '</div>';
+}
+
+function renderDealHead(l, def, idx) {
+  const stagePill = '<span class="sg ' + (def.status==='uc'?'red':def.status==='live'?'green':def.status==='warm'?'warm':def.status==='hold'?'hold':'gray') + '">' + escapeHtml(l.stage_label || '?') + '</span>';
+  return '<div class="deal-head" onclick="toggleDeal(this)">' +
+    '<div class="deal-num">' + String(idx).padStart(2,'0') + '</div>' +
+    '<div class="deal-title">' +
+      '<h3>' + escapeHtml(l.name || '(no name)') + (l.addr ? ' · <span style="font-weight:400;color:var(--muted)">' + escapeHtml(l.addr) + '</span>' : '') + '</h3>' +
+      '<p class="tagline">' + (l.place ? escapeHtml(l.place) + ' · ' : '') + stagePill + ' ' + renderSignalSet(l) + '</p>' +
+    '</div>' +
+    statusBadge(l, def) +
+    '<div class="deal-toggle"></div>' +
+    '</div>';
+}
+
+function renderDealBody(l) {
+  const ghl = GHL_BASE + '/' + l.cid;
+  let html = '<div class="deal-body"><div class="deal-body-inner">';
+
+  // Contact + Phone field
+  html += '<div class="field"><h4>Contact</h4>';
+  html += '<div class="contact">';
+  if (l.phone)        html += '<div><span class="c-lbl">☎</span><a href="tel:' + escapeHtml(l.phone_e164 || l.phone) + '">' + escapeHtml(l.phone) + '</a> · <a href="sms:' + escapeHtml(l.phone_e164 || l.phone) + '">Text</a></div>';
+  if (l.last_from_number) html += '<div><span class="c-lbl">↳</span>Last SMS from: ' + escapeHtml(l.last_from_number) + '</div>';
   html += '</div></div>';
+
+  // Numbers field
+  if (l.asking || l.arv || l.mao || l.spread != null) {
+    html += '<div class="field"><h4>Deal Numbers</h4><div class="num-table">';
+    if (l.asking) html += '<div class="k">Asking</div><div class="v">' + fmtMoney(l.asking) + '</div>';
+    if (l.arv)    html += '<div class="k">ARV</div><div class="v">' + fmtMoney(l.arv) + '</div>';
+    if (l.mao)    html += '<div class="k">70% MAO</div><div class="v">' + fmtMoney(l.mao) + '</div>';
+    if (l.spread != null) {
+      const cls = l.spread >= 0 ? 'green' : 'red';
+      const sign = l.spread >= 0 ? '+' : '';
+      html += '<div class="k">Spread</div><div class="v ' + cls + '">' + sign + fmtMoney(l.spread) + '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  // Last call
+  if (l.last_call_summary) {
+    html += '<div class="field full"><h4>Last Call</h4>';
+    html += '<p>' + escapeHtml(l.last_call_summary) + '</p>';
+    if (l.rating != null) html += '<p style="font-size:12px;color:var(--muted)">Rating: ' + l.rating + '/10' + (l.temp ? ' · Temp: ' + escapeHtml(l.temp) : '') + '</p>';
+    html += '</div>';
+  }
+
+  // SMS
+  if (l.sms_count || l.last_sms_at || l.replied) {
+    html += '<div class="field"><h4>SMS</h4>';
+    html += '<p><strong>' + (l.sms_count || 0) + '</strong> sent';
+    if (l.last_sms_at) {
+      const d = new Date(l.last_sms_at);
+      html += ' · Last: ' + d.toLocaleString('en-US', {timeZone:'America/New_York', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) + ' ET';
+    }
+    html += '</p>';
+    if (l.replied && l.reply_text) {
+      html += '<div class="callout"><strong>Last Reply' + (l.reply_class ? ' · ' + escapeHtml(l.reply_class) : '') + '</strong>"' + escapeHtml(l.reply_text) + '"</div>';
+    }
+    html += '</div>';
+  }
+
+  // Motivation/timeline
+  if (l.motivation || l.timeline) {
+    html += '<div class="field"><h4>Context</h4><p>';
+    if (l.motivation) html += '<strong>Motivation:</strong> ' + escapeHtml(l.motivation) + '<br>';
+    if (l.timeline)   html += '<strong>Timeline:</strong> ' + escapeHtml(l.timeline);
+    html += '</p></div>';
+  }
+
+  // Slack mentions for this lead
+  if (l.slack_this_week && l.slack_this_week.length) {
+    html += '<div class="field full"><h4>Slack This Week</h4>';
+    for (const sm of l.slack_this_week) {
+      html += '<div class="slack-card">';
+      html += '<div class="slack-meta">#' + escapeHtml(sm.channel || '?') + ' · ' + escapeHtml(sm.ts_text || '') + '</div>';
+      if (sm.original) html += '<div class="original">"' + escapeHtml(sm.original) + '"</div>';
+      if (sm.summary)  html += '<div class="summary"><strong>AI summary:</strong> ' + escapeHtml(sm.summary) + '</div>';
+      if (sm.permalink) html += '<div class="actions"><a href="' + escapeHtml(sm.permalink) + '" target="_blank">Open in Slack ↗</a></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // Action buttons
+  html += '<div class="field full" style="display:flex;gap:8px;flex-wrap:wrap">';
+  html += '<a class="deal-status" style="text-decoration:none;cursor:pointer;background:var(--ink)" href="' + ghl + '" target="_blank">Open in GHL ↗</a>';
+  if (l.phone_e164) html += '<a class="deal-status" style="text-decoration:none;cursor:pointer;background:var(--s-live)" href="tel:' + escapeHtml(l.phone_e164) + '">Call</a>';
+  html += '</div>';
+
+  html += '</div></div>';
+  return html;
+}
+
+function renderDeal(l, def, idx) {
+  return '<article class="deal ' + def.status + '" data-stage="' + escapeHtml(l.stage_label || '') + '">' +
+    renderDealHead(l, def, idx) + renderDealBody(l) +
+    '</article>';
+}
+
+function toggleDeal(head) {
+  head.parentElement.classList.toggle('open');
+}
+
+function renderSlackSection(week) {
+  const items = (week.slack_mentions || []).filter(s => stageFilter === 'all' || s.lead_stage === stageFilter);
+  if (!items.length) return '';
+  let html = '<section><h2><span class="num">📡</span>Slack Mentions This Week<span class="sec-count">' + items.length + ' mention' + (items.length===1?'':'s') + '</span></h2>';
+  html += '<p class="lede">Lead mentions captured from APG Slack channels in the last 7 days. Click "Open in Slack" to jump to the original message.</p>';
+  html += '<div class="deal-grid">';
+  for (const s of items) {
+    const ghl = GHL_BASE + '/' + s.cid;
+    html += '<div class="slack-card">';
+    html += '<div class="slack-meta">#' + escapeHtml(s.channel || '?') + ' · ' + escapeHtml(s.ts_text || '') + ' · ' + escapeHtml(s.lead_stage || '') + '</div>';
+    html += '<a class="lead-link" href="' + ghl + '" target="_blank">' + escapeHtml(s.lead_name || '(no name)') + '</a>';
+    if (s.lead_addr) html += '<span style="color:var(--muted);font-size:12px"> · ' + escapeHtml(s.lead_addr) + '</span>';
+    if (s.original)  html += '<div class="original">"' + escapeHtml(s.original) + '"</div>';
+    if (s.summary)   html += '<div class="summary"><strong>AI:</strong> ' + escapeHtml(s.summary) + '</div>';
+    html += '<div class="actions">';
+    if (s.permalink) html += '<a href="' + escapeHtml(s.permalink) + '" target="_blank">Open in Slack ↗</a>';
+    html += '<a href="' + ghl + '" target="_blank">Open in GHL ↗</a>';
+    html += '</div>';
+    html += '</div>';
+  }
+  html += '</div></section>';
   return html;
 }
 
 function render(week) {
   const c = document.getElementById('content');
-  if (!week) {
-    c.innerHTML = '<div class="empty">No analysis for this week.</div>';
-    return;
-  }
+  if (!week) { c.innerHTML = '<div class="empty">No analysis for this week.</div>'; return; }
   const totals = week.totals || {};
   const buckets = week.buckets || {};
-
   let html = '';
 
-  // KPIs — focus on WEEKLY ACTIVITY, not pipeline totals
-  html += '<section class="sec">';
-  html += '<div class="tag-row"><span class="num">00</span><h2>This Week</h2></div><hr>';
-  html += '<div class="stat-row">';
-  html += '<div class="stat green"><div class="lab">Active This Week</div><div class="v">' + (totals.active_this_week||0) + '</div><div class="sub">had SMS / reply / Slack</div></div>';
-  html += '<div class="stat green"><div class="lab">Stage Moves</div><div class="v">' + ((totals.advanced||0) + (totals.demoted||0)) + '</div><div class="sub">' + (totals.advanced||0) + ' forward · ' + (totals.demoted||0) + ' back</div></div>';
-  html += '<div class="stat warm"><div class="lab">New This Week</div><div class="v">' + (totals.new||0) + '</div><div class="sub">added to pipeline</div></div>';
-  html += '<div class="stat"><div class="lab">SMS Sent</div><div class="v">' + (totals.sms_sent_week||0) + '</div><div class="sub">' + (totals.replies_week||0) + ' reply' + (totals.replies_week===1?'':'ies') + ' received</div></div>';
-  html += '<div class="stat"><div class="lab">Slack Mentions</div><div class="v">' + (totals.slack_mentions||0) + '</div><div class="sub">captured this week</div></div>';
-  html += '<div class="stat green"><div class="lab">Ready Contract</div><div class="v">' + (totals.ready_contract||0) + '</div><div class="sub">send it</div></div>';
+  // Snapshot section
+  html += '<section><h2><span class="num">00</span>This Week</h2>';
+  html += '<p class="lede">' + (totals.active_this_week || 0) + ' lead' + (totals.active_this_week===1?'':'s') + ' had activity this week. ' +
+          (totals.advanced || 0) + ' moved forward, ' + (totals.demoted || 0) + ' moved back. ' +
+          (totals.new || 0) + ' new in pipeline. ' +
+          (totals.ready_contract || 0) + ' ready to contract, ' + (totals.ready_mao || 0) + ' ready to MAO offer.</p>';
+  html += '<div class="crit-grid">';
+  html += '<div class="crit live"><div class="kicker">Active This Week</div><p class="num-big">' + (totals.active_this_week||0) + '</p><div class="sub">SMS / reply / Slack / note</div></div>';
+  html += '<div class="crit live"><div class="kicker">Stage Moves</div><p class="num-big">' + ((totals.advanced||0) + (totals.demoted||0)) + '</p><div class="sub">' + (totals.advanced||0) + ' fwd · ' + (totals.demoted||0) + ' back</div></div>';
+  html += '<div class="crit warm"><div class="kicker">New This Week</div><p class="num-big">' + (totals.new||0) + '</p><div class="sub">added to pipeline</div></div>';
+  html += '<div class="crit"><div class="kicker">SMS Sent / Replies</div><p class="num-big">' + (totals.sms_sent_week||0) + '<span style="font-size:18px;color:var(--muted)"> / ' + (totals.replies_week||0) + '</span></p><div class="sub">past 7 days</div></div>';
+  html += '<div class="crit"><div class="kicker">Slack Mentions</div><p class="num-big">' + (totals.slack_mentions||0) + '</p><div class="sub">captured this week</div></div>';
+  html += '<div class="crit uc"><div class="kicker">Ready Contract</div><p class="num-big">' + (totals.ready_contract||0) + '</p><div class="sub">send it</div></div>';
   html += '</div>';
-  html += '<div style="margin-top:10px;font-size:12px;color:var(--ink-mute)">Pipeline total this snapshot: <strong>' + (totals.total_pipeline||0) + '</strong> · Quiet (no activity): <strong>' + (totals.quiet||0) + '</strong></div>';
-  html += '</section>';
+  html += '<div style="margin-top:12px;font-size:12px;color:var(--muted);letter-spacing:0.06em">Pipeline total: <strong style="color:var(--ink)">' + (totals.total_pipeline||0) + '</strong> · Quiet (no activity): <strong style="color:var(--muted)">' + (totals.quiet||0) + '</strong></div>';
 
-  // Slack mentions section first (high signal — what the team talked about)
-  html += renderSlack(week);
+  // Stage filter chips
+  html += '<div class="stage-filter">';
+  const chipDefs = [
+    ['all','All Stages'],
+    ['0. Unqualified Leads','Unqualified'],
+    ['1. Qualified Leads (Warm/Hot)','Qualified'],
+    ['2. Prequalified Offer (LAO)','LAO'],
+    ['3. Due Diligence (RR)','DD'],
+    ['4. Negotiate (MAO)','MAO'],
+    ['5. Contract Sent','Contract'],
+    ['6. Executed PSA','PSA'],
+    ['7. Disposition','Dispo'],
+    ['Follow Up (1.5 month)','FU 1.5mo'],
+    ['Follow Up (3 months)','FU 3mo'],
+    ['Dead Deals','Dead'],
+  ];
+  for (const [val,lab] of chipDefs) {
+    html += '<span class="filter-chip' + (stageFilter===val?' active':'') + '" data-stage="' + escapeHtml(val) + '">' + escapeHtml(lab) + '</span>';
+  }
+  html += '</div></section>';
 
-  // Active buckets — apply stage filter to each bucket's items
+  // Slack section
+  html += renderSlackSection(week);
+
+  // Buckets
+  let dealCounter = 1;
   for (const def of BUCKET_DEFS) {
     const all = buckets[def.key] || [];
     const items = all.filter(leadMatchesStage);
     if (!items.length) continue;
-    html += '<div class="bucket ' + def.tone + '">';
-    html += '<div class="head">';
-    html += '<span class="num-big">' + def.num + '</span>';
-    html += '<h3>' + def.title + '</h3>';
     const filterNote = (stageFilter !== 'all' && all.length !== items.length) ?
-        ' <span style="color:var(--ink-mute);font-weight:500">of ' + all.length + '</span>' : '';
-    html += '<span class="ct">' + items.length + ' lead' + (items.length===1?'':'s') + filterNote + '</span>';
-    html += '</div>';
-    html += '<div class="body">';
-    if (def.desc) html += '<div class="lead-line desc-row"><div>' + def.desc + '</div></div>';
-    for (const l of items) html += renderLead(l, {showMove: def.showMove});
-    html += '</div></div>';
+      ' <span style="color:var(--muted);font-weight:500">of ' + all.length + '</span>' : '';
+    html += '<section><h2><span class="num">' + def.num + '</span>' + def.title + '<span class="sec-count">' + items.length + ' lead' + (items.length===1?'':'s') + filterNote + '</span></h2>';
+    if (def.desc) html += '<p class="lede">' + def.desc + '</p>';
+    html += '<div class="deal-grid">';
+    for (const l of items) {
+      html += renderDeal(l, def, dealCounter++);
+    }
+    html += '</div></section>';
   }
 
-  // Quiet bucket — collapsed details so it's findable but not in the way
+  // Quiet bucket — collapsed
   const quietAll = buckets['quiet'] || [];
   const quietItems = quietAll.filter(leadMatchesStage);
   if (quietItems.length) {
-    html += '<details class="bucket gray quiet-block"><summary>';
-    html += '<span class="num-big">∅</span>';
-    html += '<span class="quiet-summary-text"><strong>' + QUIET_DEF.title + '</strong>';
-    html += ' <span class="ct">' + quietItems.length + ' lead' + (quietItems.length===1?'':'s') + '</span></span>';
-    html += '</summary><div class="body">';
-    html += '<div class="lead-line desc-row"><div>' + QUIET_DEF.desc + '</div></div>';
-    for (const l of quietItems) html += renderLead(l, {});
-    html += '</div></details>';
+    html += '<section><h2><span class="num">∅</span>Quiet — No Activity This Week<span class="sec-count">' + quietItems.length + ' lead' + (quietItems.length===1?'':'s') + '</span></h2>';
+    html += '<p class="lede">Leads in pipeline but no SMS / reply / Slack / note this week. Click any to expand details.</p>';
+    html += '<div class="deal-grid">';
+    const quietDef = {key:'quiet', title:'Quiet', status:'dead', num:'∅'};
+    for (const l of quietItems) {
+      html += renderDeal(l, quietDef, dealCounter++);
+    }
+    html += '</div></section>';
   }
 
-  if (!html.includes('bucket')) html += '<div class="empty">No weekly activity to show. The pipeline is quiet.</div>';
+  if (!html.includes('<article')) html += '<div class="empty">No leads match this filter for this week.</div>';
 
   c.innerHTML = html;
-  // Re-run entrance animations on the freshly rendered DOM
-  if (window.runEntranceAnimations) window.runEntranceAnimations(c);
-}
-
-let _currentWeekData = null;
-
-function applyStageFilter(stage) {
-  stageFilter = stage;
-  document.querySelectorAll('.stage-filter .filter-chip').forEach(c => {
-    c.classList.toggle('active', c.dataset.stage === stage);
+  // Wire stage-filter chip clicks
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      stageFilter = chip.dataset.stage;
+      render(_currentWeekData);
+    });
   });
-  if (_currentWeekData) render(_currentWeekData);
 }
 
-document.querySelectorAll('.stage-filter .filter-chip').forEach(chip => {
-  chip.addEventListener('click', e => applyStageFilter(chip.dataset.stage));
-});
-
-// ─────────────── In-page refresh (workflow_dispatch via PAT) ───────────────
-const REPO = 'Mid0117/acq-automation';
-const PAT_KEY = 'apg_gh_pat_v1';
-
+// ── Refresh button (PAT → workflow_dispatch) ──
 async function dispatchWorkflow(workflowFile, ref='main', inputs={}) {
   let pat = localStorage.getItem(PAT_KEY);
   if (!pat) {
     pat = prompt(
-      'Refreshing requires a GitHub personal access token (one-time setup).\\n\\n' +
-      '1. Open: https://github.com/settings/tokens?type=beta\\n' +
-      '2. Create a fine-grained token with "Actions: Read & Write" on Mid0117/acq-automation\\n' +
-      '3. Paste it here. Stored only in your browser.'
+      'Refreshing requires a GitHub fine-grained personal access token (one-time setup).\\n\\n' +
+      '1. https://github.com/settings/tokens?type=beta\\n' +
+      '2. Repo: Mid0117/acq-automation · Permissions: Actions = Read+Write\\n' +
+      '3. Paste token here. Stored only in your browser.'
     );
     if (!pat) throw new Error('No token provided');
     localStorage.setItem(PAT_KEY, pat.trim());
@@ -1260,25 +1156,20 @@ async function dispatchWorkflow(workflowFile, ref='main', inputs={}) {
   throw new Error('Dispatch failed: ' + r.status + ' ' + txt.slice(0, 120));
 }
 
-async function pollLatestRun(workflowName, sinceMs, maxMs=180000) {
+async function pollLatestRun(workflowName, sinceMs, maxMs=240000) {
   const pat = localStorage.getItem(PAT_KEY);
   const url = 'https://api.github.com/repos/' + REPO + '/actions/runs?per_page=10';
   const start = Date.now();
   while (Date.now() - start < maxMs) {
     const r = await fetch(url, {
-      headers: {
-        'Authorization': 'Bearer ' + pat,
-        'Accept': 'application/vnd.github+json',
-      }
+      headers: {'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json'}
     });
     if (r.ok) {
       const js = await r.json();
       const run = (js.workflow_runs || []).find(rr =>
         rr.name === workflowName && new Date(rr.created_at).getTime() > sinceMs - 5000
       );
-      if (run) {
-        if (run.status === 'completed') return run;
-      }
+      if (run && run.status === 'completed') return run;
     }
     await new Promise(res => setTimeout(res, 4000));
   }
@@ -1286,33 +1177,33 @@ async function pollLatestRun(workflowName, sinceMs, maxMs=180000) {
 }
 
 document.getElementById('refreshBtn').addEventListener('click', async () => {
-  const btn   = document.getElementById('refreshBtn');
-  const icon  = document.getElementById('refreshIcon');
+  const btn = document.getElementById('refreshBtn');
+  const icon = document.getElementById('refreshIcon');
   const label = document.getElementById('refreshLabel');
-  const stat  = document.getElementById('refreshStatus');
+  const stat = document.getElementById('refreshStatus');
   btn.disabled = true;
   icon.outerHTML = '<span class="spin" id="refreshIcon"></span>';
   label.textContent = 'Triggering…';
-  stat.textContent  = '';
+  stat.textContent = '';
   const startedAt = Date.now();
   try {
     await dispatchWorkflow('weekly.yml');
     label.textContent = 'Running…';
-    stat.textContent  = 'Snapshot in progress (typically ~1 min)';
+    stat.textContent = '~1 min';
     const run = await pollLatestRun('Weekly Analysis', startedAt);
     if (run && run.conclusion === 'success') {
       label.textContent = 'Done — reloading';
-      stat.textContent  = 'Fresh snapshot ready.';
+      stat.textContent = 'Fresh snapshot ready.';
       setTimeout(() => location.reload(), 800);
     } else {
       label.textContent = 'Refresh';
-      stat.textContent  = 'Workflow may still be running. Refresh manually in a minute.';
+      stat.textContent = 'Still running. Refresh page in a minute.';
     }
   } catch (e) {
     label.textContent = 'Refresh';
     stat.textContent = '⚠ ' + (e.message || e);
   } finally {
-    document.getElementById('refreshBtn').disabled = false;
+    btn.disabled = false;
     const newIcon = document.getElementById('refreshIcon');
     if (newIcon && newIcon.classList.contains('spin')) {
       newIcon.outerHTML = '<span id="refreshIcon">↻</span>';
@@ -1325,7 +1216,7 @@ async function main() {
   try {
     idx = await fetch(ROOT + 'index.json', {cache:'no-store'}).then(r => r.json());
   } catch (e) {
-    document.getElementById('content').innerHTML = '<div class="empty">No weekly analysis has run yet. The first one fires Friday 10 AM ET.</div>';
+    document.getElementById('content').innerHTML = '<div class="empty">No weekly analysis has run yet. Click Refresh above to fire the first one.</div>';
     document.getElementById('weekSel').innerHTML = '<option>—</option>';
     return;
   }
@@ -1339,75 +1230,18 @@ async function main() {
       const data = await fetch(ROOT + w + '.json', {cache:'no-store'}).then(r => r.json());
       _currentWeekData = data;
       document.getElementById('metaWeek').textContent = w + ' · ' + (data.range_label || '');
-      document.getElementById('weekMeta').textContent = 'Generated ' + (data.generated_at_et || '');
       render(data);
-    } catch(e) {
+    } catch (e) {
       _currentWeekData = null;
       document.getElementById('content').innerHTML = '<div class="empty">Failed to load this week\\'s data.</div>';
     }
   }
-
   sel.addEventListener('change', e => loadWeek(e.target.value));
   if (weeks.length) loadWeek(weeks[0]);
   else document.getElementById('content').innerHTML = '<div class="empty">No weeks available yet.</div>';
 }
 
 main();
-
-// ── Animation runtime (count-up + stagger) ──────────────────
-function animateNumber(el, durationMs) {
-  durationMs = durationMs || 700;
-  const original = el.textContent.trim();
-  const m = original.match(/-?\d+(?:\.\d+)?/);
-  if (!m) return;
-  const target = parseFloat(m[0]);
-  const decimals = (m[0].split('.')[1] || '').length;
-  if (target === 0) return;  // nothing to animate
-  const start = performance.now();
-  function tick(now) {
-    const p = Math.min(1, (now - start) / durationMs);
-    const eased = 1 - Math.pow(1 - p, 3);
-    const current = (target * eased).toFixed(decimals);
-    el.textContent = original.replace(/-?\d+(?:\.\d+)?/, current);
-    if (p < 1) requestAnimationFrame(tick);
-    else el.textContent = original;
-  }
-  requestAnimationFrame(tick);
-}
-
-function staggerIn(selector, baseDelay) {
-  baseDelay = baseDelay || 0;
-  document.querySelectorAll(selector).forEach((el, i) => {
-    el.style.animationDelay = (baseDelay + i * 35) + 'ms';
-    el.classList.add('fade-in-up');
-  });
-}
-
-function runEntranceAnimations(root) {
-  root = root || document;
-  root.querySelectorAll('.stat .v').forEach(el => animateNumber(el));
-  // Stagger top-level grid children within key containers
-  ['.stat-row', '.charts-grid', '.kpi-row'].forEach(sel => {
-    root.querySelectorAll(sel).forEach(parent => {
-      Array.from(parent.children).forEach((el, i) => {
-        el.style.animationDelay = (i * 50) + 'ms';
-        el.classList.add('fade-in-up');
-      });
-    });
-  });
-  ['.bucket', '.cron-card', '.roadmap .item', '.grid > .card'].forEach(sel => {
-    root.querySelectorAll(sel).forEach((el, i) => {
-      el.style.animationDelay = (i * 30) + 'ms';
-      el.classList.add('fade-in-up');
-    });
-  });
-}
-
-// Run once on initial load. For pages that re-render content (weekly,
-// follow-ups), they should call this again after replacing the DOM.
-document.addEventListener('DOMContentLoaded', () => runEntranceAnimations());
-window.runEntranceAnimations = runEntranceAnimations;  // expose for re-render
-
 </script>
 </body>
 </html>
@@ -1456,6 +1290,9 @@ def main():
                 per_lead_slacks.append(entry)
         rec['slack_this_week'] = per_lead_slacks
         slack_count_by_cid[lead['cid']] = len(per_lead_slacks)
+        # Total notes added this week (any kind — manual notes, summary
+        # updates, Slack mentions all count as "the team paid attention")
+        rec['notes_added_this_week'] = count_recent_notes(lead['cid'], week_start_iso)
 
         current[lead['cid']] = rec
         time.sleep(0.05)
@@ -1473,7 +1310,9 @@ def main():
         'active_no_move','drop_suggest','quiet')}
 
     for cid, c in current.items():
-        movement, meta, action_tags = categorize(c, prev, week_start_iso, slack_count_by_cid.get(cid, 0))
+        movement, meta, action_tags = categorize(c, prev, week_start_iso,
+                                                  slack_count_by_cid.get(cid, 0),
+                                                  c.get('notes_added_this_week', 0))
         c_out = dict(c)
         c_out['movement'] = movement
         c_out['movement_meta'] = meta
