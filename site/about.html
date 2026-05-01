@@ -6,335 +6,460 @@
 <title>APG ACQ — How the Automation Works</title>
 <style>
 :root {
-  --bg: #0b0d12;
-  --panel: rgba(255,255,255,0.04);
-  --panel-border: rgba(255,255,255,0.08);
-  --text: #e6e8ee;
-  --text-dim: #8b93a7;
-  --accent: #6366f1;
-  --accent2: #06b6d4;
-  --hot: #ef4444;
-  --warm: #f59e0b;
-  --green: #10b981;
-  --gray: #475569;
+  --bg: #FBF8F0;
+  --paper: #FFFCF4;
+  --ink: #1A2840;
+  --ink-soft: #455066;
+  --ink-mute: #6B7591;
+  --gold: #E8C547;
+  --gold-deep: #C9A52A;
+  --gold-soft: #FFF6D6;
+  --rule: rgba(26,40,64,0.12);
+  --rule-strong: rgba(26,40,64,0.22);
+  --green: #2F7D5B;
+  --hot:   #C5443A;
+  --warm:  #B57A1A;
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0; padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: radial-gradient(1200px 800px at 20% -10%, rgba(99,102,241,.15), transparent 60%),
-              radial-gradient(1000px 600px at 100% 100%, rgba(6,182,212,.12), transparent 60%),
-              var(--bg);
-  color: var(--text);
-  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  line-height: 1.6;
 }
-.container { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+.container { max-width: 880px; margin: 0 auto; padding: 28px 36px 80px; }
 
-.nav { display: flex; gap: 8px; margin-bottom: 28px; }
-.nav a {
-  padding: 10px 18px; border-radius: 10px; background: var(--panel);
-  border: 1px solid var(--panel-border); color: var(--text-dim);
-  font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s;
-}
-.nav a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
-.nav a.active {
-  color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-color: transparent;
+/* ── Top meta line ─────────────────────────────────────────── */
+.meta-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 4px solid var(--ink);
+  padding: 14px 0 0;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-soft);
 }
 
-.hero {
-  text-align: center; padding: 40px 24px 32px;
-  margin-bottom: 32px; border-radius: 20px;
-  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(6,182,212,0.10));
-  border: 1px solid rgba(99,102,241,0.25);
+/* ── Document header ───────────────────────────────────────── */
+.doc-header { padding: 36px 0 28px; }
+.doc-header h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-weight: 600; font-style: normal;
+  font-size: 56px; line-height: 1.05; letter-spacing: -0.01em;
+  margin: 0 0 14px; color: var(--ink);
 }
-.logo-wrap {
-  display: inline-flex; flex-direction: column; align-items: center;
-  margin-bottom: 18px;
+.doc-header h1 .accent {
+  font-style: italic; color: var(--gold-deep);
 }
-.logo-svg {
-  width: 280px; height: auto; max-width: 100%;
-  filter: drop-shadow(0 8px 24px rgba(244,180,0,0.25));
+.doc-header .lede {
+  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
+  font-size: 17px; color: var(--ink-soft); max-width: 640px; margin: 0;
+  line-height: 1.55;
 }
-.logo-svg .atom-orbit { stroke: #F4B400; stroke-width: 3; fill: none; }
-.logo-svg .atom-core  { fill: #F4B400; }
-.logo-svg .brand-main { fill: #fff; }
-.logo-svg .brand-sub  { fill: rgba(255,255,255,0.78); letter-spacing: 6px; }
-.hero .eyebrow {
+.doc-header hr {
+  border: 0; border-top: 1px solid var(--rule);
+  margin: 32px 0 0;
+}
+
+/* ── Logo block (small, top-of-doc) ────────────────────────── */
+.logo-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.logo-svg { width: 200px; height: auto; }
+.logo-svg .atom-orbit { stroke: var(--gold-deep); stroke-width: 2.6; fill: none; }
+.logo-svg .atom-core  { fill: var(--gold-deep); }
+.logo-svg .brand-main { fill: var(--ink); }
+.logo-svg .brand-sub  { fill: var(--ink-soft); letter-spacing: 4px; }
+
+/* ── Section tag (00 · The Frame) ──────────────────────────── */
+.sec {
+  margin: 56px 0 22px;
+}
+.sec .tag-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+}
+.sec .num {
   display: inline-block;
-  font-size: 11px; padding: 4px 12px; border-radius: 999px;
-  background: rgba(99,102,241,0.20); color: #a5b4fc;
-  font-weight: 600; letter-spacing: 0.10em; text-transform: uppercase;
-  margin-bottom: 12px;
+  background: var(--gold); color: var(--ink);
+  font-weight: 800; font-size: 12px; letter-spacing: 0.04em;
+  padding: 3px 8px; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", monospace;
 }
-.hero h1 {
-  font-size: 38px; font-weight: 800; letter-spacing: -0.03em;
-  margin: 0 0 12px;
-  background: linear-gradient(90deg, #fff, #94a3b8);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  line-height: 1.1;
+.sec h2 {
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-weight: 600; font-size: 26px; letter-spacing: -0.005em;
+  margin: 0; color: var(--ink);
 }
-.hero .tagline { color: var(--text-dim); font-size: 16px; max-width: 720px; margin: 0 auto; }
-
-section { margin-bottom: 44px; }
-h2 {
-  font-size: 24px; font-weight: 700; margin: 0 0 18px;
-  display: flex; align-items: center; gap: 12px; letter-spacing: -0.01em;
-  flex-wrap: wrap;
-}
-h2 .badge {
-  font-size: 11px; padding: 4px 10px; border-radius: 999px;
-  background: rgba(99,102,241,0.15); color: #a5b4fc;
-  font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
-}
-h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; }
-p { color: var(--text); margin: 0 0 12px; }
-p.dim { color: var(--text-dim); }
-
-.card {
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 16px; padding: 24px; margin-bottom: 16px;
-  position: relative; overflow: hidden;
-}
-.card::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), transparent 60%);
-  pointer-events: none;
-}
-.card.accent {
-  border: 1px solid rgba(99,102,241,0.30);
-  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(6,182,212,0.04));
+.sec hr {
+  border: 0; border-top: 1px solid var(--rule);
+  margin: 0 0 20px;
 }
 
-.cron-card {
-  display: grid; grid-template-columns: 220px 1fr; gap: 24px;
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 16px; padding: 22px; margin-bottom: 16px;
+/* ── Callout box (yellow-tinted) ───────────────────────────── */
+.callout {
+  background: var(--gold-soft);
+  border-left: 3px solid var(--gold);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  border-radius: 2px;
 }
-@media (max-width: 700px) { .cron-card { grid-template-columns: 1fr; gap: 12px; } }
-.cron-card .meta .name { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-.cron-card .meta .freq {
-  display: inline-block; padding: 3px 10px; border-radius: 999px;
-  background: rgba(16,185,129,0.15); color: var(--green);
-  font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+.callout p { margin: 0 0 10px; color: var(--ink); font-size: 15px; }
+.callout p:last-child { margin-bottom: 0; }
+.callout .rule-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold-deep);
+  margin-bottom: 8px;
+}
+
+/* ── Card grid (the 3 workers) ─────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px; margin-top: 16px;
+}
+.mini-card {
+  background: var(--paper); border: 1px solid var(--rule-strong);
+  border-radius: 4px; padding: 14px 16px;
+  border-top: 3px solid var(--ink);
+  transition: transform .12s ease;
+}
+.mini-card:hover { transform: translateY(-2px); }
+.mini-card .num {
+  font-size: 11px; color: var(--ink-mute);
+  font-family: ui-monospace, monospace; margin-bottom: 6px;
+}
+.mini-card .title {
+  font-weight: 700; font-size: 16px; margin-bottom: 8px;
+  line-height: 1.25;
+}
+.mini-card .freq-badge {
+  display: inline-block;
+  background: var(--gold); color: var(--ink);
+  font-weight: 800; font-size: 10px; letter-spacing: 0.06em;
+  padding: 3px 8px; border-radius: 3px; margin-bottom: 10px;
   text-transform: uppercase;
 }
-.cron-card .meta .file {
-  font-family: ui-monospace, "SF Mono", monospace; font-size: 11px;
-  color: var(--text-dim); margin-top: 8px;
+.mini-card .specs {
+  font-size: 12px; color: var(--ink-soft); line-height: 1.5;
 }
-.cron-card ul { margin: 0; padding-left: 20px; }
-.cron-card li { color: var(--text); margin-bottom: 6px; }
-.cron-card li strong { color: var(--accent2); font-weight: 600; }
+.mini-card .specs span { display: inline-block; margin-right: 8px; }
+.mini-card .specs strong { color: var(--ink); font-weight: 600; }
 
-.compare {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-  margin-bottom: 12px;
+/* ── Detail card (full worker / detail block) ──────────────── */
+.detail {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 0;
+  margin-bottom: 18px; overflow: hidden;
 }
-@media (max-width: 700px) { .compare { grid-template-columns: 1fr; } }
-.compare .col { padding: 16px; border-radius: 12px; }
-.compare .before {
-  background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2);
+.detail .head {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(232,197,71,0.04);
 }
-.compare .after {
-  background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2);
+.detail .num-big {
+  font-family: ui-monospace, monospace; font-size: 20px;
+  color: var(--gold-deep); font-weight: 700;
 }
-.compare .label {
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
-  font-weight: 700; margin-bottom: 8px;
+.detail .head h3 {
+  margin: 0; font-family: "Iowan Old Style", Georgia, serif;
+  font-weight: 600; font-size: 22px; color: var(--ink);
+  flex: 1; min-width: 0;
 }
-.compare .before .label { color: var(--hot); }
-.compare .after  .label { color: var(--green); }
+.detail .head .pill {
+  font-family: ui-monospace, monospace;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+  padding: 3px 8px; border-radius: 3px;
+  background: var(--gold); color: var(--ink);
+  text-transform: uppercase;
+}
+.detail .head .pill.green { background: rgba(47,125,91,0.15); color: var(--green); }
+.detail .head .pill.subtle {
+  background: transparent; color: var(--ink-mute);
+  border: 1px solid var(--rule-strong);
+}
+.detail .body {
+  padding: 18px 22px;
+}
+.detail .body .lead-line {
+  font-style: italic; font-family: "Iowan Old Style", Georgia, serif;
+  color: var(--ink-soft); border-left: 3px solid var(--gold);
+  padding: 4px 0 4px 14px; margin: 0 0 14px; font-size: 14px;
+}
+.detail .body h4 {
+  margin: 18px 0 8px; font-family: "Iowan Old Style", Georgia, serif;
+  font-weight: 600; font-size: 18px; color: var(--ink);
+}
+.detail .body ul { margin: 0; padding-left: 22px; }
+.detail .body li { margin-bottom: 6px; font-size: 14px; color: var(--ink); }
+.detail .body li strong { color: var(--ink); font-weight: 700; }
+code {
+  font-family: ui-monospace, monospace; font-size: 12px;
+  background: var(--gold-soft); padding: 1px 5px; border-radius: 3px;
+  color: var(--ink);
+}
 
+/* ── Stat block row (KPIs / What it saves) ─────────────────── */
+.stat-row {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-top: 14px;
+}
+.stat {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 3px solid var(--gold);
+  border-radius: 3px; padding: 16px 18px;
+}
+.stat .lab {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px;
+}
+.stat .v {
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 28px; font-weight: 600; color: var(--ink);
+  line-height: 1.05;
+}
+.stat .sub {
+  font-size: 12px; color: var(--ink-soft); margin-top: 6px; line-height: 1.4;
+}
+.stat.green { border-top-color: var(--green); }
+.stat.green .v { color: var(--green); }
+.stat.hot { border-top-color: var(--hot); }
+.stat.hot .v { color: var(--hot); }
+
+/* ── Where revenue / costs lives bullets ───────────────────── */
+.where-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  margin-top: 16px;
+}
+@media (max-width: 700px) { .where-grid { grid-template-columns: 1fr; } }
+.where-grid .col .heading {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--green); margin-bottom: 8px;
+}
+.where-grid .col.before .heading { color: var(--hot); }
+.where-grid ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink); }
+.where-grid li { margin-bottom: 4px; }
+
+/* ── Cost table ────────────────────────────────────────────── */
 table {
   width: 100%; border-collapse: collapse; font-size: 14px;
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 12px; overflow: hidden;
+  background: var(--paper); margin-top: 14px;
+  border: 1px solid var(--rule);
 }
-th { text-align: left; padding: 12px 16px;
-     background: rgba(255,255,255,0.03);
-     color: var(--text-dim); font-size: 12px;
-     text-transform: uppercase; letter-spacing: 0.06em;
-     font-weight: 600; }
-td { padding: 12px 16px; border-top: 1px solid var(--panel-border); }
-td.num { font-variant-numeric: tabular-nums; text-align: right; font-weight: 600; }
-tr.total td { font-weight: 700; background: rgba(99,102,241,0.06); border-top: 1px solid rgba(99,102,241,0.3); }
-
-.kpi-row {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px; margin-bottom: 24px;
+th { text-align: left; padding: 10px 16px;
+     background: var(--gold-soft);
+     color: var(--ink); font-size: 11px;
+     text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; }
+td { padding: 10px 16px; border-top: 1px solid var(--rule); }
+td.num { font-variant-numeric: tabular-nums; text-align: right; font-weight: 700; }
+tr.total td {
+  font-weight: 800; background: rgba(232,197,71,0.10);
+  border-top: 2px solid var(--gold);
 }
-.kpi-row .kpi {
-  padding: 16px; background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 12px;
-}
-.kpi-row .kpi .lab { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-.kpi-row .kpi .v { font-size: 24px; font-weight: 700; }
-.kpi-row .kpi.green .v { color: var(--green); }
-.kpi-row .kpi.warm  .v { color: var(--warm); }
-.kpi-row .kpi.hot   .v { color: var(--hot); }
-.kpi-row .kpi.cyan  .v { color: var(--accent2); }
-
 .tag {
-  display: inline-block; padding: 3px 8px; font-size: 11px;
-  border-radius: 6px; background: rgba(255,255,255,0.06);
-  color: var(--text-dim); margin-right: 4px; margin-bottom: 4px;
+  display: inline-block; padding: 2px 7px; font-size: 10px; font-weight: 700;
+  border-radius: 3px; background: rgba(181,122,26,0.15); color: var(--warm);
+  letter-spacing: 0.06em; text-transform: uppercase;
 }
-.tag.green { background: rgba(16,185,129,0.15); color: var(--green); }
-.tag.hot   { background: rgba(239,68,68,0.15); color: var(--hot); }
-.tag.warm  { background: rgba(245,158,11,0.15); color: var(--warm); }
-.tag.cyan  { background: rgba(6,182,212,0.15); color: var(--accent2); }
 
-.team-row {
-  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
-}
-.team-row .person {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 6px 12px; border-radius: 999px;
-  background: var(--panel); border: 1px solid var(--panel-border);
-  font-size: 13px;
-}
-.team-row .person .initial {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; color: #fff;
-}
-.team-row .person .role { color: var(--text-dim); font-size: 11px; }
-
-.state-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
-  gap: 8px; margin-top: 12px;
-}
-.state-grid .st {
-  padding: 10px 12px; background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 10px; text-align: center;
-}
-.state-grid .st .code { font-size: 14px; font-weight: 700; }
-.state-grid .st .num  { font-size: 11px; color: var(--text-dim); margin-top: 2px;
-                       font-family: ui-monospace, monospace; }
-
-.stack {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-}
-.stack .pill {
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 12px; padding: 14px 16px; text-align: center;
-}
-.stack .pill .name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
-.stack .pill .role { font-size: 11px; color: var(--text-dim); }
-
+/* ── Roadmap ───────────────────────────────────────────────── */
 .section-divider {
   display: flex; align-items: center; gap: 12px;
-  margin: 32px 0 16px;
-  font-size: 12px; font-weight: 700; color: var(--text-dim);
-  letter-spacing: 0.1em; text-transform: uppercase;
+  margin: 24px 0 12px;
+  font-size: 11px; font-weight: 800; color: var(--ink-soft);
+  letter-spacing: 0.14em; text-transform: uppercase;
 }
 .section-divider::before,
 .section-divider::after {
-  content: ''; flex: 1; height: 1px;
-  background: var(--panel-border);
+  content: ''; flex: 1; height: 1px; background: var(--rule);
 }
-.section-divider.now-building {
-  color: var(--green);
-}
+.section-divider.now { color: var(--green); }
+.section-divider.now::before,
+.section-divider.now::after { background: rgba(47,125,91,0.3); }
 
 .roadmap {
-  display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 .roadmap .item {
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 12px; padding: 18px;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink);
+  padding: 14px 18px; border-radius: 3px;
 }
-.roadmap .item.now {
-  border: 1px solid rgba(16,185,129,0.30);
-  background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(6,182,212,0.04));
-}
+.roadmap .item.now { border-left-color: var(--green); background: rgba(47,125,91,0.04); }
 .roadmap .item h4 {
-  margin: 0 0 6px; font-size: 14px; font-weight: 600;
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin: 0 0 6px; font-family: "Iowan Old Style", Georgia, serif;
+  font-weight: 600; font-size: 16px; color: var(--ink);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
-.roadmap .item p { font-size: 13px; color: var(--text-dim); margin: 0; }
+.roadmap .item p { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
 .priority {
-  font-size: 10px; padding: 2px 8px; border-radius: 4px;
-  font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  font-size: 9px; padding: 2px 7px; border-radius: 3px;
+  font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
 }
-.priority.now    { background: rgba(16,185,129,0.20); color: var(--green); }
-.priority.medium { background: rgba(245,158,11,0.15); color: var(--warm); }
-.priority.future { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+.priority.now    { background: rgba(47,125,91,0.18); color: var(--green); }
+.priority.medium { background: rgba(181,122,26,0.18); color: var(--warm); }
+.priority.future { background: rgba(26,40,64,0.10); color: var(--ink-soft); }
+
+/* ── Team / States grids ───────────────────────────────────── */
+.team-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.team-row .person {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 3px;
+  background: var(--paper); border: 1px solid var(--rule); font-size: 13px;
+}
+.team-row .person .initial {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--gold); color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+}
+.team-row .person .role { color: var(--ink-mute); font-size: 11px; }
+
+.state-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+  gap: 6px; margin-top: 12px;
+}
+.state-grid .st {
+  padding: 8px 10px; background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 3px; text-align: center;
+}
+.state-grid .st .code { font-size: 13px; font-weight: 800; color: var(--ink); }
+.state-grid .st .num { font-size: 10px; color: var(--ink-mute); margin-top: 2px;
+                       font-family: ui-monospace, monospace; }
+
+/* ── Tech stack pills ──────────────────────────────────────── */
+.stack {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px; margin-top: 14px;
+}
+.stack .pill {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 3px; padding: 10px 12px; text-align: center;
+}
+.stack .pill .name { font-weight: 700; font-size: 12px; margin-bottom: 2px; color: var(--ink); }
+.stack .pill .role { font-size: 10px; color: var(--ink-mute); }
+
+/* ── Nav ───────────────────────────────────────────────────── */
+.nav-mini { display: flex; gap: 6px; }
+.nav-mini a {
+  padding: 6px 12px; border-radius: 3px;
+  background: transparent; border: 1px solid var(--rule);
+  color: var(--ink-soft); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+  transition: all .12s;
+}
+.nav-mini a:hover { color: var(--ink); border-color: var(--ink); }
+.nav-mini a.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
 
 footer {
-  color: var(--text-dim); font-size: 12px; text-align: center;
-  margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--panel-border);
+  color: var(--ink-mute); font-size: 11px; text-align: center;
+  margin-top: 64px; padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  letter-spacing: 0.04em;
 }
-a { color: var(--accent2); }
-a:hover { color: #fff; }
-code {
-  font-family: ui-monospace, "SF Mono", monospace; font-size: 12px;
-  background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;
-  color: var(--accent2);
-}
+a { color: var(--gold-deep); }
+a:hover { color: var(--ink); }
 </style>
 </head>
 <body>
 <div class="container">
 
-  <div class="nav">
-    <a href="index.html">Follow-Ups</a>
-    <a href="deals.html">Deals</a>
-    <a href="about.html" class="active">About</a>
+  <!-- ── Top meta ──────────────────────────────────────────── -->
+  <div class="meta-bar">
+    <div>APG · ACQ Operating Layer · Walkthrough</div>
+    <div>V1 · 2026-04-30</div>
   </div>
 
-  <!-- ─────────────────────── HERO ─────────────────────── -->
-  <div class="hero">
-    <div class="logo-wrap">
-      <!-- Atom Property Group — inline SVG so it ships without an external file.
-           If you drop a real logo.png/svg into site/, swap this <svg> block
-           for <img src="logo.png" alt="Atom Property Group"> -->
-      <svg class="logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" aria-label="Atom Property Group">
-        <!-- "AT" -->
-        <text x="50" y="70" font-family="Arial Black, Helvetica, sans-serif"
-              font-weight="900" font-size="64" class="brand-main">AT</text>
-
-        <!-- Atom emblem replacing the "O" -->
-        <g transform="translate(166, 40)">
-          <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" />
-          <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(60 28 28)" />
-          <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(-60 28 28)" />
-          <circle  class="atom-core"  cx="28" cy="28" r="5" />
-        </g>
-
-        <!-- "M" -->
-        <text x="232" y="70" font-family="Arial Black, Helvetica, sans-serif"
-              font-weight="900" font-size="64" class="brand-main">M</text>
-
-        <!-- "PROPERTY GROUP" -->
-        <text x="50" y="108" font-family="Arial, Helvetica, sans-serif"
-              font-weight="700" font-size="14" class="brand-sub">PROPERTY GROUP</text>
-      </svg>
+  <!-- ── Logo + nav ────────────────────────────────────────── -->
+  <div class="logo-row" style="margin-top:24px">
+    <svg class="logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" aria-label="Atom Property Group">
+      <text x="50" y="70" font-family="Arial Black, Helvetica, sans-serif"
+            font-weight="900" font-size="64" class="brand-main">AT</text>
+      <g transform="translate(166, 40)">
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" />
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(60 28 28)" />
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(-60 28 28)" />
+        <circle  class="atom-core"  cx="28" cy="28" r="5" />
+      </g>
+      <text x="232" y="70" font-family="Arial Black, Helvetica, sans-serif"
+            font-weight="900" font-size="64" class="brand-main">M</text>
+      <text x="50" y="108" font-family="Arial, Helvetica, sans-serif"
+            font-weight="700" font-size="14" class="brand-sub">PROPERTY GROUP</text>
+    </svg>
+    <div class="nav-mini">
+      <a href="index.html">Follow-Ups</a>
+      <a href="deals.html">Deals</a>
+      <a href="about.html" class="active">About</a>
     </div>
-    <div class="eyebrow">ACQ Pipeline · Acquisitions Automation</div>
-    <h1>Three Robots, Working 24/7</h1>
-    <p class="tagline">Built specifically for APG's acquisitions workflow. Every call gets transcribed, every lead gets scored, every follow-up SMS goes out on time, every reply gets classified, every property gets priced. The team only sees what needs a human decision — Jeff calls people who actually want to talk; Mike reviews instead of doing data entry.</p>
   </div>
 
-  <!-- ─────────────────────── OVERVIEW ─────────────────────── -->
-  <section>
-    <div class="card accent">
-      <h2 style="margin-top:0">The 30-Second Version</h2>
-      <p>Three crons run on Microsoft's servers (free, public repo). Together they handle every step that used to need a human: transcribing calls, scoring leads, building rehab reports, sending follow-up SMS, classifying replies, advancing stages, and pricing properties. Two live dashboards (Follow-Ups and Deals) show what's happening and what needs attention.</p>
+  <!-- ── Title ─────────────────────────────────────────────── -->
+  <header class="doc-header">
+    <h1>The Three <span class="accent">Robots</span></h1>
+    <p class="lede">A read on how APG's acquisitions automation actually works. What runs, what it costs, what it saves the team — and what we'd build next, knowing the system can flex hard between use cases.</p>
+    <hr>
+  </header>
 
-      <p style="margin-top:20px"><strong style="color:var(--accent2)">Built for APG's specific operation:</strong></p>
+  <!-- ── 00 · THE FRAME ────────────────────────────────────── -->
+  <section class="sec" id="frame">
+    <div class="tag-row">
+      <span class="num">00</span>
+      <h2>The Frame</h2>
+    </div>
+    <hr>
+
+    <div class="callout">
+      <p><strong>Three crons run on Microsoft's servers</strong> (free, public repo). They handle every step that used to need a human: transcribing calls, scoring leads, building rehab reports, sending follow-up SMS, classifying replies, advancing stages, and pricing properties. Two live dashboards — Follow-Ups and Deals — show what's happening and what needs attention.</p>
+      <p><strong style="color:var(--gold-deep)">Net result.</strong> Jeff calls people who actually want to talk. Mike reviews instead of doing data entry. Cold leads stop clogging the qualified queue. ARV gets calculated automatically. The team only sees what needs a human decision.</p>
+    </div>
+
+    <div class="callout">
+      <div class="rule-label">DESIGN RULE</div>
+      <p><strong>Trust the AI for routing, never for closing.</strong> Calls get analyzed, leads get classified, stages get auto-routed when the system is confident — but a deal never moves from LAO → DD → MAO → Contract without a human signing off. The automation handles the noise so humans handle the signal.</p>
+    </div>
+
+    <p style="font-size: 14px; color: var(--ink-soft); margin-top: 18px">Three workers running 24/7. Tap any card to jump.</p>
+
+    <div class="card-grid">
+      <a href="#worker-01" style="text-decoration:none;color:inherit">
+        <div class="mini-card">
+          <div class="num">01</div>
+          <div class="title">Call Recording Pipeline</div>
+          <div class="freq-badge">EVERY 15 MIN</div>
+          <div class="specs"><span><strong>Audio</strong> · Deepgram</span><span><strong>Analysis</strong> · Claude</span></div>
+        </div>
+      </a>
+      <a href="#worker-02" style="text-decoration:none;color:inherit">
+        <div class="mini-card">
+          <div class="num">02</div>
+          <div class="title">SMS + Dashboards</div>
+          <div class="freq-badge">EVERY 30 MIN</div>
+          <div class="specs"><span><strong>Sends</strong> · State-routed</span><span><strong>Replies</strong> · Classified</span></div>
+        </div>
+      </a>
+      <a href="#worker-03" style="text-decoration:none;color:inherit">
+        <div class="mini-card">
+          <div class="num">03</div>
+          <div class="title">Slack Scraper</div>
+          <div class="freq-badge">EVERY 60 MIN</div>
+          <div class="specs"><span><strong>4 channels</strong></span><span><strong>Audit trail</strong> · GHL notes</span></div>
+        </div>
+      </a>
+    </div>
+
+    <div class="callout" style="margin-top: 22px">
+      <div class="rule-label">BUILT FOR APG SPECIFICALLY</div>
       <div class="team-row">
         <div class="person"><div class="initial">J</div> Jeff <span class="role">Acquisitions calls</span></div>
         <div class="person"><div class="initial">M</div> Mike <span class="role">Review · QA</span></div>
         <div class="person"><div class="initial">A</div> Adam <span class="role">Pipeline owner</span></div>
       </div>
-
-      <p style="margin-top:18px"><strong style="color:var(--accent2)">Markets we cover</strong> — each state has its own primary SMS number, with an automatic secondary swap on touches 4-6 so we don't look like one spammer:</p>
+      <p style="margin-top:14px"><strong>Markets we cover.</strong> Each state has its own primary SMS number with an automatic secondary swap on touches 4-6 so we don't look like one spammer:</p>
       <div class="state-grid">
         <div class="st"><div class="code">NJ</div><div class="num">Jeff (lead)</div></div>
         <div class="st"><div class="code">PA</div><div class="num">+1-267…</div></div>
@@ -349,158 +474,219 @@ code {
     </div>
   </section>
 
-  <!-- ─────────────────────── TECH STACK ─────────────────────── -->
-  <section>
-    <h2>The Stack <span class="badge">all integrated</span></h2>
+  <!-- ── 01 · CALL RECORDING PIPELINE ──────────────────────── -->
+  <section class="sec" id="worker-01">
+    <div class="detail">
+      <div class="head">
+        <div class="num-big">01</div>
+        <h3>Call Recording Pipeline</h3>
+        <span class="pill green">EVERY 15 MIN</span>
+        <span class="pill subtle">acq_automation.py</span>
+      </div>
+      <div class="body">
+        <p class="lead-line">"Find new recordings. Transcribe them. Extract everything that matters. Route the lead. Move on."</p>
+
+        <h4>Quick model</h4>
+        <p>Recording-driven enrichment. Every 15 min, the cron checks GHL for new call recordings on stages 1-4. Each one runs through Deepgram → Claude → Apify → GHL writeback in under a minute. Side effect: the lead gets its stage auto-routed based on the call's outcome, and a clean "APG Lead Summary" note replaces the old freeform clutter.</p>
+
+        <div class="stat-row">
+          <div class="stat">
+            <div class="lab">Per-recording cost</div>
+            <div class="v">~$0.04</div>
+            <div class="sub">Deepgram transcription + Claude analysis + Apify enrichment, all-in.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">Time recovered</div>
+            <div class="v">~30 min/call</div>
+            <div class="sub">Mike's old job: listen, type, look up Zillow, write summary, set fields.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">Coverage</div>
+            <div class="v">100%</div>
+            <div class="sub">Every recording analyzed. Old workflow caught maybe 10-20%.</div>
+          </div>
+        </div>
+
+        <div class="where-grid">
+          <div class="col">
+            <div class="heading">What flows IN</div>
+            <ul>
+              <li>Call recording URL from GHL</li>
+              <li>Contact's existing custom fields</li>
+              <li>Apify Zillow detail (beds/baths/sqft/year)</li>
+              <li>Apify sold comps in the same ZIP</li>
+            </ul>
+          </div>
+          <div class="col">
+            <div class="heading">What flows OUT</div>
+            <ul>
+              <li>Transcript stored on contact</li>
+              <li>16 GHL custom fields populated</li>
+              <li>"APG Lead Summary" note (upserted)</li>
+              <li>Rehab Report Google Doc</li>
+              <li>Auto-routed stage + Lead Type</li>
+              <li>Tasks for Jeff/Adam/Mike (if Hot)</li>
+            </ul>
+          </div>
+        </div>
+
+        <h4>Auto-routing logic</h4>
+        <ul>
+          <li><strong>Hot</strong> → moves Stage 1 → Stage 2 (LAO), creates Jeff/Adam/Mike tasks (4h due), sets Lead Type = "Hot Lead".</li>
+          <li><strong>Warm</strong> → stays in Stage 1, sets Lead Type = "Warm Lead". Still in qualified queue.</li>
+          <li><strong>Nurture</strong> → moves to Stage 0 (Unqualified), sets Lead Type = "Nurture Lead". Silent demotion.</li>
+          <li><strong>Cold</strong> → moves to Stage 0 (Unqualified), sets Lead Type = "Cold Lead". Silent demotion.</li>
+        </ul>
+        <p style="font-size:13px;color:var(--ink-soft);margin-top:8px">Stages 2-4 are never auto-reversed. Once a lead is a real deal, only humans move it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 · SMS + DASHBOARDS ─────────────────────────────── -->
+  <section class="sec" id="worker-02">
+    <div class="detail">
+      <div class="head">
+        <div class="num-big">02</div>
+        <h3>SMS Follow-Up + Dashboards</h3>
+        <span class="pill green">EVERY 30 MIN</span>
+        <span class="pill subtle">sms_followup.py + 3 dashboards</span>
+      </div>
+      <div class="body">
+        <p class="lead-line">"The right SMS, at the right time, on the right number. Filter the noise. Push the signal to Jeff."</p>
+
+        <h4>Quick model</h4>
+        <p>Cadence-driven outbound. The cron walks every active lead in stages 1-4 + the three reactivation stages, checks where they are in the SMS sequence, and sends the next message if it's due. Inbound replies get classified by Claude before Jeff sees anything — STOP/hostile/wrong-number all auto-DND silently. Only positive/neutral replies reach Jeff's task list.</p>
+
+        <div class="stat-row">
+          <div class="stat green">
+            <div class="lab">Hours/week saved</div>
+            <div class="v">25-40h</div>
+            <div class="sub">Jeff + Mike's combined manual SMS + reply triage time.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">From-numbers</div>
+            <div class="v">9</div>
+            <div class="sub">8 state-routed primaries + Jeff NJ. Secondary swap on touches 4-6.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">Reply latency</div>
+            <div class="v">≤ 30 min</div>
+            <div class="sub">Bounded by cron tick. Webhooks would push this to seconds.</div>
+          </div>
+        </div>
+
+        <div class="where-grid">
+          <div class="col before">
+            <div class="heading">Before — manual</div>
+            <ul>
+              <li>SMS sent by hand, missed days, typos</li>
+              <li>Replies trickle in, Jeff scrambles</li>
+              <li>STOP requests sometimes ignored (legal risk)</li>
+              <li>No record of which from-number was used</li>
+            </ul>
+          </div>
+          <div class="col">
+            <div class="heading">After — automated</div>
+            <ul>
+              <li>Right SMS, right time, right state-routed number</li>
+              <li>Replies classified before Jeff sees them</li>
+              <li>"Reply STOP to opt out" appended on touches 1, 4, last</li>
+              <li>Negative replies auto-DND, never escalated</li>
+            </ul>
+          </div>
+        </div>
+
+        <h4>Reply classifier (Claude Haiku)</h4>
+        <ul>
+          <li><strong>STOP / hostile</strong> → set GHL DND, tag <code>dnd-opt-out</code>, no Jeff task.</li>
+          <li><strong>Wrong number</strong> → set GHL DND, tag <code>wrong-number</code>, no task.</li>
+          <li><strong>Not interested</strong> (polite no) → tag <code>not-interested</code>, no Jeff task. Re-touch eligible later.</li>
+          <li><strong>Positive / neutral</strong> → Jeff callback task + Mike review task, both with reply text inline.</li>
+        </ul>
+
+        <h4>Dashboards (also produced here)</h4>
+        <ul>
+          <li><strong>Google Sheet</strong> — raw rows, kill-switch toggle, live-editable templates.</li>
+          <li><strong>Follow-Ups HTML</strong> — action queue: Replied / Dormant / Active.</li>
+          <li><strong>Deals HTML</strong> — property cards: ARV, 70% MAO, assignment fee, call rating.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 · SLACK SCRAPER ───────────────────────────────── -->
+  <section class="sec" id="worker-03">
+    <div class="detail">
+      <div class="head">
+        <div class="num-big">03</div>
+        <h3>Slack Scraper</h3>
+        <span class="pill green">EVERY 60 MIN</span>
+        <span class="pill subtle">slack_scraper.py</span>
+      </div>
+      <div class="body">
+        <p class="lead-line">"Watch the team chatter. When someone mentions a lead, capture it before it's lost in the channel."</p>
+
+        <h4>Quick model</h4>
+        <p>Channel-driven enrichment. Every hour, the cron pulls new messages from 4 APG Slack channels, locally scores them against the contact index (no LLM call until there's a candidate hit — keeps cost down), then sends matched candidates to Claude for confidence-rated info extraction. High-confidence updates auto-apply to GHL fields; medium-confidence becomes an audit-trail note.</p>
+
+        <div class="stat-row">
+          <div class="stat">
+            <div class="lab">Channels watched</div>
+            <div class="v">4</div>
+            <div class="sub"><code>#base0-hot-warm-nurture-fu</code>, <code>#base1-sms-leadgen</code>, <code>#base4-dispo</code>, <code>#construction-services</code></div>
+          </div>
+          <div class="stat">
+            <div class="lab">Local pre-filter</div>
+            <div class="v">~98%</div>
+            <div class="sub">Of messages skip Claude entirely (no candidate match). Keeps cost per match low.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">Auto-update threshold</div>
+            <div class="v">High only</div>
+            <div class="sub">Medium gets a note. Low/none gets nothing. No silent overwrites.</div>
+          </div>
+        </div>
+
+        <p style="font-size:13px;color:var(--ink-soft);margin-top:14px">Respects Slack's May 2025 rate limits (limit=15 per page, 2s sleep between pages).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 · THE STACK ────────────────────────────────────── -->
+  <section class="sec">
+    <div class="tag-row">
+      <span class="num">04</span>
+      <h2>The Stack</h2>
+    </div>
+    <hr>
+    <p style="color:var(--ink-soft);font-size:14px">Eight services, all integrated. Nothing custom-hosted — everything runs on managed infrastructure with predictable per-event pricing.</p>
     <div class="stack">
       <div class="pill"><div class="name">GitHub Actions</div><div class="role">Cron runner</div></div>
       <div class="pill"><div class="name">GoHighLevel</div><div class="role">CRM + ACQ pipeline</div></div>
-      <div class="pill"><div class="name">Anthropic Claude</div><div class="role">Call analysis · ARV · classification</div></div>
+      <div class="pill"><div class="name">Anthropic Claude</div><div class="role">Analysis · classification</div></div>
       <div class="pill"><div class="name">Deepgram</div><div class="role">Audio → transcript</div></div>
-      <div class="pill"><div class="name">Apify (Zillow)</div><div class="role">Property data + sold comps</div></div>
-      <div class="pill"><div class="name">Google Sheets / Drive</div><div class="role">Live dashboard + Rehab Reports</div></div>
-      <div class="pill"><div class="name">Slack API</div><div class="role">Channel scraping + notes</div></div>
-      <div class="pill"><div class="name">GitHub Pages</div><div class="role">HTML dashboards hosting</div></div>
+      <div class="pill"><div class="name">Apify (Zillow)</div><div class="role">Property + comps</div></div>
+      <div class="pill"><div class="name">Google Sheets / Drive</div><div class="role">Sheet + Rehab Reports</div></div>
+      <div class="pill"><div class="name">Slack API</div><div class="role">Channel scraping</div></div>
+      <div class="pill"><div class="name">GitHub Pages</div><div class="role">Dashboards hosting</div></div>
     </div>
   </section>
 
-  <!-- ─────────────────────── THE 3 WORKERS ─────────────────────── -->
-  <section>
-    <h2>The Three Workers <span class="badge">running 24/7</span></h2>
-
-    <div class="cron-card">
-      <div class="meta">
-        <div class="name">📞 Call Recording Pipeline</div>
-        <div class="freq">Every 15 min</div>
-        <div class="file">acq_automation.py</div>
-      </div>
-      <div>
-        <ul>
-          <li><strong>Finds new call recordings</strong> in stages 1-4 of the APG ACQ pipeline.</li>
-          <li>Sends audio to <strong>Deepgram</strong> → transcript.</li>
-          <li>Sends transcript to <strong>Claude</strong> → extracts beds/baths/sqft, condition, asking price, motivation, timeline, deal type, lead temp (Hot/Warm/Nurture/Cold), call rating /10, action items, red flags.</li>
-          <li>Calls <strong>Apify Zillow</strong> → property details + sold comps in the same ZIP.</li>
-          <li>Sends comps to <strong>Claude</strong> → ARV estimate. Falls back to Zestimate if comps thin.</li>
-          <li>Writes everything back to GHL: contact + opportunity custom fields, "APG Lead Summary" note (single upserted note — no duplicates), Rehab Report Google Doc.</li>
-          <li><strong>Auto-routes Stage 1 leads:</strong> Hot → LAO + tasks for Jeff/Adam/Mike. Warm stays. Nurture/Cold → Unqualified. Lead Type field set on every move.</li>
-          <li><strong>Backfill phase:</strong> any Stage 1-4 lead missing ARV gets Apify-enriched (capped 15/run, ZIP-cached so clusters share one fetch).</li>
-        </ul>
-      </div>
+  <!-- ── 05 · MONTHLY COSTS ────────────────────────────────── -->
+  <section class="sec" id="costs">
+    <div class="tag-row">
+      <span class="num">05</span>
+      <h2>Monthly Cost Breakdown</h2>
     </div>
+    <hr>
 
-    <div class="cron-card">
-      <div class="meta">
-        <div class="name">💬 SMS + Dashboards</div>
-        <div class="freq">Every 30 min</div>
-        <div class="file">sms_followup.py + 3 dashboard scripts</div>
-      </div>
-      <div>
-        <ul>
-          <li><strong>Reads kill switch + live templates</strong> from APG's Google Sheet (Settings + Templates tabs — Mike can edit copy without a code push).</li>
-          <li>For every active lead in stages 1-4 + Follow Up 1.5mo / 3mo / Dead Deals: sends next SMS in sequence based on per-stage cadence.</li>
-          <li><strong>From-number routing by state:</strong> 8 state-specific numbers + Jeff's NJ line; touches 4-6 swap to a secondary state's number to avoid spam-flagging.</li>
-          <li><strong>TCPA compliance:</strong> "Reply STOP to opt out." appended on touches 1, 4, and the final touch.</li>
-          <li><strong>Reply detection + classification:</strong> when an inbound SMS arrives, Claude classifies it: STOP / hostile / wrong number / not interested / positive / neutral. Negative replies set GHL DND silently — no Jeff task. Positive/neutral creates the callback pack for Jeff with Mike review.</li>
-          <li><strong>Dormant detection:</strong> after 6 unanswered SMS, mark dormant + manual-call task for Jeff + review task for Mike.</li>
-          <li><strong>Refreshes 3 dashboards:</strong> Google Sheet (raw data), Follow-Ups HTML (action queue), Deals HTML (deal cards with ARV / call rating / assignment fee).</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="cron-card">
-      <div class="meta">
-        <div class="name">📡 Slack Scraper</div>
-        <div class="freq">Every 60 min</div>
-        <div class="file">slack_scraper.py</div>
-      </div>
-      <div>
-        <ul>
-          <li>Pulls new messages from <code>#base0-hot-warm-nurture-fu</code>, <code>#base1-sms-leadgen</code>, <code>#base4-dispo</code>, <code>#construction-services</code>.</li>
-          <li>Local keyword/phone matching against the contact index (no LLM call until there's a candidate — keeps cost down).</li>
-          <li>For matched candidates: <strong>Claude extracts info</strong> — match confidence, summary, optional field updates (asking price, timeline, motivation, reason for selling).</li>
-          <li>Adds an audit-trail "Slack mention" note to the GHL contact. Auto-applies field updates only at HIGH confidence.</li>
-          <li>Respects Slack's May 2025 rate limits (limit=15, sleep between pages).</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─────────────────────── WHAT IT SAVES ─────────────────────── -->
-  <section>
-    <h2>What This Saves the Team <span class="badge">vs doing it manually</span></h2>
-
-    <div class="kpi-row">
-      <div class="kpi green"><div class="lab">Hours/week saved</div><div class="v">~25-40h</div></div>
-      <div class="kpi"><div class="lab">Calls auto-analyzed</div><div class="v">100%</div></div>
-      <div class="kpi cyan"><div class="lab">Cold leads filtered</div><div class="v">Auto</div></div>
-      <div class="kpi warm"><div class="lab">Reply latency</div><div class="v">≤30 min</div></div>
-    </div>
-
-    <div class="compare">
-      <div class="col before">
-        <div class="label">Before — manual</div>
-        <p>Jeff or Mike listens to every call, types notes by hand. Maybe 1-2 leads/day actually get analyzed. The rest sit untranscribed.</p>
-      </div>
-      <div class="col after">
-        <div class="label">After — automated</div>
-        <p>Every recording transcribed within 15 min. Beds/baths/sqft, motivation, lead temp, call rating, action items — all written to GHL custom fields automatically.</p>
-      </div>
-    </div>
-
-    <div class="compare">
-      <div class="col before">
-        <div class="label">Before</div>
-        <p>SMS follow-ups sent manually, missed days, copy-paste typos, no record of which from-number was used. Replies trickle in and Jeff scrambles.</p>
-      </div>
-      <div class="col after">
-        <div class="label">After</div>
-        <p>Every active lead gets the right SMS at the right time on the right state-routed number. Replies are classified — Jeff only sees real prospects. STOPs auto-DND. Wrong numbers auto-DND.</p>
-      </div>
-    </div>
-
-    <div class="compare">
-      <div class="col before">
-        <div class="label">Before</div>
-        <p>Cold and Nurture leads pile up in the Qualified queue, making it impossible to see what's actually a hot prospect. Jeff wastes calls on dead air.</p>
-      </div>
-      <div class="col after">
-        <div class="label">After</div>
-        <p>After every call, AI auto-routes the lead: Hot → LAO with tasks, Warm stays, Nurture/Cold → Unqualified silently. Stage 1 stays clean.</p>
-      </div>
-    </div>
-
-    <div class="compare">
-      <div class="col before">
-        <div class="label">Before</div>
-        <p>ARV calculated by hand on Zillow. 15-30 min per property. Often skipped. No comps record.</p>
-      </div>
-      <div class="col after">
-        <div class="label">After</div>
-        <p>Every Stage 1-4 lead gets ARV auto-calculated from sold comps + Claude appraiser logic. ZIP-cached so clusters share fetches. Falls back to Zestimate if comps thin.</p>
-      </div>
-    </div>
-
-    <div class="compare">
-      <div class="col before">
-        <div class="label">Before</div>
-        <p>Slack chatter about leads gets lost. Someone mentions a price on Tuesday and by Friday no one remembers which deal it was.</p>
-      </div>
-      <div class="col after">
-        <div class="label">After</div>
-        <p>Slack scraper monitors 4 APG channels every hour. Mentions tied to leads get appended as notes in GHL with full audit trail. High-confidence info auto-updates fields.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─────────────────────── COSTS ─────────────────────── -->
-  <section>
-    <h2>Monthly Cost Breakdown <span class="badge">all-in</span></h2>
+    <p style="color:var(--ink-soft);font-size:14px">All-in. Apify capped, Claude predictable, Deepgram pay-as-you-go, everything else free.</p>
 
     <table>
       <thead><tr><th>Service</th><th>What it does</th><th class="num">Cost / mo</th></tr></thead>
       <tbody>
         <tr>
-          <td>Apify <span class="tag warm">capped</span></td>
+          <td>Apify <span class="tag">capped</span></td>
           <td>Zillow property data + sold comps</td>
           <td class="num">$50</td>
         </tr>
@@ -520,18 +706,8 @@ code {
           <td class="num">$0</td>
         </tr>
         <tr>
-          <td>Google Sheets / Drive</td>
-          <td>Live dashboard sheet + Rehab Report docs</td>
-          <td class="num">$0</td>
-        </tr>
-        <tr>
-          <td>GHL API</td>
-          <td>Already in APG's subscription</td>
-          <td class="num">$0</td>
-        </tr>
-        <tr>
-          <td>Slack</td>
-          <td>Bot token + channel reads</td>
+          <td>Google · GHL · Slack</td>
+          <td>Already in APG's existing subscriptions</td>
           <td class="num">$0</td>
         </tr>
         <tr class="total">
@@ -542,18 +718,22 @@ code {
       </tbody>
     </table>
 
-    <div class="card" style="margin-top:16px">
-      <h3 style="margin-top:0">Cost guardrails baked in</h3>
-      <p class="dim">The Apify budget guard checks remaining monthly limit before every call. Once we're $1 from the cap, all enrichment stops cleanly — no surprise overruns. Claude usage scales linearly with call volume; if calls double, Claude cost doubles, predictably. Deepgram is pay-as-you-go so it tracks call minutes 1:1.</p>
-      <p class="dim" style="margin-bottom:0"><strong>For context:</strong> a single hour of Jeff's time replaced by automation pays for the entire system for a month.</p>
+    <div class="callout" style="margin-top:18px">
+      <div class="rule-label">COST GUARDRAILS</div>
+      <p>The Apify budget guard checks remaining monthly limit before every call. Once we're $1 from the cap, all enrichment stops cleanly — no surprise overruns. Claude usage scales linearly with call volume; predictable. Deepgram is pay-as-you-go so it tracks call minutes 1:1.</p>
+      <p style="margin-bottom:0"><strong>For context:</strong> a single hour of Jeff's time replaced by automation pays for the entire system for a month.</p>
     </div>
   </section>
 
-  <!-- ─────────────────────── ROADMAP ─────────────────────── -->
-  <section>
-    <h2>Roadmap</h2>
+  <!-- ── 06 · ROADMAP ──────────────────────────────────────── -->
+  <section class="sec" id="roadmap">
+    <div class="tag-row">
+      <span class="num">06</span>
+      <h2>Roadmap</h2>
+    </div>
+    <hr>
 
-    <div class="section-divider now-building">▸ Now Building</div>
+    <div class="section-divider now">▸ Now Building</div>
 
     <div class="roadmap">
       <div class="item now">
@@ -563,12 +743,12 @@ code {
 
       <div class="item now">
         <h4>Predictive lead scoring <span class="priority now">In Progress</span></h4>
-        <p>Score every new lead 0-100 before the first call using property + motivation + timeline + market signals. Jeff prioritizes by score. Initial heuristic-based version ships now; ML-trained version once APG hits ~50 closed deals as training data.</p>
+        <p>Score every new lead 0-100 before the first call using property + motivation + timeline + market signals. Jeff prioritizes by score. Heuristic version ships now; ML-trained version once APG hits ~50 closed deals as training data.</p>
       </div>
 
       <div class="item now">
         <h4>Cold lead reactivation <span class="priority now">In Progress</span></h4>
-        <p>Properties that went Dead 6+ months ago — life events change. Re-touch sequence with property-specific Zestimate updates ("market's up 8% in your area, want a new number?"). Builds on the existing Follow Up 1.5mo / 3mo / Dead Deals cadence with smarter copy.</p>
+        <p>Properties that went Dead 6+ months ago — life events change. Re-touch sequence with property-specific Zestimate updates ("market's up 8% in your area, want a new number?"). Builds on the existing Follow Up cadence with smarter copy.</p>
       </div>
 
       <div class="item now">
@@ -582,48 +762,55 @@ code {
     <div class="roadmap">
       <div class="item">
         <h4>Real-time reply detection <span class="priority medium">Medium</span></h4>
-        <p>Switch the SMS reply path from 30-min polling to a GHL webhook for sub-second detection. Means Jeff can call back while the seller is still thinking about it. Hosting: Cloudflare Workers free tier.</p>
+        <p>Switch the SMS reply path from 30-min polling to a GHL webhook for sub-second detection. Means Jeff can call back while the seller is still thinking about it.</p>
       </div>
 
       <div class="item">
         <h4>Calendly auto-booking <span class="priority medium">Medium</span></h4>
-        <p>When a positive reply comes in, parse the seller's stated availability (Claude already does this). Send back a Calendly link pre-filtered to matching slots. Saves Jeff an entire round-trip of "what time works for you?"</p>
+        <p>When a positive reply comes in, parse the seller's stated availability. Send back a Calendly link pre-filtered to matching slots. Saves Jeff a round-trip.</p>
       </div>
 
       <div class="item">
         <h4>Multi-language SMS <span class="priority future">Future</span></h4>
-        <p>Detect seller's preferred language from inbound replies. Maintain Spanish + Portuguese template tracks for relevant markets (NJ has heavy Hispanic + Brazilian populations). Opens markets where current outreach is invisible.</p>
+        <p>Detect seller's preferred language. Maintain Spanish + Portuguese template tracks for relevant markets (NJ has heavy Hispanic + Brazilian populations).</p>
       </div>
 
       <div class="item">
         <h4>Voice AI cold caller <span class="priority future">Future</span></h4>
-        <p>For "Call Needed" leads with no recording yet — AI voice agent makes the first qualifying call, transcript flows into the same pipeline. Only escalates to Jeff if Hot. Currently the most expensive bottleneck (Jeff time) has no automation.</p>
+        <p>For "Call Needed" leads with no recording yet — AI voice agent makes the first qualifying call. Only escalates to Jeff if Hot. Tackles the biggest remaining bottleneck.</p>
       </div>
 
       <div class="item">
         <h4>Cash buyer dashboard <span class="priority future">Future</span></h4>
-        <p>Mirror the ACQ deals dashboard but for the Cash Buyer pipeline (OH/PA/NJ/AL). Track buyer engagement, last contact, capacity per buyer, match rate vs APG dispo flow.</p>
+        <p>Mirror the ACQ deals dashboard for the Cash Buyer pipeline (OH/PA/NJ/AL). Track buyer engagement, last contact, capacity per buyer.</p>
       </div>
 
       <div class="item">
         <h4>Spend-per-deal analytics <span class="priority future">Future</span></h4>
-        <p>Break down Apify + Claude + Deepgram spend per lead. Calculate APG's true cost-per-closed-deal. Helps decide which lead sources are actually profitable.</p>
+        <p>Break down Apify + Claude + Deepgram spend per lead. Calculate APG's true cost-per-closed-deal. Tells us which lead sources are profitable.</p>
       </div>
 
       <div class="item">
         <h4>Construction services pipeline <span class="priority future">Future</span></h4>
-        <p>Same call → transcript → analyze flow but for the Construction Services pipeline. Different prompt, different fields, different routing — but identical infrastructure.</p>
+        <p>Same call → transcript → analyze flow but for the Construction Services pipeline. Different prompt, different fields, different routing — same infrastructure.</p>
       </div>
     </div>
   </section>
 
-  <!-- ─────────────────────── FOOTER ─────────────────────── -->
-  <section>
-    <div class="card">
-      <h3 style="margin-top:0">Where the code lives</h3>
-      <p class="dim">All scripts and workflows are in the public repo at <a href="https://github.com/Mid0117/acq-automation" target="_blank">github.com/Mid0117/acq-automation</a>. Every cron run is logged at <a href="https://github.com/Mid0117/acq-automation/actions" target="_blank">github.com/Mid0117/acq-automation/actions</a>. Secrets (API tokens) are encrypted by GitHub and never appear in code.</p>
-      <p class="dim" style="margin-bottom:0">Live dashboards: <a href="index.html">Follow-Ups</a> · <a href="deals.html">Deals</a></p>
+  <!-- ── 07 · WHERE THE CODE LIVES ─────────────────────────── -->
+  <section class="sec">
+    <div class="tag-row">
+      <span class="num">07</span>
+      <h2>Where the Code Lives</h2>
     </div>
+    <hr>
+
+    <div class="callout">
+      <p>All scripts and workflows are in the public repo at <a href="https://github.com/Mid0117/acq-automation" target="_blank">github.com/Mid0117/acq-automation</a>. Every cron run is logged at <a href="https://github.com/Mid0117/acq-automation/actions" target="_blank">github.com/Mid0117/acq-automation/actions</a>.</p>
+      <p style="margin-bottom:0">Secrets (API tokens) are encrypted by GitHub and never appear in code. The repo is public so the code is auditable; only the API tokens are hidden.</p>
+    </div>
+
+    <p style="margin-top:18px;font-size:14px"><strong>Live dashboards:</strong> <a href="index.html">Follow-Ups</a> · <a href="deals.html">Deals</a></p>
   </section>
 
   <footer>
