@@ -67,6 +67,15 @@ jobs:
           GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
         run: python deals_dashboard.py
 
+      - name: Refresh site/weekly.html shell with latest layout
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+        run: |
+          # Regenerate just the static HTML shell every cron tick so layout
+          # changes (modal, refresh button, KPI strip, etc.) propagate without
+          # waiting for the Friday weekly snapshot.
+          python -c "from weekly_analysis import write_html_shell; write_html_shell()"
+
       - name: Bundle weekly analysis files into site/
         run: |
           mkdir -p site/weekly
