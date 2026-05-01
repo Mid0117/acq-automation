@@ -204,11 +204,14 @@ def parse_slack_note(body):
     out = {'channel': '', 'user': '', 'ts_text': '',
            'permalink': '', 'original': '', 'summary': '',
            'confidence': '', 'suggested': {}, 'auto_applied': {}}
-    # Try NEW format first: 'by Real Name (UID) — ts'
+    # Try NEW format first: 'by Real Name [optional (UID)] — ts'
     m = SLACK_NOTE_HEAD_NEW_RE.search(body)
     if m and '<@' not in m.group(2):
         out['channel'] = m.group(1)
-        out['user']    = m.group(2)
+        # Strip any '(UID)' suffix from old notes that wrote 'Name (U06...)'
+        user_str = m.group(2).strip()
+        user_str = re.sub(r'\s*\(U[A-Z0-9]+\)\s*$', '', user_str).strip()
+        out['user']    = user_str or 'unknown'
         out['ts_text'] = m.group(3).strip()
     else:
         # Fall back to OLD format with raw <@USERID> + resolve via cache

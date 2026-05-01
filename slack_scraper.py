@@ -475,15 +475,18 @@ def _main_inner():
                 # Note with audit trail + real Slack permalink
                 permalink = slack_permalink(ch_id, m['ts'])
                 permalink_line = f'\nSlack: {permalink}' if permalink else ''
-                # Friendly attribution: 'by Real Name (uid)' so we never lose
-                # the raw ID for debugging but the human name renders.
-                attribution = (f'{slack_user_name} ({slack_user_id})'
-                               if slack_user_name and slack_user_name != slack_user_id
-                               else slack_user_id or 'unknown')
+                # Friendly attribution: just the resolved name. We don't include
+                # the raw UID in the human-facing line — keeps the dashboard
+                # clean. Raw UID is still written below in 'User-ID:' for
+                # debugging.
+                attribution = (slack_user_name or slack_user_id or 'unknown')
+                # Raw UID kept on its own line for debugging — never shown in
+                # the dashboard's user attribution line.
+                uid_line = f'\nUser-ID: {slack_user_id}' if slack_user_id else ''
                 note_body = (
                     f'Slack mention\n'
                     f'#{ch_name} by {attribution} — {fmt_slack_ts(m["ts"])}'
-                    f'{permalink_line}\n'
+                    f'{permalink_line}{uid_line}\n'
                     f'Confidence: {conf}{suggested_line}\n\n'
                     f'Original: "{m["text"][:600]}"\n\n'
                     f'Summary: {summary}'
