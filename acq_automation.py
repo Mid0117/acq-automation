@@ -1122,6 +1122,62 @@ def backfill_property_data(cid, oid, contact, cfields, opp_cf, force=False):
     return 'ok'
 
 
+def backfill_rehab_report(cid, oid, contact, cfields, opp_cf, google_svc):
+    """Generate a Rehab Report Google Doc for a deal that's missing one.
+
+    Uses existing GHL custom fields — no Claude re-analysis or Apify call. Just
+    copies the template, fills in the lead's data, writes the URL back to
+    OF_REHAB on the opportunity. Cheap (only Google Docs API quota), so this
+    runs on every cron tick to ensure every active deal eventually has a link.
+    """
+    if opp_cf.get(OF_REHAB):
+        return 'has_rehab'
+    if not google_svc:
+        return 'no_google'
+
+    addr1 = (contact.get('address1') or '').strip()
+    city  = (contact.get('city') or '').strip()
+    state = (contact.get('state') or '').strip()
+    if not addr1:
+        return 'no_addr'
+
+    addr_str = ', '.join(p for p in (addr1, city, state) if p) or addr1
+    name = f"{contact.get('firstName','')} {contact.get('lastName','')}".strip()
+
+    # Reconstruct the data dict the rehab-doc template expects from saved fields.
+    data = {
+        'beds':                cfields.get(CF_BED) or '',
+        'baths':               cfields.get(CF_BATH) or '',
+        'sqft':                cfields.get(CF_SQFT) or '',
+        'property_type':       cfields.get(CF_PROP_TYPE) or '',
+        'condition':           cfields.get(CF_CONDITION) or '',
+        'asking_price':        cfields.get(CF_ASK_PRICE) or '',
+        'estimated_arv':       cfields.get(CF_ARV) or '',
+        'motivation':          cfields.get(CF_MOTIVATION) or '',
+        'timeline':            cfields.get(CF_TIMELINE) or '',
+        'reason_for_selling':  cfields.get(CF_REASON_SELL) or '',
+        'deal_type':           cfields.get(CF_DEAL_TYPE) or '',
+        'repairs_needed':      cfields.get(CF_REPAIRS) or '',
+    }
+    transcript = cfields.get(CF_AI_TX) or ''
+
+    print(f'  Rehab backfill: {name} | {addr_str}')
+    doc_url = create_rehab_doc(google_svc, addr_str, data, transcript)
+    if not doc_url:
+        return 'create_failed'
+
+    try:
+        requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
+                     headers=GHL_H,
+                     json={'customFields': [{'id': OF_REHAB, 'field_value': doc_url}]})
+    except Exception as e:
+        print(f'    rehab url write failed: {e}')
+        return 'write_failed'
+
+    print(f'    → {doc_url}')
+    return 'ok'
+
+
 def main():
     try:
         ok, fail, skipped, synced = _main_inner()
@@ -1239,6 +1295,46 @@ def _main_inner():
     print(f'[Backfill] {bf_ok} full ARV | {bf_partial} property-only | '
           f'{bf_skip} already-had-ARV | attempts={bf_attempts}'
           + (f' | budget-stopped' if bf_nobudget else ''))
+
+    # ── Rehab Report backfill phase ─────────────────────────────────────────
+    # Generate a Rehab Report Google Doc for any stage 1-4 lead missing one.
+    # Free (Google Docs API quota only — no Apify / Claude cost). Capped at
+    # 10/run so we don't bottleneck behind Google Drive copy operations.
+    REHAB_CAP = int(os.environ.get('REHAB_BACKFILL_CAP', '10'))
+    rh_ok = rh_skip = rh_fail = 0
+    rh_attempts = 0
+    print(f'\n[Rehab Backfill] generating reports for active deals missing one (cap={REHAB_CAP}/run)')
+
+    if not google_svc:
+        print('  → Google not configured; skipping rehab backfill.')
+    else:
+        for e in entries:
+            if rh_attempts >= REHAB_CAP:
+                break
+            cid, oid = e['cid'], e['oid']
+            try:
+                r = requests.get(f'https://services.leadconnectorhq.com/contacts/{cid}', headers=GHL_H)
+                if r.status_code != 200:
+                    continue
+                contact = r.json().get('contact', {})
+                cfields = {f['id']: (f.get('value') or '') for f in contact.get('customFields', [])}
+                opp_cf = get_opp_fields(oid)
+                if opp_cf.get(OF_REHAB):
+                    rh_skip += 1
+                    continue
+                rh_attempts += 1
+                r = backfill_rehab_report(cid, oid, contact, cfields, opp_cf, google_svc)
+                if r == 'ok':
+                    rh_ok += 1
+                elif r in ('create_failed', 'write_failed'):
+                    rh_fail += 1
+                time.sleep(0.5)
+            except Exception as exc:
+                print(f'  Rehab backfill error for {cid[:6]}: {exc}')
+                rh_fail += 1
+                continue
+
+    print(f'[Rehab Backfill] {rh_ok} created | {rh_skip} already had | {rh_fail} failed | attempts={rh_attempts}')
 
     return ok, fail, skipped, synced
 
