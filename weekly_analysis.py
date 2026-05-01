@@ -320,9 +320,10 @@ def build_lead_record(lead, sms_state):
 
 
 def count_recent_notes(cid, since_iso):
-    """Count notes added to this contact since the given ISO timestamp.
-    Captures Slack mentions, manual notes Adam/Jeff add post-meeting, APG
-    Lead Summary updates — anything that signals attention this week."""
+    """Count HUMAN-added notes (manual entries by Adam/Jeff/Mike post-call)
+    in the past 7 days. Excludes auto-generated 'APG Lead Summary' upserts
+    and 'Slack mention' bodies — those are written by the cron, not by a
+    person paying attention to the lead."""
     try:
         r = http('GET', f'https://services.leadconnectorhq.com/contacts/{cid}/notes', headers=GHL_H)
         if r.status_code != 200:
@@ -330,8 +331,15 @@ def count_recent_notes(cid, since_iso):
         n = 0
         for note in r.json().get('notes', []):
             ts = note.get('dateAdded') or note.get('createdAt') or ''
-            if ts and ts >= since_iso:
-                n += 1
+            if not ts or ts < since_iso:
+                continue
+            body = (note.get('body') or '')[:60]
+            # Skip auto-generated note types
+            if body.startswith('APG Lead Summary'):
+                continue
+            if body.startswith('Slack mention'):
+                continue
+            n += 1
         return n
     except Exception:
         return 0
@@ -348,19 +356,23 @@ def categorize(curr, prev_map, week_start_iso, slack_mention_count, recent_notes
     cid = curr['cid']
     prev = prev_map.get(cid)
 
-    # Did anything happen for this lead in the last 7 days?
+    # Activity = HUMAN signals only. opp/contact updatedAt are excluded
+    # from had_activity because our own backfill scripts (ARV, rehab,
+    # auto-routing) touch every lead's fields, which would mark the whole
+    # pipeline 'active'. Notes are filtered to exclude auto-generated
+    # APG Lead Summary / Slack mention bodies (see count_recent_notes).
     last_sms_at  = curr.get('last_sms_at') or ''
     replied_at   = curr.get('replied_at') or ''
-    last_updated = curr.get('last_updated') or ''
-    contact_updated = curr.get('contact_updated_at') or ''
     sms_this_week    = bool(last_sms_at  and last_sms_at  >= week_start_iso)
     reply_this_week  = bool(replied_at   and replied_at   >= week_start_iso)
-    opp_update_week  = bool(last_updated and last_updated >= week_start_iso)
-    contact_update_week = bool(contact_updated and contact_updated >= week_start_iso)
     slack_this_week  = slack_mention_count > 0
     notes_this_week  = recent_notes_count > 0
-    had_activity = (sms_this_week or reply_this_week or slack_this_week or
-                    opp_update_week or contact_update_week or notes_this_week)
+    # Kept for inline-detail display but NOT counted in had_activity
+    last_updated = curr.get('last_updated') or ''
+    contact_updated = curr.get('contact_updated_at') or ''
+    opp_update_week  = bool(last_updated and last_updated >= week_start_iso)
+    contact_update_week = bool(contact_updated and contact_updated >= week_start_iso)
+    had_activity = sms_this_week or reply_this_week or slack_this_week or notes_this_week
 
     # Movement bucket
     if not prev:
