@@ -271,6 +271,7 @@ CF_ARV           = 'nCWzIGfZHki0dv84gUem'
 CF_70_ARV        = 'R7QUzOdOnJXgoGRPwxdF'
 CF_ZILLOW        = '48pr9cc9hDFas111fDpF'
 CF_LEAD_TYPE     = 'nqErDKRO1IdhmmoDos15'  # multi-select: Hot/Warm/Nurture/Cold Lead, etc.
+CF_REHAB         = '85ZNNLPiPj3qjhii2UmC'  # contact-level Rehab Report field (LARGE_TEXT)
 
 # Opportunity custom fields
 OF_BED        = 'NdjIxlmD8KGBJH7xQ0rv'
@@ -886,7 +887,9 @@ def process_contact(cid, oid, google_svc):
                      json={'customFields': [{'id': k, 'field_value': str(v)} for k, v in ou.items()]})
         time.sleep(0.1)
 
-    # Rehab Report — only create if not already present
+    # Rehab Report — only create if not already present. Mirror the URL to
+    # BOTH the opportunity field (OF_REHAB) and the contact field (CF_REHAB)
+    # so it's clickable from anywhere Jeff/Mike/Adam open the lead in GHL.
     opp_cf = get_opp_fields(oid)
     if google_svc and not opp_cf.get(OF_REHAB):
         addr_parts = [contact.get('address1',''), contact.get('city',''), contact.get('state','')]
@@ -896,6 +899,8 @@ def process_contact(cid, oid, google_svc):
         if doc_url:
             requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
                          headers=GHL_H, json={'customFields': [{'id': OF_REHAB, 'field_value': doc_url}]})
+            requests.put(f'https://services.leadconnectorhq.com/contacts/{cid}',
+                         headers=GHL_H, json={'customFields': [{'id': CF_REHAB, 'field_value': doc_url}]})
             print(f'  Rehab: {doc_url}')
 
     # Auto-stage move from Stage 1 (Qualified) based on Claude's lead_temp:
@@ -1123,15 +1128,35 @@ def backfill_property_data(cid, oid, contact, cfields, opp_cf, force=False):
 
 
 def backfill_rehab_report(cid, oid, contact, cfields, opp_cf, google_svc):
-    """Generate a Rehab Report Google Doc for a deal that's missing one.
+    """Generate a Rehab Report Google Doc for a deal that's missing one — and
+    write the URL to BOTH the contact-level (CF_REHAB) and opportunity-level
+    (OF_REHAB) custom fields so it's clickable everywhere in GHL.
 
-    Uses existing GHL custom fields — no Claude re-analysis or Apify call. Just
-    copies the template, fills in the lead's data, writes the URL back to
-    OF_REHAB on the opportunity. Cheap (only Google Docs API quota), so this
-    runs on every cron tick to ensure every active deal eventually has a link.
+    Cheap (only Google Docs API quota), so this runs every cron tick.
     """
-    if opp_cf.get(OF_REHAB):
-        return 'has_rehab'
+    # Fast-path: if the URL already exists on either side, just mirror it
+    # across so both fields stay in sync. No new doc gets created.
+    existing = opp_cf.get(OF_REHAB) or cfields.get(CF_REHAB)
+    if existing:
+        wrote = False
+        if not cfields.get(CF_REHAB):
+            try:
+                requests.put(f'https://services.leadconnectorhq.com/contacts/{cid}',
+                             headers=GHL_H,
+                             json={'customFields': [{'id': CF_REHAB, 'field_value': existing}]})
+                wrote = True
+            except Exception as e:
+                print(f'    rehab url contact-mirror failed: {e}')
+        if not opp_cf.get(OF_REHAB):
+            try:
+                requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
+                             headers=GHL_H,
+                             json={'customFields': [{'id': OF_REHAB, 'field_value': existing}]})
+                wrote = True
+            except Exception as e:
+                print(f'    rehab url opp-mirror failed: {e}')
+        return 'mirrored' if wrote else 'has_rehab'
+
     if not google_svc:
         return 'no_google'
 
@@ -1170,6 +1195,9 @@ def backfill_rehab_report(cid, oid, contact, cfields, opp_cf, google_svc):
         requests.put(f'https://services.leadconnectorhq.com/opportunities/{oid}',
                      headers=GHL_H,
                      json={'customFields': [{'id': OF_REHAB, 'field_value': doc_url}]})
+        requests.put(f'https://services.leadconnectorhq.com/contacts/{cid}',
+                     headers=GHL_H,
+                     json={'customFields': [{'id': CF_REHAB, 'field_value': doc_url}]})
     except Exception as e:
         print(f'    rehab url write failed: {e}')
         return 'write_failed'
@@ -1301,9 +1329,9 @@ def _main_inner():
     # Free (Google Docs API quota only — no Apify / Claude cost). Capped at
     # 10/run so we don't bottleneck behind Google Drive copy operations.
     REHAB_CAP = int(os.environ.get('REHAB_BACKFILL_CAP', '10'))
-    rh_ok = rh_skip = rh_fail = 0
+    rh_ok = rh_mirrored = rh_skip = rh_fail = 0
     rh_attempts = 0
-    print(f'\n[Rehab Backfill] generating reports for active deals missing one (cap={REHAB_CAP}/run)')
+    print(f'\n[Rehab Backfill] generating + mirroring rehab links to GHL contact + opp fields (cap={REHAB_CAP}/run)')
 
     if not google_svc:
         print('  → Google not configured; skipping rehab backfill.')
@@ -1319,13 +1347,17 @@ def _main_inner():
                 contact = r.json().get('contact', {})
                 cfields = {f['id']: (f.get('value') or '') for f in contact.get('customFields', [])}
                 opp_cf = get_opp_fields(oid)
-                if opp_cf.get(OF_REHAB):
+                # Skip ONLY if both fields are already populated; otherwise we
+                # may need to mirror.
+                if opp_cf.get(OF_REHAB) and cfields.get(CF_REHAB):
                     rh_skip += 1
                     continue
                 rh_attempts += 1
                 r = backfill_rehab_report(cid, oid, contact, cfields, opp_cf, google_svc)
                 if r == 'ok':
                     rh_ok += 1
+                elif r == 'mirrored':
+                    rh_mirrored += 1
                 elif r in ('create_failed', 'write_failed'):
                     rh_fail += 1
                 time.sleep(0.5)
@@ -1334,7 +1366,8 @@ def _main_inner():
                 rh_fail += 1
                 continue
 
-    print(f'[Rehab Backfill] {rh_ok} created | {rh_skip} already had | {rh_fail} failed | attempts={rh_attempts}')
+    print(f'[Rehab Backfill] {rh_ok} created | {rh_mirrored} mirrored to missing field | '
+          f'{rh_skip} fully populated | {rh_fail} failed | attempts={rh_attempts}')
 
     return ok, fail, skipped, synced
 
