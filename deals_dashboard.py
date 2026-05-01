@@ -282,19 +282,36 @@ HTML = """<!doctype html>
 <title>APG ACQ — Deals Dashboard</title>
 <style>
 :root {
-  --bg: #FBF8F0;
-  --paper: #FFFCF4;
-  --ink: #1A2840;
-  --ink-soft: #455066;
-  --ink-mute: #6B7591;
-  --gold: #FFC72C;
-  --gold-deep: #C99500;
-  --gold-soft: #FFF6CC;
-  --rule: rgba(26,40,64,0.12);
-  --rule-strong: rgba(26,40,64,0.22);
-  --green: #2F7D5B;
-  --hot:   #C5443A;
-  --warm:  #B57A1A;
+  --ink: #0A1F44;
+  --ink-deep: #061331;
+  --ink-soft: #1A3A7A;
+  --gold: #F5C518;
+  --gold-soft: #FFE58A;
+  --gold-wash: #FFF6D0;
+  --cream: #FAF7EC;
+  --cream-deep: #F3EED8;
+  --paper: #FFFFFF;
+  --rule: #C9C2A8;
+  --rule-soft: #E5E0C8;
+  --muted: #5A6786;
+  --muted-soft: #8A93AA;
+  --text: #101827;
+  --s-uc:   #B91C1C;
+  --s-live: #10B981;
+  --s-warm: #EA580C;
+  --s-hold: #EAB308;
+  --s-dead: #6B625A;
+  /* legacy aliases — keep older selectors working */
+  --bg: var(--cream);
+  --paper-border: var(--rule);
+  --panel: var(--paper);
+  --panel-border: var(--rule);
+  --ink-mute: var(--muted);
+  --gold-deep: var(--ink);
+  --rule-strong: var(--ink);
+  --green: var(--s-live);
+  --hot:   var(--s-uc);
+  --warm:  var(--s-warm);
 }
 * { box-sizing: border-box; }
 body {
@@ -339,14 +356,14 @@ body {
 /* ── Document header ─────────────────────── */
 .doc-header { padding: 28px 0 24px; }
 .doc-header h1 {
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-family: Georgia, "Times New Roman", serif;
   font-weight: 600;
   font-size: 48px; line-height: 1.05; letter-spacing: -0.01em;
   margin: 0 0 12px; color: var(--ink);
 }
 .doc-header h1 .accent { font-style: italic; color: var(--gold-deep); }
 .doc-header .lede {
-  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
+  font-family: Georgia, "Times New Roman", serif; font-style: italic;
   font-size: 16px; color: var(--ink-soft); max-width: 640px; margin: 0;
 }
 .doc-header hr { border: 0; border-top: 1px solid var(--rule); margin: 28px 0 0; }
@@ -361,7 +378,7 @@ body {
   font-family: ui-monospace, "SF Mono", monospace;
 }
 .sec h2 {
-  font-family: "Iowan Old Style", Georgia, serif; font-weight: 600;
+  font-family: Georgia, "Times New Roman", serif; font-weight: 600;
   font-size: 24px; letter-spacing: -0.005em; margin: 0; color: var(--ink);
 }
 .sec .count { font-size: 13px; color: var(--ink-mute); font-weight: 500; }
@@ -383,7 +400,7 @@ body {
   text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px;
 }
 .stat .v {
-  font-family: "Iowan Old Style", Georgia, serif;
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 30px; font-weight: 600; color: var(--ink); line-height: 1.05;
 }
 .stat .sub { font-size: 12px; color: var(--ink-soft); margin-top: 6px; line-height: 1.4; }
@@ -439,7 +456,7 @@ body {
   text-transform: uppercase; color: var(--ink-mute);
 }
 .card .addr {
-  font-family: "Iowan Old Style", Georgia, serif;
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 17px; font-weight: 600; line-height: 1.25; margin: 4px 0 6px;
   color: var(--ink);
 }
@@ -485,7 +502,7 @@ body {
   letter-spacing: 0.10em; font-weight: 800;
 }
 .fin-grid .fin .val {
-  font-family: "Iowan Old Style", Georgia, serif;
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.1;
 }
 .fin-grid .fin .val.positive { color: var(--green); }
@@ -499,7 +516,7 @@ body {
   letter-spacing: 0.10em; font-weight: 800;
 }
 .rating {
-  font-family: "Iowan Old Style", Georgia, serif;
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 16px; font-weight: 700; padding: 3px 10px; border-radius: 3px;
   display: inline-block;
 }
@@ -508,7 +525,7 @@ body {
 .rating.hot   { background: rgba(197,68,58,0.15); color: var(--hot); }
 .rating.gray  { background: rgba(26,40,64,0.08);  color: var(--ink-mute); }
 .rating-row .summary {
-  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
+  font-family: Georgia, "Times New Roman", serif; font-style: italic;
   font-size: 13px; color: var(--ink-soft); flex: 1; line-height: 1.5;
   border-left: 2px solid var(--rule); padding-left: 10px;
 }
@@ -593,33 +610,79 @@ a:hover { color: var(--ink); }
 /* Smooth section reveal (set via JS-applied stagger) */
 .bucket, .stat, .card { animation-fill-mode: backwards; }
 
+
+/* ── MEETING-BRIEF MASTHEAD ────────────────────────── */
+body { background: var(--cream); color: var(--text); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+.container, .shell { max-width: 1240px; margin: 0 auto; padding: 40px 64px 120px; background: var(--paper); min-height: 100vh; }
+@media (max-width: 820px) { .container, .shell { padding: 32px 24px 80px; } }
+.masthead {
+  border-top: 5px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 28px 0 24px; margin-bottom: 24px; position: relative;
+}
+.masthead::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: 160px; height: 5px; background: var(--gold);
+}
+.brandrow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+}
+.brand { color: var(--ink); font-weight: 700; }
+.masthead h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 54px; line-height: 1.04; letter-spacing: -0.015em;
+  margin: 0 0 14px; color: var(--ink); font-weight: 700;
+}
+.masthead h1 .accent { color: var(--gold); font-style: italic; }
+.masthead .dek {
+  font-family: Georgia, serif; font-style: italic; font-size: 18px;
+  line-height: 1.5; color: var(--ink-soft); max-width: 780px; margin: 10px 0 0;
+}
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 236, 0.96); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 -64px 28px; padding: 10px 64px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  display: flex; gap: 18px; overflow-x: auto; white-space: nowrap;
+  align-items: center;
+}
+@media (max-width: 820px) { .topnav { margin: 0 -24px 24px; padding: 10px 24px; } }
+.topnav a {
+  color: var(--ink-soft); text-decoration: none; font-weight: 700; padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+.topnav a:hover, .topnav a.active { color: var(--ink); border-bottom: 2px solid var(--gold); }
+section h2, h2 {
+  font-family: Georgia, serif; font-size: 26px; color: var(--ink);
+  border-bottom: 2px solid var(--ink); padding-bottom: 10px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  letter-spacing: -0.01em;
+}
+
 </style>
 </head>
 <body>
 <div class="container">
 
-  <div class="meta-bar">
-    <div>APG · ACQ Operating Layer · Deals</div>
-    <div>Last updated __TIMESTAMP__</div>
-  </div>
-
-  <div class="logo-row">
-    <img class="logo-svg" src="logo.png"
-         onerror="this.onerror=null; this.src='logo.svg';"
-         alt="Atom Property Group" />
-    <div class="nav">
-      <a href="index.html">Follow-Ups</a>
-      <a href="deals.html" class="active">Deals</a>
-      <a href="weekly.html">Weekly</a>
-      <a href="about.html">About</a>
+  <header class="masthead">
+    <div class="brandrow">
+      <span class="brand">Atom Property Group · ACQ Operations</span>
+      <span>Last updated __TIMESTAMP__</span>
     </div>
-  </div>
-
-  <header class="doc-header">
-    <h1>Active <span class="accent">Deals</span></h1>
-    <p class="lede">Every property currently in stages 1-4 of the ACQ pipeline. Sorted by call rating within each stage so the strongest deals surface first. Use the filter bar to narrow.</p>
-    <hr>
+    <h1>Active <span class="accent">Deals.</span></h1>
+    <p class="dek">Every property currently in stages 1-7 of the ACQ pipeline. Sorted by call rating within each stage so the strongest deals surface first.</p>
   </header>
+
+  <nav class="topnav">
+    <a href="index.html">Follow-Ups</a>
+    <a href="deals.html" class="active">Deals</a>
+    <a href="weekly.html">Weekly</a>
+    <a href="about.html">About</a>
+  </nav>
 
   <section class="sec">
     <div class="tag-row"><span class="num">01</span><h2>At a Glance</h2></div>
