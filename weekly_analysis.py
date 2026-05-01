@@ -372,7 +372,11 @@ def categorize(curr, prev_map, week_start_iso, slack_mention_count, recent_notes
     contact_updated = curr.get('contact_updated_at') or ''
     opp_update_week  = bool(last_updated and last_updated >= week_start_iso)
     contact_update_week = bool(contact_updated and contact_updated >= week_start_iso)
-    had_activity = sms_this_week or reply_this_week or slack_this_week or notes_this_week
+    # Only count REAL outreach signals: SMS we sent, reply we got, Slack
+    # mention. Notes aren't included — too many auto-generated entries from
+    # other GHL workflows / team members were creeping in. Slack mention
+    # already gives us 'team paid attention' coverage anyway.
+    had_activity = sms_this_week or reply_this_week or slack_this_week
 
     # Movement bucket
     if not prev:
