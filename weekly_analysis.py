@@ -1544,7 +1544,7 @@ def main():
     print(f'\n[Week {week}] {range_label}')
     print(f'  Total pipeline: {totals["total_pipeline"]}  |  Active this week: {totals["active_this_week"]}')
     print(f'  Advanced: {totals["advanced"]} | Demoted: {totals["demoted"]} | New: {totals["new"]}')
-    print(f'  Stagnant active: {totals["stagnant_active"]} | Stagnant cold: {totals["stagnant_inactive"]}')
+    print(f'  Active no stage move: {totals["active_no_move"]} | Quiet: {totals["quiet"]}')
     print(f'  Ready contract: {totals["ready_contract"]} | Ready MAO: {totals["ready_mao"]} | Drop suggest: {totals["drop_suggest"]}')
 
 
