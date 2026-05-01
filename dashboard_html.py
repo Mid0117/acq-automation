@@ -257,311 +257,396 @@ HTML_TEMPLATE = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>APG ACQ Dashboard</title>
+<title>APG ACQ — Follow-Ups Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg: #0b0d12;
-  --panel: rgba(255,255,255,0.04);
-  --panel-border: rgba(255,255,255,0.08);
-  --text: #e6e8ee;
-  --text-dim: #8b93a7;
-  --accent: #6366f1;
-  --accent2: #06b6d4;
-  --hot: #ef4444;
-  --warm: #f59e0b;
-  --green: #10b981;
-  --gray: #475569;
+  --bg: #FBF8F0;
+  --paper: #FFFCF4;
+  --ink: #1A2840;
+  --ink-soft: #455066;
+  --ink-mute: #6B7591;
+  --gold: #E8C547;
+  --gold-deep: #C9A52A;
+  --gold-soft: #FFF6D6;
+  --rule: rgba(26,40,64,0.12);
+  --rule-strong: rgba(26,40,64,0.22);
+  --green: #2F7D5B;
+  --hot:   #C5443A;
+  --warm:  #B57A1A;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0; padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: radial-gradient(1200px 800px at 20% -10%, rgba(99,102,241,.15), transparent 60%),
-              radial-gradient(1000px 600px at 100% 100%, rgba(6,182,212,.12), transparent 60%),
-              var(--bg);
-  color: var(--text);
-  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
-.container { max-width: 1400px; margin: 0 auto; padding: 32px 24px 80px; }
-header {
-  display: flex; justify-content: space-between; align-items: end;
-  margin-bottom: 32px; flex-wrap: wrap; gap: 12px;
+.container { max-width: 1200px; margin: 0 auto; padding: 28px 36px 80px; }
+
+/* ── Top meta ─────────────────────────────────── */
+.meta-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 4px solid var(--ink); padding: 14px 0 0;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-soft);
 }
-h1 {
-  font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
-  margin: 0; background: linear-gradient(90deg, #fff, #94a3b8);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+
+/* ── Logo + nav row ───────────────────────────── */
+.logo-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin: 24px 0 12px; flex-wrap: wrap;
 }
-.subtitle { color: var(--text-dim); font-size: 13px; margin-top: 6px; }
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
+.logo-svg { width: 200px; height: auto; }
+.logo-svg .atom-orbit { stroke: var(--gold-deep); stroke-width: 2.6; fill: none; }
+.logo-svg .atom-core  { fill: var(--gold-deep); }
+.logo-svg .brand-main { fill: var(--ink); }
+.logo-svg .brand-sub  { fill: var(--ink-soft); letter-spacing: 4px; }
+.nav { display: flex; gap: 6px; }
+.nav a {
+  padding: 6px 12px; border-radius: 3px;
+  background: transparent; border: 1px solid var(--rule);
+  color: var(--ink-soft); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+  transition: all .12s;
 }
-.kpi {
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  backdrop-filter: blur(20px);
-  border-radius: 16px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
+.nav a:hover { color: var(--ink); border-color: var(--ink); }
+.nav a.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
+
+/* ── Document header ──────────────────────────── */
+.doc-header { padding: 28px 0 24px; }
+.doc-header h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-weight: 600;
+  font-size: 48px; line-height: 1.05; letter-spacing: -0.01em;
+  margin: 0 0 12px; color: var(--ink);
 }
-.kpi::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), transparent 60%);
-  pointer-events: none;
+.doc-header h1 .accent { font-style: italic; color: var(--gold-deep); }
+.doc-header .lede {
+  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
+  font-size: 16px; color: var(--ink-soft); max-width: 640px; margin: 0;
 }
-.kpi .label {
-  font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;
-  margin-bottom: 8px;
+.doc-header hr { border: 0; border-top: 1px solid var(--rule); margin: 28px 0 0; }
+
+/* ── Numbered section headers ─────────────────── */
+.sec { margin: 44px 0 18px; }
+.sec .tag-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.sec .num {
+  display: inline-block; background: var(--gold); color: var(--ink);
+  font-weight: 800; font-size: 12px; letter-spacing: 0.04em;
+  padding: 3px 8px; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", monospace;
 }
-.kpi .value { font-size: 32px; font-weight: 700; line-height: 1; }
-.kpi .sub { color: var(--text-dim); font-size: 12px; margin-top: 6px; }
-.kpi.hot .value { color: var(--hot); }
-.kpi.warm .value { color: var(--warm); }
-.kpi.green .value { color: var(--green); }
+.sec h2 {
+  font-family: "Iowan Old Style", Georgia, serif; font-weight: 600;
+  font-size: 24px; letter-spacing: -0.005em; margin: 0; color: var(--ink);
+}
+.sec hr { border: 0; border-top: 1px solid var(--rule); margin: 0 0 16px; }
+
+/* ── Status banners (kill switch + failure) ───── */
+.status-banner {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  padding: 14px 18px; border-radius: 4px; margin-bottom: 12px;
+  background: var(--paper); border: 1px solid var(--rule); gap: 12px;
+}
+.status-banner.on  { border-left: 3px solid var(--green); }
+.status-banner.off { border-left: 3px solid var(--hot); background: rgba(197,68,58,0.05); }
+.status-banner.failure {
+  border: 1px solid rgba(197,68,58,0.40); border-left: 3px solid var(--hot);
+  background: rgba(197,68,58,0.06);
+}
+.status-banner .status-text {
+  font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 10px;
+  color: var(--ink);
+}
+.status-banner.failure .status-text { color: var(--hot); }
+.status-banner .pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green); animation: pulse 2s infinite;
+}
+.status-banner.off .pulse { background: var(--hot); animation: none; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.btn {
+  display: inline-block; padding: 7px 14px; border-radius: 3px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
+  text-transform: uppercase; text-decoration: none; transition: all 0.15s;
+}
+.btn-kill { background: var(--hot); color: var(--paper); }
+.btn-kill:hover { background: #A93730; }
+.btn-edit { background: var(--ink); color: var(--gold); border: 1px solid var(--ink); }
+.btn-edit:hover { background: var(--gold-deep); color: var(--ink); }
+
+/* ── Run status grid ──────────────────────────── */
+.run-grid {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 12px 16px; background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 4px;
+  margin-bottom: 12px; font-size: 12px;
+}
+.run-grid-collapsed summary {
+  cursor: pointer; padding: 10px 16px; color: var(--ink-soft);
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 4px; font-size: 12px; margin-bottom: 12px;
+  font-weight: 700; letter-spacing: 0.04em;
+}
+.run-row { display: grid; grid-template-columns: 80px 160px 160px 1fr; gap: 12px; align-items: center; }
+.run-row .run-name { color: var(--ink); font-weight: 700; }
+.run-row .run-ts { color: var(--ink-mute); font-size: 11px; }
+.run-row .run-detail { color: var(--ink-mute); font-family: monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── KPI / Stat blocks ────────────────────────── */
+.stat-row {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin-top: 14px;
+}
+.stat {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 3px solid var(--gold);
+  border-radius: 3px; padding: 16px 18px;
+}
+.stat .lab {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px;
+}
+.stat .v {
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 32px; font-weight: 600; color: var(--ink); line-height: 1.05;
+}
+.stat .sub { font-size: 12px; color: var(--ink-soft); margin-top: 6px; line-height: 1.4; }
+.stat.green { border-top-color: var(--green); }
+.stat.green .v { color: var(--green); }
+.stat.hot { border-top-color: var(--hot); }
+.stat.hot .v { color: var(--hot); }
+.stat.warm { border-top-color: var(--warm); }
+.stat.warm .v { color: var(--warm); }
+
+/* ── Charts ───────────────────────────────────── */
 .charts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 32px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;
 }
 @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
 .chart-card {
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 16px;
-  padding: 24px;
-  height: 320px;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 18px; height: 320px;
 }
 .chart-card h3 {
-  margin: 0 0 16px; font-size: 14px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim);
+  margin: 0 0 14px; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; color: var(--ink-mute); text-transform: uppercase;
 }
 .chart-card canvas { max-height: 240px; }
-section { margin-bottom: 32px; }
-.section-title {
-  font-size: 18px; font-weight: 600; margin: 0 0 16px;
-  display: flex; align-items: center; gap: 10px;
-}
-.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-.dot.hot { background: var(--hot); box-shadow: 0 0 12px var(--hot); }
-.dot.warm { background: var(--warm); }
-.dot.green { background: var(--green); }
-.dot.gray { background: var(--gray); }
+
+/* ── Tables ───────────────────────────────────── */
 .lead-table {
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 16px;
-  overflow: hidden;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 4px; overflow: hidden;
 }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { text-align: left; padding: 14px 16px; background: rgba(255,255,255,0.02);
-     font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
-     color: var(--text-dim); font-weight: 600; }
-td { padding: 14px 16px; border-top: 1px solid var(--panel-border); }
-tr:hover td { background: rgba(255,255,255,0.02); }
+th { text-align: left; padding: 12px 16px;
+     background: var(--gold-soft); color: var(--ink);
+     font-size: 11px; text-transform: uppercase;
+     letter-spacing: 0.06em; font-weight: 800; }
+td { padding: 12px 16px; border-top: 1px solid var(--rule); color: var(--ink); }
+tr:hover td { background: rgba(232,197,71,0.05); }
 .tag {
-  display: inline-block; padding: 3px 8px; font-size: 11px; border-radius: 4px;
-  background: rgba(255,255,255,0.06); color: var(--text-dim); margin-right: 4px;
+  display: inline-block; padding: 2px 7px; font-size: 11px; font-weight: 700;
+  border-radius: 3px; background: var(--gold-soft); color: var(--ink);
+  letter-spacing: 0.04em;
 }
-.tag.hot { background: rgba(239,68,68,0.15); color: var(--hot); }
-.tag.warm { background: rgba(245,158,11,0.15); color: var(--warm); }
-.tag.green { background: rgba(16,185,129,0.15); color: var(--green); }
-.tag.gray { background: rgba(71,85,105,0.2); color: #94a3b8; }
-.search { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04);
-          border: 1px solid var(--panel-border); border-radius: 10px;
-          color: var(--text); font-size: 14px; margin-bottom: 16px; }
-.search:focus { outline: none; border-color: var(--accent); }
-.empty { text-align: center; color: var(--text-dim); padding: 40px; }
-.status-banner {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-radius: 12px; margin-bottom: 24px;
-  background: var(--panel); border: 1px solid var(--panel-border);
+.tag.hot   { background: rgba(197,68,58,0.15); color: var(--hot); }
+.tag.warm  { background: rgba(181,122,26,0.15); color: var(--warm); }
+.tag.green { background: rgba(47,125,91,0.15);  color: var(--green); }
+.tag.gray  { background: rgba(26,40,64,0.08);   color: var(--ink-mute); }
+
+.search {
+  width: 100%; padding: 10px 14px; background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 4px;
+  color: var(--ink); font-size: 14px; margin-bottom: 12px;
 }
-.status-banner.on  { border-color: rgba(16,185,129,0.4); }
-.status-banner.off { border-color: rgba(239,68,68,0.6); background: rgba(239,68,68,0.08); }
-.status-banner .status-text { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-.status-banner .pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); animation: pulse 2s infinite; }
-.status-banner.off .pulse { background: var(--hot); box-shadow: 0 0 12px var(--hot); animation: none; }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-.btn { display: inline-block; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.15s; }
-.btn-kill { background: var(--hot); color: white; }
-.btn-kill:hover { background: #dc2626; }
-.btn-edit { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
-.btn-edit:hover { background: rgba(99,102,241,0.3); }
+.search:focus { outline: none; border-color: var(--gold-deep); }
+.empty { text-align: center; color: var(--ink-mute); padding: 40px; font-style: italic; }
+
+/* ── Section dot indicators ───────────────────── */
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.dot.hot   { background: var(--hot); }
+.dot.warm  { background: var(--warm); }
+.dot.green { background: var(--green); }
+.dot.gray  { background: var(--ink-mute); }
+
+/* ── Templates editor ─────────────────────────── */
 .template-grid {
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 12px; padding: 4px 16px;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 4px 16px;
 }
 .template-row {
   display: grid; grid-template-columns: 110px 40px 1fr; gap: 12px;
-  padding: 10px 0; border-bottom: 1px solid var(--panel-border);
+  padding: 10px 0; border-bottom: 1px solid var(--rule);
   align-items: start; font-size: 13px;
 }
 .template-row:last-child { border-bottom: none; }
-.template-row .stage { color: var(--accent); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em; padding-top: 2px; }
-.template-row .num { color: var(--text-dim); text-align: center; padding-top: 2px; }
-.template-row .msg { color: var(--text); line-height: 1.5; }
-.nav { display: flex; gap: 8px; margin-bottom: 24px; }
-.nav a {
-  padding: 10px 18px; border-radius: 10px; background: var(--panel);
-  border: 1px solid var(--panel-border); color: var(--text-dim);
-  font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s;
+.template-row .stage {
+  color: var(--gold-deep); font-weight: 700;
+  text-transform: uppercase; font-size: 11px;
+  letter-spacing: 0.06em; padding-top: 2px;
 }
-.nav a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
-.nav a.active {
-  color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-color: transparent;
+.template-row .num { color: var(--ink-mute); text-align: center; padding-top: 2px; font-family: ui-monospace, monospace; }
+.template-row .msg { color: var(--ink); line-height: 1.5; }
+
+.help-line { color: var(--ink-soft); font-size: 13px; margin-bottom: 12px; }
+.help-line strong { color: var(--ink); font-weight: 700; }
+
+footer {
+  color: var(--ink-mute); font-size: 11px; text-align: center;
+  margin-top: 64px; padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  letter-spacing: 0.04em;
 }
-.status-banner.failure {
-  background: rgba(239,68,68,0.10);
-  border: 1px solid rgba(239,68,68,0.40);
-  color: #fff;
-}
-.status-banner.failure .status-text { color: #fecaca; }
-.run-grid {
-  display: flex; flex-direction: column; gap: 6px;
-  margin: 0 0 16px;
-  padding: 12px 16px;
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  font-size: 13px;
-}
-.run-grid-collapsed summary {
-  cursor: pointer; padding: 10px 16px; color: var(--text-dim);
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 12px; font-size: 13px; margin-bottom: 16px;
-}
-.run-row { display: grid; grid-template-columns: 80px 140px 160px 1fr; gap: 12px; align-items: center; }
-.run-row .run-name { color: var(--text); font-weight: 500; }
-.run-row .run-ts { color: var(--text-dim); font-size: 12px; }
-.run-row .run-detail { color: var(--text-dim); font-family: monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top: 40px; }
+a { color: var(--gold-deep); }
+a:hover { color: var(--ink); }
 </style>
 </head>
 <body>
 <div class="container">
-  <header>
-    <div>
-      <h1>APG ACQ — SMS Follow-Up Dashboard</h1>
-      <div class="subtitle">Last updated: __TIMESTAMP__ (Eastern Time)</div>
-    </div>
-  </header>
 
-  <div class="nav">
-    <a href="index.html" class="active">Follow-Ups</a>
-    <a href="deals.html">Deals</a>
-    <a href="about.html">About</a>
+  <div class="meta-bar">
+    <div>APG · ACQ Operating Layer · Follow-Ups</div>
+    <div>Last updated __TIMESTAMP__ ET</div>
   </div>
+
+  <div class="logo-row">
+    <svg class="logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" aria-label="Atom Property Group">
+      <text x="50" y="70" font-family="Arial Black, Helvetica, sans-serif"
+            font-weight="900" font-size="64" class="brand-main">AT</text>
+      <g transform="translate(166, 40)">
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" />
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(60 28 28)" />
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(-60 28 28)" />
+        <circle  class="atom-core"  cx="28" cy="28" r="5" />
+      </g>
+      <text x="232" y="70" font-family="Arial Black, Helvetica, sans-serif"
+            font-weight="900" font-size="64" class="brand-main">M</text>
+      <text x="50" y="108" font-family="Arial, Helvetica, sans-serif"
+            font-weight="700" font-size="14" class="brand-sub">PROPERTY GROUP</text>
+    </svg>
+    <div class="nav">
+      <a href="index.html" class="active">Follow-Ups</a>
+      <a href="deals.html">Deals</a>
+      <a href="about.html">About</a>
+    </div>
+  </div>
+
+  <header class="doc-header">
+    <h1>SMS <span class="accent">Follow-Ups</span></h1>
+    <p class="lede">Action queue for Jeff and Mike. Replies that need a callback, leads that went dormant, and everything still cycling through the sequence.</p>
+    <hr>
+  </header>
 
   __STATUS_BANNER__
 
-  <div class="kpi-grid">
-    <div class="kpi"><div class="label">Total Leads</div><div class="value">__TOTAL__</div><div class="sub">across all stages</div></div>
-    <div class="kpi"><div class="label">In Sequence</div><div class="value">__ACTIVE__</div><div class="sub">SMS scheduled</div></div>
-    <div class="kpi hot"><div class="label">Replied — Call Now</div><div class="value">__REPLIED__</div><div class="sub">Jeff has tasks</div></div>
-    <div class="kpi warm"><div class="label">Dormant — Manual Call</div><div class="value">__DORMANT__</div><div class="sub">no reply after sequence</div></div>
-    <div class="kpi green"><div class="label">Reply Rate</div><div class="value">__RATE__%</div><div class="sub">replied / total touched</div></div>
-  </div>
+  <section class="sec">
+    <div class="tag-row"><span class="num">01</span><h2>At a Glance</h2></div>
+    <hr>
+    <div class="stat-row">
+      <div class="stat"><div class="lab">Total Leads</div><div class="v">__TOTAL__</div><div class="sub">across all stages</div></div>
+      <div class="stat"><div class="lab">In Sequence</div><div class="v">__ACTIVE__</div><div class="sub">SMS scheduled</div></div>
+      <div class="stat hot"><div class="lab">Replied — Call Now</div><div class="v">__REPLIED__</div><div class="sub">Jeff has tasks</div></div>
+      <div class="stat warm"><div class="lab">Dormant — Manual Call</div><div class="v">__DORMANT__</div><div class="sub">no reply after sequence</div></div>
+      <div class="stat green"><div class="lab">Reply Rate</div><div class="v">__RATE__%</div><div class="sub">replied / total touched</div></div>
+    </div>
+  </section>
 
-  <div class="charts-grid">
-    <div class="chart-card">
-      <h3>Leads by Stage</h3>
-      <canvas id="stageChart"></canvas>
+  <section class="sec">
+    <div class="tag-row"><span class="num">02</span><h2>Visual Breakdown</h2></div>
+    <hr>
+    <div class="charts-grid">
+      <div class="chart-card"><h3>Leads by Stage</h3><canvas id="stageChart"></canvas></div>
+      <div class="chart-card"><h3>Leads by State</h3><canvas id="stateChart"></canvas></div>
     </div>
-    <div class="chart-card">
-      <h3>Leads by State</h3>
-      <canvas id="stateChart"></canvas>
+    <div class="charts-grid">
+      <div class="chart-card"><h3>SMS Progress</h3><canvas id="progressChart"></canvas></div>
+      <div class="chart-card"><h3>From Numbers — Sends</h3><canvas id="numberChart"></canvas></div>
     </div>
-  </div>
+  </section>
 
-  <div class="charts-grid">
-    <div class="chart-card">
-      <h3>SMS Progress</h3>
-      <canvas id="progressChart"></canvas>
-    </div>
-    <div class="chart-card">
-      <h3>From Numbers — Sends</h3>
-      <canvas id="numberChart"></canvas>
-    </div>
-  </div>
-
-  <section>
-    <h2 class="section-title"><span class="dot hot"></span> Replied (Action Needed)</h2>
+  <section class="sec">
+    <div class="tag-row"><span class="num">03</span><h2><span class="dot hot"></span>Replied — Action Needed</h2></div>
+    <hr>
     <div class="lead-table">__REPLIED_TABLE__</div>
   </section>
 
-  <section>
-    <h2 class="section-title"><span class="dot warm"></span> Dormant (Manual Call Needed)</h2>
+  <section class="sec">
+    <div class="tag-row"><span class="num">04</span><h2><span class="dot warm"></span>Dormant — Manual Call Needed</h2></div>
+    <hr>
     <div class="lead-table">__DORMANT_TABLE__</div>
   </section>
 
-  <section>
-    <h2 class="section-title"><span class="dot green"></span> Active in Sequence</h2>
+  <section class="sec">
+    <div class="tag-row"><span class="num">05</span><h2><span class="dot green"></span>Active in Sequence</h2></div>
+    <hr>
     <input type="text" class="search" id="searchActive" placeholder="Search by name, address, state...">
     <div class="lead-table">__ACTIVE_TABLE__</div>
   </section>
 
-  <section>
-    <h2 class="section-title"><span class="dot hot"></span> Open Tasks (active leads)</h2>
+  <section class="sec">
+    <div class="tag-row"><span class="num">06</span><h2><span class="dot hot"></span>Open Tasks</h2></div>
+    <hr>
     <div class="lead-table">__TASKS_TABLE__</div>
   </section>
 
-  <section>
-    <h2 class="section-title"><span class="dot gray"></span> SMS Templates — Edit Live</h2>
-    <div style="margin-bottom:12px;color:var(--text-dim);font-size:13px;">
+  <section class="sec">
+    <div class="tag-row"><span class="num">07</span><h2><span class="dot gray"></span>SMS Templates — Edit Live</h2></div>
+    <hr>
+    <p class="help-line">
       Click any cell below to edit. Changes save instantly to the sheet and apply on the next 30-min cron run.
-      <strong style="color:#a5b4fc;">You must be signed in to a Google account that has access to the sheet</strong>
+      <strong>You must be signed in to a Google account that has access</strong>
       (mike@atompropertygroup.org / atompropertygroup@gmail.com / jeff@atompropertygroup.org).
       <a class="btn btn-edit" style="float:right;" href="__TEMPLATES_EDIT_URL__" target="_blank">Open in Sheets ↗</a>
-    </div>
+    </p>
     <iframe src="__TEMPLATES_EDIT_URL__"
-            style="width:100%;height:600px;border:1px solid var(--panel-border);border-radius:12px;background:white;"
+            style="width:100%;height:600px;border:1px solid var(--rule);border-radius:4px;background:white;"
             allow="clipboard-read; clipboard-write"></iframe>
     <details style="margin-top:14px;">
-      <summary style="cursor:pointer;color:var(--text-dim);font-size:13px;">Show templates as plain list (read-only)</summary>
+      <summary style="cursor:pointer;color:var(--ink-soft);font-size:13px;font-weight:700;letter-spacing:0.04em;">Show templates as plain list (read-only)</summary>
       <div class="template-grid" style="margin-top:10px;">__TEMPLATES_BLOCK__</div>
     </details>
   </section>
 
-  <footer>Auto-refreshed every 30 minutes by the GitHub Actions cron</footer>
+  <footer>Auto-refreshed every 30 minutes by the GitHub Actions cron · APG ACQ Operating Layer</footer>
 </div>
 
 <script>
-Chart.defaults.color = '#8b93a7';
-Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
-Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+Chart.defaults.color = '#6B7591';
+Chart.defaults.borderColor = 'rgba(26,40,64,0.08)';
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
 
-const palette = ['#6366f1','#06b6d4','#10b981','#f59e0b','#ef4444','#a855f7','#ec4899','#14b8a6'];
+// Editorial cream palette: gold/navy/green/copper — readable on cream bg
+const palette = ['#C9A52A','#1A2840','#2F7D5B','#B57A1A','#C5443A','#6B7591','#8B6914','#3F5275'];
 
 new Chart(document.getElementById('stageChart'), {
   type: 'doughnut',
-  data: { labels: __STAGE_LABELS__, datasets: [{ data: __STAGE_DATA__, backgroundColor: palette, borderWidth: 0 }] },
-  options: { plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } } }, cutout: '65%' }
+  data: { labels: __STAGE_LABELS__, datasets: [{ data: __STAGE_DATA__, backgroundColor: palette, borderWidth: 2, borderColor: '#FFFCF4' }] },
+  options: { plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, color: '#455066' } } }, cutout: '65%' }
 });
 
 new Chart(document.getElementById('stateChart'), {
   type: 'bar',
-  data: { labels: __STATE_LABELS__, datasets: [{ data: __STATE_DATA__, backgroundColor: '#06b6d4', borderRadius: 6 }] },
-  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  data: { labels: __STATE_LABELS__, datasets: [{ data: __STATE_DATA__, backgroundColor: '#C9A52A', borderRadius: 4 }] },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0, color: '#6B7591' }, grid: { color: 'rgba(26,40,64,0.06)' } }, x: { ticks: { color: '#455066' }, grid: { display: false } } } }
 });
 
 new Chart(document.getElementById('progressChart'), {
   type: 'bar',
-  data: { labels: ['0','1','2','3','4','5','6'], datasets: [{ label: 'Contacts', data: __PROGRESS_DATA__, backgroundColor: '#6366f1', borderRadius: 6 }] },
-  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  data: { labels: ['0','1','2','3','4','5','6'], datasets: [{ label: 'Contacts', data: __PROGRESS_DATA__, backgroundColor: '#1A2840', borderRadius: 4 }] },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0, color: '#6B7591' }, grid: { color: 'rgba(26,40,64,0.06)' } }, x: { ticks: { color: '#455066' }, grid: { display: false } } } }
 });
 
 new Chart(document.getElementById('numberChart'), {
   type: 'bar',
-  data: { labels: __NUMBER_LABELS__, datasets: [{ data: __NUMBER_DATA__, backgroundColor: palette, borderRadius: 6 }] },
-  options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } }
+  data: { labels: __NUMBER_LABELS__, datasets: [{ data: __NUMBER_DATA__, backgroundColor: palette, borderRadius: 4 }] },
+  options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0, color: '#6B7591' }, grid: { color: 'rgba(26,40,64,0.06)' } }, y: { ticks: { color: '#455066' }, grid: { display: false } } } }
 });
 
 // Search filter
@@ -727,14 +812,14 @@ def _main_inner():
     if kill_on:
         banner = (
             '<div class="status-banner on">'
-            '<div class="status-text"><span class="pulse"></span>SMS Automation: <span style="color:var(--green)">ACTIVE</span></div>'
+            '<div class="status-text"><span class="pulse"></span>SMS Automation: <span style="color:var(--green);font-weight:800">ACTIVE</span></div>'
             f'<a class="btn btn-kill" href="{sheet_url}#gid=0" target="_blank">EMERGENCY KILL SWITCH</a>'
             '</div>'
         )
     else:
         banner = (
             '<div class="status-banner off">'
-            '<div class="status-text"><span class="pulse"></span>SMS Automation: <span style="color:var(--hot)">HALTED</span> — no messages will be sent</div>'
+            '<div class="status-text"><span class="pulse"></span>SMS Automation: <span style="color:var(--hot);font-weight:800">HALTED</span> — no messages will be sent</div>'
             f'<a class="btn btn-edit" href="{sheet_url}#gid=0" target="_blank">RE-ENABLE</a>'
             '</div>'
         )

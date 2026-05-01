@@ -57,7 +57,6 @@ DEAL_STAGES = {
     STAGE_RR:  '3. Due Diligence',
     STAGE_MAO: '4. MAO',
 }
-# Show Qualified too, but in its own grouping at the bottom
 INCLUDE_QUALIFIED = True
 
 # Contact custom fields
@@ -261,212 +260,339 @@ HTML = """<!doctype html>
 <title>APG ACQ — Deals Dashboard</title>
 <style>
 :root {
-  --bg: #0b0d12;
-  --panel: rgba(255,255,255,0.04);
-  --panel-border: rgba(255,255,255,0.08);
-  --text: #e6e8ee;
-  --text-dim: #8b93a7;
-  --accent: #6366f1;
-  --accent2: #06b6d4;
-  --hot: #ef4444;
-  --warm: #f59e0b;
-  --green: #10b981;
-  --gray: #475569;
+  --bg: #FBF8F0;
+  --paper: #FFFCF4;
+  --ink: #1A2840;
+  --ink-soft: #455066;
+  --ink-mute: #6B7591;
+  --gold: #E8C547;
+  --gold-deep: #C9A52A;
+  --gold-soft: #FFF6D6;
+  --rule: rgba(26,40,64,0.12);
+  --rule-strong: rgba(26,40,64,0.22);
+  --green: #2F7D5B;
+  --hot:   #C5443A;
+  --warm:  #B57A1A;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0; padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: radial-gradient(1200px 800px at 20% -10%, rgba(99,102,241,.15), transparent 60%),
-              radial-gradient(1000px 600px at 100% 100%, rgba(6,182,212,.12), transparent 60%),
-              var(--bg);
-  color: var(--text);
-  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
-.container { max-width: 1500px; margin: 0 auto; padding: 32px 24px 80px; }
-header {
-  display: flex; justify-content: space-between; align-items: end;
-  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
-}
-h1 {
-  font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
-  margin: 0; background: linear-gradient(90deg, #fff, #94a3b8);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.subtitle { color: var(--text-dim); font-size: 13px; margin-top: 6px; }
-.nav { display: flex; gap: 8px; margin-bottom: 24px; }
-.nav a {
-  padding: 10px 18px; border-radius: 10px; background: var(--panel);
-  border: 1px solid var(--panel-border); color: var(--text-dim);
-  font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s;
-}
-.nav a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
-.nav a.active {
-  color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-color: transparent;
-}
-.kpi-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px; margin-bottom: 24px;
-}
-.kpi {
-  background: var(--panel); border: 1px solid var(--panel-border);
-  backdrop-filter: blur(20px); border-radius: 16px; padding: 20px;
-}
-.kpi .label { font-size: 12px; color: var(--text-dim); text-transform: uppercase;
-              letter-spacing: 0.08em; margin-bottom: 8px; }
-.kpi .value { font-size: 28px; font-weight: 700; line-height: 1; }
-.kpi .sub { color: var(--text-dim); font-size: 12px; margin-top: 6px; }
-.kpi.green .value { color: var(--green); }
-.kpi.warm .value { color: var(--warm); }
-.kpi.hot .value { color: var(--hot); }
+.container { max-width: 1300px; margin: 0 auto; padding: 28px 36px 80px; }
 
+/* ── Top meta ────────────────────────────── */
+.meta-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 4px solid var(--ink); padding: 14px 0 0;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-soft);
+}
+
+/* ── Logo + nav row ──────────────────────── */
+.logo-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin: 24px 0 12px; flex-wrap: wrap;
+}
+.logo-svg { width: 200px; height: auto; }
+.logo-svg .atom-orbit { stroke: var(--gold-deep); stroke-width: 2.6; fill: none; }
+.logo-svg .atom-core  { fill: var(--gold-deep); }
+.logo-svg .brand-main { fill: var(--ink); }
+.logo-svg .brand-sub  { fill: var(--ink-soft); letter-spacing: 4px; }
+.nav { display: flex; gap: 6px; }
+.nav a {
+  padding: 6px 12px; border-radius: 3px;
+  background: transparent; border: 1px solid var(--rule);
+  color: var(--ink-soft); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+  transition: all .12s;
+}
+.nav a:hover { color: var(--ink); border-color: var(--ink); }
+.nav a.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
+
+/* ── Document header ─────────────────────── */
+.doc-header { padding: 28px 0 24px; }
+.doc-header h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-weight: 600;
+  font-size: 48px; line-height: 1.05; letter-spacing: -0.01em;
+  margin: 0 0 12px; color: var(--ink);
+}
+.doc-header h1 .accent { font-style: italic; color: var(--gold-deep); }
+.doc-header .lede {
+  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
+  font-size: 16px; color: var(--ink-soft); max-width: 640px; margin: 0;
+}
+.doc-header hr { border: 0; border-top: 1px solid var(--rule); margin: 28px 0 0; }
+
+/* ── Numbered section ─────────────────────── */
+.sec { margin: 36px 0 18px; }
+.sec .tag-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.sec .num {
+  display: inline-block; background: var(--gold); color: var(--ink);
+  font-weight: 800; font-size: 12px; letter-spacing: 0.04em;
+  padding: 3px 8px; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", monospace;
+}
+.sec h2 {
+  font-family: "Iowan Old Style", Georgia, serif; font-weight: 600;
+  font-size: 24px; letter-spacing: -0.005em; margin: 0; color: var(--ink);
+}
+.sec .count { font-size: 13px; color: var(--ink-mute); font-weight: 500; }
+.sec hr { border: 0; border-top: 1px solid var(--rule); margin: 0 0 16px; }
+
+/* ── Stat row (KPIs) ──────────────────────── */
+.stat-row {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin-top: 14px;
+}
+.stat {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 3px solid var(--gold);
+  border-radius: 3px; padding: 16px 18px;
+}
+.stat .lab {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px;
+}
+.stat .v {
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 30px; font-weight: 600; color: var(--ink); line-height: 1.05;
+}
+.stat .sub { font-size: 12px; color: var(--ink-soft); margin-top: 6px; line-height: 1.4; }
+.stat.green { border-top-color: var(--green); }
+.stat.green .v { color: var(--green); }
+.stat.hot { border-top-color: var(--hot); }
+.stat.hot .v { color: var(--hot); }
+.stat.warm { border-top-color: var(--warm); }
+.stat.warm .v { color: var(--warm); }
+
+/* ── Filter bar ─────────────────────────── */
 .filter-bar {
   display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
-  margin-bottom: 20px;
-  padding: 12px 16px; background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 12px;
+  margin-bottom: 16px; padding: 10px 14px;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px;
 }
 .filter-bar input[type=text] {
   flex: 1; min-width: 220px;
-  padding: 8px 12px; background: rgba(255,255,255,0.04);
-  border: 1px solid var(--panel-border); border-radius: 8px;
-  color: var(--text); font-size: 13px;
+  padding: 8px 12px; background: var(--bg);
+  border: 1px solid var(--rule); border-radius: 3px;
+  color: var(--ink); font-size: 13px;
 }
-.filter-bar input[type=text]:focus { outline: none; border-color: var(--accent); }
+.filter-bar input[type=text]:focus { outline: none; border-color: var(--gold-deep); }
 .filter-chip {
-  padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.04);
-  border: 1px solid var(--panel-border); color: var(--text-dim);
-  font-size: 12px; font-weight: 500; cursor: pointer; user-select: none;
+  padding: 6px 12px; border-radius: 3px;
+  background: transparent; border: 1px solid var(--rule);
+  color: var(--ink-soft); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  cursor: pointer; user-select: none; transition: all .12s;
 }
-.filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.filter-chip:hover { color: var(--ink); border-color: var(--ink); }
+.filter-chip.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
 
+/* ── Card grid ──────────────────────────── */
 .grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 .card {
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 16px; padding: 20px; display: flex; flex-direction: column;
-  position: relative; overflow: hidden;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 3px solid var(--gold);
+  border-radius: 3px; padding: 18px;
+  display: flex; flex-direction: column;
 }
+.card.stage-mao        { border-top-color: var(--green); }
+.card.stage-rr         { border-top-color: var(--gold-deep); }
+.card.stage-lao        { border-top-color: var(--warm); }
+.card.stage-qualified  { border-top-color: var(--ink-soft); }
+
 .card .top { display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 12px; }
-.card .name { font-size: 13px; color: var(--text-dim); font-weight: 500; }
-.card .addr { font-size: 16px; font-weight: 600; line-height: 1.3; margin: 4px 0 6px; }
-.card .place { font-size: 12px; color: var(--text-dim); }
-.card .stage-pill {
-  font-size: 11px; padding: 4px 10px; border-radius: 999px; font-weight: 600;
-  white-space: nowrap; letter-spacing: 0.04em;
+.card .name {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-mute);
 }
-.stage-qualified { background: rgba(99,102,241,0.15); color: #a5b4fc; }
-.stage-lao       { background: rgba(6,182,212,0.15); color: #67e8f9; }
-.stage-rr        { background: rgba(245,158,11,0.15); color: #fcd34d; }
-.stage-mao       { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+.card .addr {
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 17px; font-weight: 600; line-height: 1.25; margin: 4px 0 6px;
+  color: var(--ink);
+}
+.card .place { font-size: 12px; color: var(--ink-soft); }
+.card .stage-pill {
+  font-size: 10px; padding: 3px 8px; border-radius: 3px; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  font-family: ui-monospace, monospace;
+}
+.stage-pill.stage-qualified { background: var(--gold-soft); color: var(--ink); }
+.stage-pill.stage-lao       { background: rgba(181,122,26,0.15); color: var(--warm); }
+.stage-pill.stage-rr        { background: rgba(201,165,42,0.18); color: var(--gold-deep); }
+.stage-pill.stage-mao       { background: rgba(47,125,91,0.15); color: var(--green); }
 
 .card .pillrow { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .pill {
-  font-size: 11px; padding: 3px 8px; border-radius: 6px;
-  background: rgba(255,255,255,0.06); color: var(--text-dim);
+  font-size: 10px; padding: 2px 7px; border-radius: 3px;
+  background: var(--gold-soft); color: var(--ink);
+  font-weight: 700; letter-spacing: 0.04em;
 }
-.pill.temp.hot   { background: rgba(239,68,68,0.18); color: #fca5a5; box-shadow: 0 0 8px rgba(239,68,68,0.3); }
-.pill.temp.warm  { background: rgba(245,158,11,0.18); color: #fcd34d; }
-.pill.temp.cold  { background: rgba(99,102,241,0.18); color: #a5b4fc; }
+.pill.temp.hot   { background: rgba(197,68,58,0.18); color: var(--hot); }
+.pill.temp.warm  { background: rgba(181,122,26,0.18); color: var(--warm); }
+.pill.temp.cold  { background: rgba(26,40,64,0.10);  color: var(--ink-soft); }
 
-.card .specs { display: flex; gap: 14px; font-size: 13px; color: var(--text-dim); margin-bottom: 14px; }
+.card .specs {
+  display: flex; gap: 14px; font-size: 13px;
+  color: var(--ink-soft); margin-bottom: 12px;
+}
 .card .specs span { display: inline-flex; align-items: center; gap: 4px; }
-.card .specs strong { color: var(--text); font-weight: 600; }
+.card .specs strong { color: var(--ink); font-weight: 700; }
 
+/* Financial strip */
 .fin-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-  margin-bottom: 14px; padding: 12px;
-  background: rgba(0,0,0,0.2); border-radius: 10px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  margin-bottom: 14px; padding: 10px 12px;
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 3px;
 }
-.fin-grid.four { grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; }
 .fin-grid .fin .lab {
-  font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;
+  font-size: 9px; color: var(--ink-mute); text-transform: uppercase;
+  letter-spacing: 0.10em; font-weight: 800;
 }
-.fin-grid .fin .val { font-size: 16px; font-weight: 700; }
-.fin-grid.four .fin .val { font-size: 15px; }
+.fin-grid .fin .val {
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.1;
+}
 .fin-grid .fin .val.positive { color: var(--green); }
 .fin-grid .fin .val.negative { color: var(--hot); }
-.fin-grid .fin.spread .val.positive { color: var(--green); }
-.fin-grid .fin.spread .val.negative { color: var(--hot); }
 
-.rating-row {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+/* Call rating row */
+.rating-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.rating-row > div:first-child { display: flex; flex-direction: column; gap: 4px; }
+.rating-row .label {
+  font-size: 9px; color: var(--ink-mute); text-transform: uppercase;
+  letter-spacing: 0.10em; font-weight: 800;
 }
 .rating {
-  font-size: 14px; font-weight: 700; padding: 4px 10px; border-radius: 8px;
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 16px; font-weight: 700; padding: 3px 10px; border-radius: 3px;
+  display: inline-block;
 }
-.rating.green { background: rgba(16,185,129,0.15); color: #6ee7b7; }
-.rating.warm  { background: rgba(245,158,11,0.15); color: #fcd34d; }
-.rating.hot   { background: rgba(239,68,68,0.15); color: #fca5a5; }
-.rating.gray  { background: rgba(71,85,105,0.18); color: #94a3b8; }
-.rating-row .summary { font-size: 12px; color: var(--text-dim); flex: 1; line-height: 1.4; }
-.rating-row .label   { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+.rating.green { background: rgba(47,125,91,0.15); color: var(--green); }
+.rating.warm  { background: rgba(181,122,26,0.15); color: var(--warm); }
+.rating.hot   { background: rgba(197,68,58,0.15); color: var(--hot); }
+.rating.gray  { background: rgba(26,40,64,0.08);  color: var(--ink-mute); }
+.rating-row .summary {
+  font-family: "Iowan Old Style", Georgia, serif; font-style: italic;
+  font-size: 13px; color: var(--ink-soft); flex: 1; line-height: 1.5;
+  border-left: 2px solid var(--rule); padding-left: 10px;
+}
 
-.deal-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; line-height: 1.5; }
-.deal-meta strong { color: var(--text); font-weight: 500; }
+.deal-meta { font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; line-height: 1.6; }
+.deal-meta strong { color: var(--ink); font-weight: 700; }
 
-.card .actions { display: flex; gap: 8px; margin-top: auto; }
+.card .actions { display: flex; gap: 6px; margin-top: auto; flex-wrap: wrap; }
 .btn {
-  padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  padding: 7px 12px; border-radius: 3px;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
   text-decoration: none; transition: all .15s; flex: 1; text-align: center;
+  white-space: nowrap;
 }
 .btn.primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff; border: 1px solid transparent;
+  background: var(--ink); color: var(--gold); border: 1px solid var(--ink);
 }
-.btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99,102,241,0.4); }
-.btn.secondary { background: rgba(255,255,255,0.04); border: 1px solid var(--panel-border); color: var(--text); }
-.btn.secondary:hover { background: rgba(255,255,255,0.08); }
-.btn.ghost { background: transparent; color: var(--text-dim); border: 1px dashed var(--panel-border); }
-.section { margin-bottom: 32px; }
-.section h2 { font-size: 18px; font-weight: 600; margin: 0 0 14px; display: flex; align-items: center; gap: 10px; }
-.section .count { font-size: 13px; color: var(--text-dim); font-weight: 400; }
-.empty { text-align: center; color: var(--text-dim); padding: 40px; background: var(--panel);
-         border: 1px solid var(--panel-border); border-radius: 16px; }
-footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top: 40px; }
+.btn.primary:hover { background: var(--gold-deep); color: var(--ink); }
+.btn.secondary {
+  background: transparent; border: 1px solid var(--rule); color: var(--ink-soft);
+}
+.btn.secondary:hover { border-color: var(--ink); color: var(--ink); }
+.btn.ghost {
+  background: transparent; color: var(--ink-mute);
+  border: 1px dashed var(--rule); cursor: not-allowed;
+}
+
+.empty {
+  text-align: center; color: var(--ink-mute); padding: 40px;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 4px; font-style: italic;
+}
+
+footer {
+  color: var(--ink-mute); font-size: 11px; text-align: center;
+  margin-top: 64px; padding-top: 18px;
+  border-top: 1px solid var(--rule); letter-spacing: 0.04em;
+}
+a { color: var(--gold-deep); }
+a:hover { color: var(--ink); }
 </style>
 </head>
 <body>
 <div class="container">
-  <header>
-    <div>
-      <h1>APG ACQ — Deals Dashboard</h1>
-      <div class="subtitle">Active properties in stages 1-4 · Last updated __TIMESTAMP__</div>
+
+  <div class="meta-bar">
+    <div>APG · ACQ Operating Layer · Deals</div>
+    <div>Last updated __TIMESTAMP__</div>
+  </div>
+
+  <div class="logo-row">
+    <svg class="logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" aria-label="Atom Property Group">
+      <text x="50" y="70" font-family="Arial Black, Helvetica, sans-serif"
+            font-weight="900" font-size="64" class="brand-main">AT</text>
+      <g transform="translate(166, 40)">
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" />
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(60 28 28)" />
+        <ellipse class="atom-orbit" cx="28" cy="28" rx="26" ry="11" transform="rotate(-60 28 28)" />
+        <circle  class="atom-core"  cx="28" cy="28" r="5" />
+      </g>
+      <text x="232" y="70" font-family="Arial Black, Helvetica, sans-serif"
+            font-weight="900" font-size="64" class="brand-main">M</text>
+      <text x="50" y="108" font-family="Arial, Helvetica, sans-serif"
+            font-weight="700" font-size="14" class="brand-sub">PROPERTY GROUP</text>
+    </svg>
+    <div class="nav">
+      <a href="index.html">Follow-Ups</a>
+      <a href="deals.html" class="active">Deals</a>
+      <a href="about.html">About</a>
     </div>
+  </div>
+
+  <header class="doc-header">
+    <h1>Active <span class="accent">Deals</span></h1>
+    <p class="lede">Every property currently in stages 1-4 of the ACQ pipeline. Sorted by call rating within each stage so the strongest deals surface first. Use the filter bar to narrow.</p>
+    <hr>
   </header>
 
-  <div class="nav">
-    <a href="index.html">Follow-Ups</a>
-    <a href="deals.html" class="active">Deals</a>
-    <a href="about.html">About</a>
-  </div>
+  <section class="sec">
+    <div class="tag-row"><span class="num">01</span><h2>At a Glance</h2></div>
+    <hr>
+    <div class="stat-row">
+      <div class="stat"><div class="lab">Total Deals</div><div class="v">__TOTAL__</div><div class="sub">stages 1-4 (active)</div></div>
+      <div class="stat green"><div class="lab">Total Assignment Fee</div><div class="v">__ASSIGN_FEE_TOTAL__</div><div class="sub">across __WITH_FEE__ deals with fee set</div></div>
+      <div class="stat"><div class="lab">Avg Call Rating</div><div class="v">__AVG_RATING__/10</div><div class="sub">across __RATED__ rated calls</div></div>
+      <div class="stat warm"><div class="lab">With ARV calculated</div><div class="v">__WITH_ARV__</div><div class="sub">/ __TOTAL__ deals</div></div>
+      <div class="stat hot"><div class="lab">Hot Leads</div><div class="v">__HOT__</div><div class="sub">flagged by call AI</div></div>
+    </div>
+  </section>
 
-  <div class="kpi-grid">
-    <div class="kpi"><div class="label">Total Deals</div><div class="value">__TOTAL__</div><div class="sub">stages 1-4 (active)</div></div>
-    <div class="kpi green"><div class="label">Total Assignment Fee</div><div class="value">__ASSIGN_FEE_TOTAL__</div><div class="sub">across __WITH_FEE__ deals with fee set</div></div>
-    <div class="kpi"><div class="label">Avg Call Rating</div><div class="value">__AVG_RATING__/10</div><div class="sub">across __RATED__ rated calls</div></div>
-    <div class="kpi warm"><div class="label">With ARV calculated</div><div class="value">__WITH_ARV__</div><div class="sub">/ __TOTAL__ deals</div></div>
-    <div class="kpi hot"><div class="label">Hot Leads</div><div class="value">__HOT__</div><div class="sub">flagged by call AI</div></div>
-  </div>
-
-  <div class="filter-bar">
-    <input type="text" id="searchBox" placeholder="Search by name, address, state, deal type, motivation...">
-    <span class="filter-chip active" data-filter="all">All</span>
-    <span class="filter-chip" data-filter="1. Qualified">Qualified</span>
-    <span class="filter-chip" data-filter="2. LAO">LAO</span>
-    <span class="filter-chip" data-filter="3. Due Diligence">DD</span>
-    <span class="filter-chip" data-filter="4. MAO">MAO</span>
-    <span class="filter-chip" data-filter="hot">🔥 Hot</span>
-    <span class="filter-chip" data-filter="has-arv">Has ARV</span>
-  </div>
+  <section class="sec">
+    <div class="tag-row"><span class="num">02</span><h2>Filter</h2></div>
+    <hr>
+    <div class="filter-bar">
+      <input type="text" id="searchBox" placeholder="Search by name, address, state, deal type, motivation...">
+      <span class="filter-chip active" data-filter="all">All</span>
+      <span class="filter-chip" data-filter="1. Qualified">Qualified</span>
+      <span class="filter-chip" data-filter="2. LAO">LAO</span>
+      <span class="filter-chip" data-filter="3. Due Diligence">DD</span>
+      <span class="filter-chip" data-filter="4. MAO">MAO</span>
+      <span class="filter-chip" data-filter="hot">🔥 Hot</span>
+      <span class="filter-chip" data-filter="has-arv">Has ARV</span>
+    </div>
+  </section>
 
   __SECTIONS__
 
-  <footer>Auto-refreshed every 30 minutes by the GitHub Actions cron · <a href="index.html" style="color:var(--accent2)">Back to follow-ups</a></footer>
+  <footer>Auto-refreshed every 30 minutes by the GitHub Actions cron · APG ACQ Operating Layer</footer>
 </div>
 
 <script>
@@ -494,7 +620,7 @@ function applyFilters() {
     c.style.display = visible ? '' : 'none';
   });
   // Hide empty sections
-  document.querySelectorAll('.section').forEach(s => {
+  document.querySelectorAll('.deals-section').forEach(s => {
     const visibleCards = s.querySelectorAll('.card:not([style*="display: none"])');
     s.style.display = visibleCards.length ? '' : 'none';
   });
@@ -548,13 +674,6 @@ def render_card(d):
     except Exception:
         arv70_v = None
 
-    # Spread = MAO - Asking (positive means deal makes sense)
-    spread_v = None
-    spread_class = ''
-    if arv70_v and asking_v:
-        spread_v = arv70_v - asking_v
-        spread_class = 'positive' if spread_v >= 0 else 'negative'
-
     motiv  = cf.get(CF_MOTIVATION) or ''
     timeln = cf.get(CF_TIMELINE) or ''
     reason = cf.get(CF_REASON_SELL) or ''
@@ -583,7 +702,6 @@ def render_card(d):
 
     ghl_link = f'{GHL_CONTACT_BASE}/{d["cid"]}'
 
-    # Build search blob (lowercase) for client-side filter
     search_blob = ' '.join([
         name, addr1, city, state, place,
         deal_t, motiv, reason, timeln, ptype, cond, temp,
@@ -596,9 +714,8 @@ def render_card(d):
     else:
         rating_html = '<span class="rating gray">—</span>'
 
-    # Compose
     pieces = []
-    pieces.append(f'<div class="card" data-stage="{escape(d["stage_label"])}" '
+    pieces.append(f'<div class="card {stage_class(d["stage"])}" data-stage="{escape(d["stage_label"])}" '
                   f'data-flags="{escape(" ".join(flags))}" '
                   f'data-search="{escape(search_blob)}">')
 
@@ -609,7 +726,6 @@ def render_card(d):
     pieces.append(f'<div class="stage-pill {stage_class(d["stage"])}">{escape(d["stage_label"])}</div>')
     pieces.append('</div>')
 
-    # Pill row: temp + days
     pill_pieces = []
     if temp:
         pill_pieces.append(f'<span class="pill {temp_class(temp)}">🌡 {escape(temp)}</span>')
@@ -620,7 +736,6 @@ def render_card(d):
     if pill_pieces:
         pieces.append(f'<div class="pillrow">{"".join(pill_pieces)}</div>')
 
-    # Specs row
     spec_pieces = []
     if beds != '?' or baths != '?':
         spec_pieces.append(f'<span><strong>{escape(str(beds))}</strong>bd / <strong>{escape(str(baths))}</strong>ba</span>')
@@ -635,7 +750,7 @@ def render_card(d):
         pieces.append(f'<div class="specs">{"".join(spec_pieces)}</div>')
 
     # Financials — 4 tiles: Asking / ARV / 70% MAO / Assignment Fee
-    pieces.append('<div class="fin-grid four">')
+    pieces.append('<div class="fin-grid">')
     pieces.append(f'<div class="fin"><div class="lab">Asking</div><div class="val">{fmt_money(asking_v) if asking_v else "—"}</div></div>')
     pieces.append(f'<div class="fin"><div class="lab">ARV</div><div class="val">{fmt_money(arv_v) if arv_v else "—"}</div></div>')
     pieces.append(f'<div class="fin"><div class="lab">70% MAO</div><div class="val">{fmt_money(arv70_v) if arv70_v else "—"}</div></div>')
@@ -648,14 +763,13 @@ def render_card(d):
 
     # Call rating + summary
     pieces.append('<div class="rating-row">')
-    pieces.append(f'<div><div class="label">Call</div>{rating_html}</div>')
+    pieces.append(f'<div><span class="label">Call</span>{rating_html}</div>')
     if summary:
         pieces.append(f'<div class="summary">{escape(summary[:240])}</div>')
     else:
-        pieces.append('<div class="summary" style="font-style:italic">No call analysis yet.</div>')
+        pieces.append('<div class="summary">No call analysis yet.</div>')
     pieces.append('</div>')
 
-    # Deal meta
     meta_lines = []
     if motiv:   meta_lines.append(f'<strong>Motivation:</strong> {escape(motiv)}')
     if timeln:  meta_lines.append(f'<strong>Timeline:</strong> {escape(timeln)}')
@@ -664,13 +778,12 @@ def render_card(d):
     if meta_lines:
         pieces.append(f'<div class="deal-meta">{"<br>".join(meta_lines)}</div>')
 
-    # Actions
     pieces.append('<div class="actions">')
     pieces.append(f'<a class="btn primary" href="{escape(ghl_link)}" target="_blank">Open in GHL</a>')
     if rehab_url:
         pieces.append(f'<a class="btn secondary" href="{escape(rehab_url)}" target="_blank">Rehab Report</a>')
     else:
-        pieces.append('<span class="btn ghost">No rehab report yet</span>')
+        pieces.append('<span class="btn ghost">No rehab yet</span>')
     if zillow:
         pieces.append(f'<a class="btn secondary" href="{escape(zillow)}" target="_blank">Zillow</a>')
     pieces.append('</div>')
@@ -738,20 +851,23 @@ def _main_inner():
 
     # Group by stage in display order: MAO → RR → LAO → Qualified
     order = [STAGE_MAO, STAGE_RR, STAGE_LAO, STAGE_QUALIFIED]
+    section_nums = {STAGE_MAO: '03', STAGE_RR: '04', STAGE_LAO: '05', STAGE_QUALIFIED: '06'}
     sections_html = []
     for stage_id in order:
         in_stage = [d for d in enriched if d['stage'] == stage_id]
         if not in_stage:
             continue
-        # Sort within section: rated first (by rating desc), then by updated desc
         in_stage.sort(key=lambda x: (
             -1 if x['note'].get('rating') is None else -x['note']['rating'],
             x.get('updated', '')
         ))
         label = in_stage[0]['stage_label']
+        sec_num = section_nums.get(stage_id, '·')
         sections_html.append(
-            f'<section class="section">'
-            f'<h2>{escape(label)} <span class="count">({len(in_stage)})</span></h2>'
+            f'<section class="sec deals-section">'
+            f'<div class="tag-row"><span class="num">{sec_num}</span>'
+            f'<h2>{escape(label)} <span class="count">({len(in_stage)})</span></h2></div>'
+            f'<hr>'
             f'<div class="grid">{"".join(render_card(d) for d in in_stage)}</div>'
             f'</section>'
         )
