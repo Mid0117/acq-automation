@@ -1,0 +1,56 @@
+name: Update Lead Manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      search:
+        description: 'Search GHL by name OR address fragment (e.g. "4704 9th Ave" or "Marlin Smith")'
+        required: true
+        type: string
+      field_updates:
+        description: 'JSON {key: value} — keys: asking_price, timeline, motivation, reason_for_selling, arv, mao, 70_arv, lao, assignment_fee, rehab_value, lead_type'
+        required: false
+        default: '{}'
+        type: string
+      stage:
+        description: 'Optional stage move'
+        required: false
+        type: choice
+        default: '(no change)'
+        options:
+          - '(no change)'
+          - unqualified
+          - qualified
+          - lao
+          - dd
+          - mao
+          - contract
+          - psa
+          - dispo
+          - follow_15
+          - follow_3
+          - dead
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Update lead in GHL
+        env:
+          GHL_TOKEN:     ${{ secrets.GHL_TOKEN }}
+          SEARCH:        ${{ inputs.search }}
+          FIELD_UPDATES: ${{ inputs.field_updates }}
+          STAGE:         ${{ inputs.stage != '(no change)' && inputs.stage || '' }}
+        run: python update_lead.py

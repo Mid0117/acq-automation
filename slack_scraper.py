@@ -159,6 +159,51 @@ def resolve_user(user_id, cache):
     return name
 
 
+def bulk_fetch_users(cache):
+    """Pre-populate the user cache with every member of the workspace. One
+    call to users.list (paginated) covers everyone — much cheaper than
+    per-user lookups, and ensures a name is ready BEFORE we see the first
+    message from any team member.
+
+    Requires the bot to have the users:read scope. If it doesn't, the API
+    returns missing_scope and we silently fall back to per-user lookups.
+    """
+    cursor = ''
+    added = 0
+    refreshed = 0
+    pages = 0
+    while True:
+        params = {'limit': 200}
+        if cursor:
+            params['cursor'] = cursor
+        j = slack_call('users.list', params=params)
+        if not j:
+            return added, refreshed
+        for user in j.get('members', []):
+            uid = user.get('id')
+            if not uid:
+                continue
+            profile = user.get('profile') or {}
+            name = (profile.get('real_name')
+                    or profile.get('display_name')
+                    or user.get('real_name')
+                    or user.get('name')
+                    or uid)
+            old = cache.get(uid)
+            if old is None:
+                cache[uid] = name
+                added += 1
+            elif old != name and name != uid:
+                # Refresh in case the user's display name changed since last cache
+                cache[uid] = name
+                refreshed += 1
+        cursor = (j.get('response_metadata') or {}).get('next_cursor', '')
+        pages += 1
+        if not cursor or pages >= 10:  # safety cap — APG won't have 2000+ users
+            break
+    return added, refreshed
+
+
 def fetch_messages(channel_id, oldest_ts):
     """Pull messages newer than oldest_ts (Slack timestamp string).
 
@@ -414,6 +459,9 @@ def _main_inner():
     state = load_state()
     users_cache = load_users_cache()
     print(f'Loaded user-name cache ({len(users_cache)} entries)')
+    print('Pre-fetching all workspace users (users.list) ...')
+    added, refreshed = bulk_fetch_users(users_cache)
+    print(f'  +{added} new · {refreshed} refreshed · {len(users_cache)} total')
     print('Resolving channel IDs...')
     chan_ids = list_channel_ids()
     print(f'  Visible channels: {len(chan_ids)}')

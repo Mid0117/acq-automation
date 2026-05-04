@@ -921,7 +921,25 @@ const REPO = 'Mid0117/acq-automation';
 const PAT_KEY = 'apg_gh_pat_v1';
 
 let stageFilter = 'all';
+let activityFilter = 'all';
 let _currentWeekData = null;
+
+function leadMatchesActivity(l) {
+  if (activityFilter === 'all') return true;
+  const a = l._activity || {};
+  const sug = (l.slack_this_week || []).some(s => Object.keys(s.suggested || {}).length > 0);
+  switch (activityFilter) {
+    case 'has_suggestions': return sug;
+    case 'hot':             return (l.temp || '').toLowerCase() === 'hot';
+    case 'replied':         return !!l.replied;
+    case 'sms_sent':        return !!a.sms_this_week;
+    case 'has_arv':         return !!l.arv;
+    case 'ready_action':    return (l.action_tags || []).includes('ready_contract')
+                                   || (l.action_tags || []).includes('ready_mao');
+    case 'stage_moved':     return l.movement === 'advanced' || l.movement === 'demoted';
+  }
+  return true;
+}
 
 function escapeHtml(s) {
   return (s || '').replace(/[&<>"']/g, ch => ({
@@ -940,6 +958,10 @@ function fmtMoney(v) {
 function leadMatchesStage(l) {
   if (stageFilter === 'all') return true;
   return (l.stage_label || '').trim() === stageFilter;
+}
+
+function leadMatchesAllFilters(l) {
+  return leadMatchesStage(l) && leadMatchesActivity(l);
 }
 
 // ── Bucket definitions: which goes where, what color, what's the heading ──
@@ -1228,10 +1250,11 @@ function render(week) {
   html += '</div>';
   html += '<div style="margin-top:12px;font-size:12px;color:var(--muted);letter-spacing:0.06em">Pipeline total: <strong style="color:var(--ink)">' + (totals.total_pipeline||0) + '</strong> · Quiet (no activity): <strong style="color:var(--muted)">' + (totals.quiet||0) + '</strong></div>';
 
-  // Stage filter chips
+  // Stage filter chips (row 1)
   html += '<div class="stage-filter">';
-  const chipDefs = [
-    ['all','All Stages'],
+  html += '<span style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.10em;margin-right:6px">STAGE</span>';
+  const stageChipDefs = [
+    ['all','All'],
     ['0. Unqualified Leads','Unqualified'],
     ['1. Qualified Leads (Warm/Hot)','Qualified'],
     ['2. Prequalified Offer (LAO)','LAO'],
@@ -1244,8 +1267,26 @@ function render(week) {
     ['Follow Up (3 months)','FU 3mo'],
     ['Dead Deals','Dead'],
   ];
-  for (const [val,lab] of chipDefs) {
+  for (const [val,lab] of stageChipDefs) {
     html += '<span class="filter-chip' + (stageFilter===val?' active':'') + '" data-stage="' + escapeHtml(val) + '">' + escapeHtml(lab) + '</span>';
+  }
+  html += '</div>';
+
+  // Activity filter chips (row 2)
+  html += '<div class="stage-filter" style="margin-top:8px">';
+  html += '<span style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.10em;margin-right:6px">SHOW</span>';
+  const activityChipDefs = [
+    ['all',          'All Leads'],
+    ['has_suggestions','Has Slack Suggestion'],
+    ['hot',          '🔥 Hot'],
+    ['replied',      'Replied to SMS'],
+    ['sms_sent',     'SMS Sent This Wk'],
+    ['has_arv',      'Has ARV'],
+    ['ready_action', 'Ready for Action'],
+    ['stage_moved',  'Stage Moved'],
+  ];
+  for (const [val,lab] of activityChipDefs) {
+    html += '<span class="filter-chip activity-chip' + (activityFilter===val?' active':'') + '" data-activity="' + escapeHtml(val) + '">' + escapeHtml(lab) + '</span>';
   }
   html += '</div></section>';
 
@@ -1256,7 +1297,7 @@ function render(week) {
   let dealCounter = 1;
   for (const def of BUCKET_DEFS) {
     const all = buckets[def.key] || [];
-    const items = all.filter(leadMatchesStage);
+    const items = all.filter(leadMatchesAllFilters);
     if (!items.length) continue;
     const filterNote = (stageFilter !== 'all' && all.length !== items.length) ?
       ' <span style="color:var(--muted);font-weight:500">of ' + all.length + '</span>' : '';
@@ -1271,7 +1312,7 @@ function render(week) {
 
   // Quiet bucket — collapsed
   const quietAll = buckets['quiet'] || [];
-  const quietItems = quietAll.filter(leadMatchesStage);
+  const quietItems = quietAll.filter(leadMatchesAllFilters);
   if (quietItems.length) {
     html += '<section><h2><span class="num">∅</span>Quiet — No Activity This Week<span class="sec-count">' + quietItems.length + ' lead' + (quietItems.length===1?'':'s') + '</span></h2>';
     html += '<p class="lede">Leads in pipeline but no SMS / reply / Slack / note this week. Click any to expand details.</p>';
@@ -1286,13 +1327,15 @@ function render(week) {
   if (!html.includes('<article')) html += '<div class="empty">No leads match this filter for this week.</div>';
 
   c.innerHTML = html;
-  // Wire stage-filter chip clicks
+  // Wire chip clicks — stage chips have data-stage, activity chips have data-activity
   document.querySelectorAll('.filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      stageFilter = chip.dataset.stage;
+      if (chip.dataset.activity != null)  activityFilter = chip.dataset.activity;
+      else if (chip.dataset.stage != null) stageFilter    = chip.dataset.stage;
       render(_currentWeekData);
     });
   });
+  if (window.runEntranceAnimations) window.runEntranceAnimations(c);
 }
 
 // ── Refresh button (PAT → workflow_dispatch) ──
