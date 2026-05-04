@@ -303,10 +303,14 @@ function escapeHtml(s) {
 function fmtMoney(v) {
   if (v == null || v === '') return '—';
   v = parseFloat(v); if (isNaN(v)) return '—';
-  v = Math.round(v);
-  if (Math.abs(v) >= 1_000_000) return '$' + (v/1_000_000).toFixed(2) + 'M';
-  if (Math.abs(v) >= 1_000)     return '$' + (v/1_000).toFixed(0) + 'k';
-  return '$' + v.toLocaleString();
+  const a = Math.abs(v);
+  if (a >= 1_000_000) return '$' + (v/1_000_000).toFixed(2) + 'M';
+  if (a >= 100_000)   return '$' + Math.round(v/1_000) + 'k';
+  if (a >= 1_000) {
+    const k = v / 1_000;
+    return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k';
+  }
+  return '$' + Math.round(v).toLocaleString();
 }
 
 function findInState(state, query) {
@@ -374,14 +378,29 @@ function renderDeal(deal, lead, slackMentions) {
     const nums = deal.numbers || {};
     const asking = (nums.asking != null) ? nums.asking : lead.asking;
     const arv    = (nums.arv != null)    ? nums.arv    : lead.arv;
-    const offer  = nums.offer;
+    const hasCurated = Object.keys(nums).length > 0;
     html += '<div class="num-table">';
     html += '<div class="k">Stage</div><div class="v">' + escapeHtml(lead.stage_label || '?') + '</div>';
-    if (asking)        html += '<div class="k">Asking</div><div class="v">' + fmtMoney(asking) + (nums.asking != null ? ' <span class="src">(curated)</span>' : '') + '</div>';
-    if (offer != null) html += '<div class="k">Best Offer</div><div class="v">' + fmtMoney(offer) + (nums.offer_status ? ' <span class="src">' + escapeHtml(nums.offer_status) + '</span>' : '') + '</div>';
+    if (asking)             html += '<div class="k">Asking</div><div class="v">' + fmtMoney(asking) + (nums.asking != null ? ' <span class="src">(curated)</span>' : '') + '</div>';
+    if (nums.list_target)   html += '<div class="k">List Target</div><div class="v">' + fmtMoney(nums.list_target) + ' <span class="src">(curated)</span></div>';
+    if (nums.our_offer != null) {
+      html += '<div class="k">Our Offer</div><div class="v">' + fmtMoney(nums.our_offer);
+      if (nums.our_offer_status) html += ' <span class="src">' + escapeHtml(nums.our_offer_status) + '</span>';
+      html += '</div>';
+    }
+    if (Array.isArray(nums.offers) && nums.offers.length) {
+      html += '<div class="k">Buyer Offers</div><div class="v">';
+      const lines = nums.offers.map(o => escapeHtml(o.name || 'Buyer') + ' ' + fmtMoney(o.amount) + (o.status ? ' <span class="src">' + escapeHtml(o.status) + '</span>' : ''));
+      html += lines.join('<br>');
+      html += '</div>';
+    } else if (nums.best_buyer_offer != null) {
+      html += '<div class="k">Best Buyer</div><div class="v">' + fmtMoney(nums.best_buyer_offer);
+      if (nums.best_buyer_status) html += ' <span class="src">' + escapeHtml(nums.best_buyer_status) + '</span>';
+      html += '</div>';
+    }
     if (arv)           html += '<div class="k">ARV</div><div class="v">' + fmtMoney(arv) + '</div>';
-    if (lead.mao && !nums.asking) html += '<div class="k">70% MAO</div><div class="v">' + fmtMoney(lead.mao) + '</div>';
-    if (lead.spread != null && lead.arv && !nums.asking) {
+    if (lead.mao && !hasCurated) html += '<div class="k">70% MAO</div><div class="v">' + fmtMoney(lead.mao) + '</div>';
+    if (lead.spread != null && lead.arv && !hasCurated) {
       const cls2 = lead.spread >= 0 ? 'green' : 'red';
       const sign = lead.spread >= 0 ? '+' : '';
       html += '<div class="k">Spread</div><div class="v ' + cls2 + '">' + sign + fmtMoney(lead.spread) + '</div>';

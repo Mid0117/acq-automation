@@ -10,8 +10,13 @@
       "priority": 1,
       "status": "showing-this-week",
       "tag": "ACTIVE",
-      "summary": "Two interested buyers walking the property — most likely Wednesday.",
-      "next_action": "Confirm walkthrough time. Line up a backup buyer in case primary walks away."
+      "numbers": {
+        "asking": 210000,
+        "best_buyer_offer": 75000,
+        "best_buyer_status": "max — well below ask"
+      },
+      "summary": "Asking $210K. One buyer engaged so far — capped at $75K. Walking the property this week.",
+      "next_action": "Confirm walkthrough time. Either move buyer up significantly or open up to more buyers — current $75K is far below ask."
     },
     {
       "id": "p2",
@@ -21,7 +26,10 @@
       "priority": 1,
       "status": "to-list",
       "tag": "TO LIST",
-      "summary": "Listing target — 3.5% commission to APG.",
+      "numbers": {
+        "list_target": 875000
+      },
+      "summary": "Listing this week at $875K. 3.5% commission to APG.",
       "next_action": "Get listing live this week."
     },
     {
@@ -32,9 +40,15 @@
       "priority": 1,
       "status": "negotiating",
       "tag": "FOLLOW UP",
-      "numbers": { "asking": 10000 },
-      "summary": "Asking $10K. Two buyers in play — Cyrus and Quel Thompson. Need to follow up on both and lock the higher one.",
-      "next_action": "Follow up with both buyers this week. Confirm offers, lock the higher one."
+      "numbers": {
+        "asking": 10000,
+        "offers": [
+          { "name": "Cyrus",          "amount": 12500 },
+          { "name": "Quel Thompson",  "amount": 14500 }
+        ]
+      },
+      "summary": "Asking $10K. Two buyers in: Cyrus at $12,500, Quel Thompson at $14,500. Quel is the high.",
+      "next_action": "Lock Quel at $14,500 or push higher. Close out Cyrus. Move to contract this week."
     },
     {
       "id": "p4",
@@ -44,8 +58,13 @@
       "priority": 2,
       "status": "negotiating",
       "tag": "GAP $3K",
-      "summary": "Offer received at $17K. Buyer wants $20K. $3K gap to close.",
-      "next_action": "Negotiate the $3K spread. Either move buyer up to $19K or push owner down to $18K."
+      "numbers": {
+        "asking": 20000,
+        "best_buyer_offer": 17000,
+        "best_buyer_status": "$3K under ask"
+      },
+      "summary": "Seller wants $20K. Best buyer offer is $17K. $3K gap.",
+      "next_action": "Either push the buyer up to $19K or get the seller down to $18K. Close the gap this week."
     },
     {
       "id": "p5",
@@ -55,9 +74,13 @@
       "priority": 3,
       "status": "stalled",
       "tag": "BUYER WALKED",
-      "numbers": { "asking": 30000, "offer": 20000, "offer_status": "buyer backed out — said property not good" },
-      "summary": "Asking $30K. We had a buyer at $20K, but she walked the property and backed out, saying it's not good. No active buyers right now.",
-      "next_action": "Either find new buyers willing to look past condition or have an honest talk with owner about price vs condition. If neither shifts, archive."
+      "numbers": {
+        "asking": 30000,
+        "best_buyer_offer": 20000,
+        "best_buyer_status": "buyer backed out — said property not good"
+      },
+      "summary": "Asking $30K. Had a buyer at $20K who walked the property and backed out, saying it's not good. No active buyers right now.",
+      "next_action": "Either find buyers willing to look past condition or have an honest talk with owner about price vs condition. If neither shifts, archive."
     },
     {
       "id": "p6",
@@ -67,8 +90,13 @@
       "priority": 2,
       "status": "needs-pics",
       "tag": "NEED PICS",
-      "summary": "2BR / 1.5BA, asking $45K. Need photos before we can market or get buyers walking.",
-      "next_action": "Get pictures from the seller this week."
+      "numbers": {
+        "asking": 42000,
+        "our_offer": 45000,
+        "our_offer_status": "we're offering above ask to lock contract"
+      },
+      "summary": "Owner asking $42K. We're offering $45K to lock the contract. 2BR / 1.5BA. Need photos before we can place buyers.",
+      "next_action": "Get photos from the seller this week so we can market and find a buyer at the right spread."
     },
     {
       "id": "p7",
@@ -78,6 +106,9 @@
       "priority": 4,
       "status": "low-interest",
       "tag": "DEAD?",
+      "numbers": {
+        "asking": 220000
+      },
       "summary": "Asking $220K. Owner already fixed it up — they're flipping. Most likely no fit for our wholesale model.",
       "next_action": "Confirm with owner there's no flexibility, then deprioritize or archive."
     }
