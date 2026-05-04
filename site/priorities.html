@@ -179,6 +179,7 @@ h2 .sec-count { margin-left: auto; font-size: 11px; letter-spacing: 0.18em; text
 .num-table .k:first-of-type, .num-table .v:first-of-type { border-top: none; }
 .num-table .v.green { color: var(--s-live); }
 .num-table .v.red   { color: var(--s-uc); }
+.num-table .v .src  { color: var(--muted); font-weight: 500; font-size: 11px; font-style: italic; margin-left: 6px; }
 
 .contact {
   background: var(--cream); border: 1px solid var(--rule);
@@ -343,7 +344,7 @@ function renderDeal(deal, lead, slackMentions) {
   // LEFT column: situation + numbers
   html += '<div>';
   html += '<div class="field"><h4>Situation</h4>';
-  html += '<div class="summary-box"><strong>What\\'s going on</strong>' + escapeHtml(deal.summary || '') + '</div>';
+  html += '<div class="summary-box"><strong>What\'s going on</strong>' + escapeHtml(deal.summary || '') + '</div>';
   if (deal.next_action) {
     html += '<div class="next-action"><strong>Next action</strong>' + escapeHtml(deal.next_action) + '</div>';
   }
@@ -370,12 +371,17 @@ function renderDeal(deal, lead, slackMentions) {
   if (!lead) {
     html += '<div class="empty-state">No matching contact found in GHL state. Search query: <code>' + escapeHtml(deal.search_query || '') + '</code></div>';
   } else {
+    const nums = deal.numbers || {};
+    const asking = (nums.asking != null) ? nums.asking : lead.asking;
+    const arv    = (nums.arv != null)    ? nums.arv    : lead.arv;
+    const offer  = nums.offer;
     html += '<div class="num-table">';
     html += '<div class="k">Stage</div><div class="v">' + escapeHtml(lead.stage_label || '?') + '</div>';
-    if (lead.asking) html += '<div class="k">Asking</div><div class="v">' + fmtMoney(lead.asking) + '</div>';
-    if (lead.arv)    html += '<div class="k">ARV</div><div class="v">' + fmtMoney(lead.arv) + '</div>';
-    if (lead.mao)    html += '<div class="k">70% MAO</div><div class="v">' + fmtMoney(lead.mao) + '</div>';
-    if (lead.spread != null && lead.arv) {
+    if (asking)        html += '<div class="k">Asking</div><div class="v">' + fmtMoney(asking) + (nums.asking != null ? ' <span class="src">(curated)</span>' : '') + '</div>';
+    if (offer != null) html += '<div class="k">Best Offer</div><div class="v">' + fmtMoney(offer) + (nums.offer_status ? ' <span class="src">' + escapeHtml(nums.offer_status) + '</span>' : '') + '</div>';
+    if (arv)           html += '<div class="k">ARV</div><div class="v">' + fmtMoney(arv) + '</div>';
+    if (lead.mao && !nums.asking) html += '<div class="k">70% MAO</div><div class="v">' + fmtMoney(lead.mao) + '</div>';
+    if (lead.spread != null && lead.arv && !nums.asking) {
       const cls2 = lead.spread >= 0 ? 'green' : 'red';
       const sign = lead.spread >= 0 ? '+' : '';
       html += '<div class="k">Spread</div><div class="v ' + cls2 + '">' + sign + fmtMoney(lead.spread) + '</div>';
@@ -399,7 +405,7 @@ function renderDeal(deal, lead, slackMentions) {
   // Adam's feedback box
   if (cid) {
     html += '<div class="feedback-box" data-cid="' + escapeHtml(cid) + '" data-deal="' + escapeHtml(deal.id) + '">';
-    html += '<label>Adam\\'s feedback — saves to GHL note</label>';
+    html += '<label>Adam\'s feedback — saves to GHL note</label>';
     html += '<textarea placeholder="e.g. Send the contract today. Cyrus committed to $14K. Walk Wednesday at 4 PM."></textarea>';
     html += '<div class="row">';
     html += '<select class="who-sel" title="Who is this from">';
@@ -412,7 +418,7 @@ function renderDeal(deal, lead, slackMentions) {
     html += '<span class="status"></span>';
     html += '</div></div>';
   } else {
-    html += '<div class="feedback-box"><div class="empty-state">Can\\'t add feedback until the lead matches in GHL state. Update the search_query in priorities.json to point to an actual lead.</div></div>';
+    html += '<div class="feedback-box"><div class="empty-state">Can\'t add feedback until the lead matches in GHL state. Update the search_query in priorities.json to point to an actual lead.</div></div>';
   }
 
   html += '</div>';  // end deal-body
@@ -423,9 +429,9 @@ function renderDeal(deal, lead, slackMentions) {
 async function dispatchAddNote(cid, who, body) {
   let pat = localStorage.getItem(PAT_KEY);
   if (!pat) {
-    pat = prompt('Saving feedback to GHL needs a GitHub PAT (one-time setup, same as the Refresh button on the Weekly page).\\n\\n' +
-                 '1. https://github.com/settings/tokens?type=beta\\n' +
-                 '2. Repo: Mid0117/acq-automation, Permissions: Actions = Read+Write\\n' +
+    pat = prompt('Saving feedback to GHL needs a GitHub PAT (one-time setup, same as the Refresh button on the Weekly page).\n\n' +
+                 '1. https://github.com/settings/tokens?type=beta\n' +
+                 '2. Repo: Mid0117/acq-automation, Permissions: Actions = Read+Write\n' +
                  '3. Paste it here.');
     if (!pat) throw new Error('No token');
     localStorage.setItem(PAT_KEY, pat.trim());

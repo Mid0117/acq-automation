@@ -32,8 +32,9 @@
       "priority": 1,
       "status": "negotiating",
       "tag": "FOLLOW UP",
-      "summary": "Two buyers in play. Cyrus offered $12,500. Quel Thompson offered $14,500. Need to follow up on both offers and lock the higher one.",
-      "next_action": "Follow up with both buyers this week. Confirm Quel's $14,500 stays firm; close out Cyrus or upsell."
+      "numbers": { "asking": 10000 },
+      "summary": "Asking $10K. Two buyers in play — Cyrus and Quel Thompson. Need to follow up on both and lock the higher one.",
+      "next_action": "Follow up with both buyers this week. Confirm offers, lock the higher one."
     },
     {
       "id": "p4",
@@ -53,9 +54,10 @@
       "search_query": "Ameen",
       "priority": 3,
       "status": "stalled",
-      "tag": "GAP $10K",
-      "summary": "Owner wants $30K. Got an offer at $20K. No other interest.",
-      "next_action": "Either push the buyer up or have a hard conversation with owner about market reality. If both refuse, archive."
+      "tag": "BUYER WALKED",
+      "numbers": { "asking": 30000, "offer": 20000, "offer_status": "buyer backed out — said property not good" },
+      "summary": "Asking $30K. We had a buyer at $20K, but she walked the property and backed out, saying it's not good. No active buyers right now.",
+      "next_action": "Either find new buyers willing to look past condition or have an honest talk with owner about price vs condition. If neither shifts, archive."
     },
     {
       "id": "p6",
