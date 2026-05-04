@@ -1,0 +1,83 @@
+{
+  "updated_at": "2026-05-04",
+  "updated_by": "Mido",
+  "deals": [
+    {
+      "id": "p1",
+      "address": "405 Pearl St",
+      "place": "Media, PA",
+      "search_query": "405 Pearl",
+      "priority": 1,
+      "status": "showing-this-week",
+      "tag": "ACTIVE",
+      "summary": "Two interested buyers walking the property — most likely Wednesday.",
+      "next_action": "Confirm walkthrough time. Line up a backup buyer in case primary walks away."
+    },
+    {
+      "id": "p2",
+      "address": "56 Valley Rd",
+      "place": "Lambertville, NJ",
+      "search_query": "56 Valley",
+      "priority": 1,
+      "status": "to-list",
+      "tag": "TO LIST",
+      "summary": "Listing target — 3.5% commission to APG.",
+      "next_action": "Get listing live this week."
+    },
+    {
+      "id": "p3",
+      "address": "4725 7th Ave",
+      "place": "Birmingham, AL 35224",
+      "search_query": "Stuart Smith",
+      "priority": 1,
+      "status": "negotiating",
+      "tag": "FOLLOW UP",
+      "summary": "Two buyers in play. Cyrus offered $12,500. Quel Thompson offered $14,500. Need to follow up on both offers and lock the higher one.",
+      "next_action": "Follow up with both buyers this week. Confirm Quel's $14,500 stays firm; close out Cyrus or upsell."
+    },
+    {
+      "id": "p4",
+      "address": "118 66th Pl N",
+      "place": "Birmingham, AL",
+      "search_query": "Carla Ider",
+      "priority": 2,
+      "status": "negotiating",
+      "tag": "GAP $3K",
+      "summary": "Offer received at $17K. Buyer wants $20K. $3K gap to close.",
+      "next_action": "Negotiate the $3K spread. Either move buyer up to $19K or push owner down to $18K."
+    },
+    {
+      "id": "p5",
+      "address": "8039 7th Ave S",
+      "place": "Birmingham, AL",
+      "search_query": "Khalil Ameen",
+      "priority": 3,
+      "status": "stalled",
+      "tag": "GAP $10K",
+      "summary": "Owner wants $30K. Got an offer at $20K. No other interest.",
+      "next_action": "Either push the buyer up or have a hard conversation with owner about market reality. If both refuse, archive."
+    },
+    {
+      "id": "p6",
+      "address": "445 Cleveland Rd",
+      "place": "Cleveland, OH 44108",
+      "search_query": "445 Cleveland",
+      "priority": 2,
+      "status": "needs-pics",
+      "tag": "NEED PICS",
+      "summary": "2BR / 1.5BA, asking $45K. Need photos before we can market or get buyers walking.",
+      "next_action": "Get pictures from the seller this week."
+    },
+    {
+      "id": "p7",
+      "address": "5910 Welber Ave",
+      "place": "Cleveland, OH",
+      "search_query": "5910 Welber",
+      "priority": 4,
+      "status": "low-interest",
+      "tag": "DEAD?",
+      "summary": "Asking $220K. Owner already fixed it up — they're flipping. Most likely no fit for our wholesale model.",
+      "next_action": "Confirm with owner there's no flexibility, then deprioritize or archive."
+    }
+  ]
+}

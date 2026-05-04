@@ -1,0 +1,42 @@
+name: Add Note to GHL Contact
+
+on:
+  workflow_dispatch:
+    inputs:
+      cid:
+        description: 'GHL contact ID'
+        required: true
+        type: string
+      who:
+        description: 'Who is leaving the note (e.g. Adam, Mido, Jeff)'
+        required: false
+        default: 'Team'
+        type: string
+      body:
+        description: 'The feedback / note body'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Add note to GHL
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+          CID:       ${{ inputs.cid }}
+          WHO:       ${{ inputs.who }}
+          BODY:      ${{ inputs.body }}
+        run: python add_note.py
