@@ -38,17 +38,17 @@
       "place": "Birmingham, AL 35224",
       "search_query": "Stuart Smith",
       "priority": 1,
-      "status": "negotiating",
-      "tag": "FOLLOW UP",
+      "status": "ready-to-contract",
+      "tag": "LOCK CYRUS",
       "numbers": {
         "asking": 10000,
         "offers": [
-          { "name": "Cyrus",          "amount": 12500 },
-          { "name": "Quel Thompson",  "amount": 14500 }
+          { "name": "Cyrus",         "amount": 13000, "status": "agreed" },
+          { "name": "Quel Thompson", "amount": 14500, "status": "passed — not interested" }
         ]
       },
-      "summary": "Asking $10K. Two buyers in: Cyrus at $12,500, Quel Thompson at $14,500. Quel is the high.",
-      "next_action": "Lock Quel at $14,500 or push higher. Close out Cyrus. Move to contract this week."
+      "summary": "Asking $10K. Cyrus agreed at $13K. Quel Thompson passed — no longer interested.",
+      "next_action": "Lock Cyrus at $13K and move to contract this week. He's the only buyer."
     },
     {
       "id": "p4",
@@ -91,12 +91,12 @@
       "status": "needs-pics",
       "tag": "NEED PICS",
       "numbers": {
-        "asking": 42000,
+        "asking": 40000,
         "our_offer": 45000,
-        "our_offer_status": "we're offering above ask to lock contract"
+        "our_offer_status": "owner dropped from $42K to $40K — we're still offering $45K to lock"
       },
-      "summary": "Owner asking $42K. We're offering $45K to lock the contract. 2BR / 1.5BA. Need photos before we can place buyers.",
-      "next_action": "Get photos from the seller this week so we can market and find a buyer at the right spread."
+      "summary": "Owner just messaged he'll come down to $40K (was $42K). We're still offering $45K to lock the contract. 2BR / 1.5BA. Need photos before we can place buyers.",
+      "next_action": "Lock contract at $40K or our $45K offer, whichever closes faster. Get photos from the seller so we can find a buyer."
     },
     {
       "id": "p7",

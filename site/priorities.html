@@ -180,6 +180,7 @@ h2 .sec-count { margin-left: auto; font-size: 11px; letter-spacing: 0.18em; text
 .num-table .v.green { color: var(--s-live); }
 .num-table .v.red   { color: var(--s-uc); }
 .num-table .v .src  { color: var(--muted); font-weight: 500; font-size: 11px; font-style: italic; margin-left: 6px; }
+.num-table .v .dead-offer { text-decoration: line-through; color: var(--muted); }
 
 .contact {
   background: var(--cream); border: 1px solid var(--rule);
@@ -390,7 +391,11 @@ function renderDeal(deal, lead, slackMentions) {
     }
     if (Array.isArray(nums.offers) && nums.offers.length) {
       html += '<div class="k">Buyer Offers</div><div class="v">';
-      const lines = nums.offers.map(o => escapeHtml(o.name || 'Buyer') + ' ' + fmtMoney(o.amount) + (o.status ? ' <span class="src">' + escapeHtml(o.status) + '</span>' : ''));
+      const lines = nums.offers.map(o => {
+        const dead = (o.status || '').toLowerCase().includes('passed') || (o.status || '').toLowerCase().includes('dropped');
+        const inner = escapeHtml(o.name || 'Buyer') + ' ' + fmtMoney(o.amount) + (o.status ? ' <span class="src">' + escapeHtml(o.status) + '</span>' : '');
+        return dead ? '<span class="dead-offer">' + inner + '</span>' : inner;
+      });
       html += lines.join('<br>');
       html += '</div>';
     } else if (nums.best_buyer_offer != null) {
