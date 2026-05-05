@@ -87,6 +87,11 @@ jobs:
             echo "No weekly/ directory yet (first weekly run hasn't fired)."
           fi
 
+      - name: Build priority deals activity feed (notes + calls + slack)
+        env:
+          GHL_TOKEN: ${{ secrets.GHL_TOKEN }}
+        run: python priority_activity.py
+
       - name: Deploy HTML dashboard to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

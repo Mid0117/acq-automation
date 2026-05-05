@@ -249,6 +249,33 @@ h2 .sec-count { margin-left: auto; font-size: 11px; letter-spacing: 0.18em; text
   padding: 8px 0;
 }
 
+.activity {
+  margin-top: 14px;
+}
+.activity h4 {
+  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink); font-weight: 700; margin: 0 0 8px;
+}
+.event {
+  border-left: 3px solid var(--rule);
+  padding: 8px 12px; margin-bottom: 8px; background: var(--cream);
+  font-size: 13px; line-height: 1.5;
+}
+.event.note   { border-left-color: var(--ink); }
+.event.slack  { border-left-color: var(--gold); }
+.event.call   { border-left-color: #3b6e8c; }
+.event.feedback { border-left-color: #b03030; background: #fff8f4; }
+.event .ev-meta {
+  font-size: 10px; color: var(--muted); letter-spacing: 0.08em;
+  text-transform: uppercase; font-weight: 700; margin-bottom: 3px;
+}
+.event .ev-body {
+  white-space: pre-wrap;
+  font-family: Georgia, serif; color: var(--ink);
+}
+.event .ev-body a { color: var(--ink-soft); }
+.event.call audio { width: 100%; max-width: 380px; margin-top: 4px; }
+
 .footer {
   margin-top: 56px; padding-top: 20px;
   border-top: 3px double var(--ink);
@@ -325,7 +352,76 @@ function findInState(state, query) {
   return null;
 }
 
-function renderDeal(deal, lead, slackMentions) {
+function fmtTime(ts) {
+  if (!ts) return '?';
+  try {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return ts;
+    const now = new Date();
+    const diffH = (now - d) / 3600000;
+    if (diffH < 24)  return d.toLocaleTimeString(undefined, {hour:'numeric',minute:'2-digit'}) + ' today';
+    if (diffH < 48)  return 'yesterday ' + d.toLocaleTimeString(undefined, {hour:'numeric',minute:'2-digit'});
+    return d.toLocaleDateString(undefined, {month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined, {hour:'numeric',minute:'2-digit'});
+  } catch(e) { return ts; }
+}
+
+function renderActivity(act, slackMentions) {
+  if (!act && (!slackMentions || !slackMentions.length)) return '';
+  const events = [];
+
+  for (const n of (act && act.notes) || []) {
+    const isFeedback = (n.by || '').match(/^(Adam|Mido|Jeff|Mike)$/);
+    events.push({
+      type: isFeedback ? 'feedback' : 'note',
+      ts:   n.ts,
+      label: n.by || 'GHL note',
+      body: n.body,
+    });
+  }
+  for (const sm of (act && act.slack) || slackMentions || []) {
+    events.push({
+      type: 'slack',
+      ts:   sm.ts,
+      label: 'Slack #' + (sm.channel || '?') + ' · ' + (sm.user || ''),
+      body: sm.text || sm.original || '',
+      link: sm.permalink || '',
+      tsText: sm.ts_text || '',
+    });
+  }
+  if (act && act.call_recording) {
+    events.push({
+      type: 'call',
+      ts:   '',
+      label: 'Latest call recording',
+      body: '',
+      audioUrl: act.call_recording,
+    });
+  }
+
+  events.sort((a,b) => {
+    if (a.type === 'call') return -1;
+    if (b.type === 'call') return 1;
+    return (b.ts || '').localeCompare(a.ts || '');
+  });
+
+  if (!events.length) return '';
+  let html = '<div class="activity"><h4>Activity (notes · calls · slack)</h4>';
+  for (const e of events.slice(0, 8)) {
+    html += '<div class="event ' + e.type + '">';
+    html += '<div class="ev-meta">' + escapeHtml(e.label) + (e.ts ? ' · ' + escapeHtml(fmtTime(e.ts)) : (e.tsText ? ' · ' + escapeHtml(e.tsText) : '')) + '</div>';
+    if (e.audioUrl) {
+      html += '<audio controls preload="none" src="' + escapeHtml(e.audioUrl) + '"></audio>';
+    } else {
+      html += '<div class="ev-body">' + escapeHtml(e.body) + '</div>';
+    }
+    if (e.link) html += '<div style="margin-top:4px"><a href="' + escapeHtml(e.link) + '" target="_blank" style="font-size:10px;color:var(--ink-soft)">Open in Slack ↗</a></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderDeal(deal, lead, slackMentions, activity) {
   const cls = 'p' + Math.min(4, deal.priority || 4);
   const cid = lead && lead.cid ? lead.cid : '';
   const ghl = cid ? GHL_BASE + '/' + cid : '';
@@ -355,18 +451,8 @@ function renderDeal(deal, lead, slackMentions) {
   }
   html += '</div>';
 
-  // Slack mentions for this lead this week
-  if (slackMentions && slackMentions.length) {
-    html += '<div class="field" style="margin-top:14px"><h4>Slack This Week (' + slackMentions.length + ')</h4>';
-    for (const sm of slackMentions.slice(0, 3)) {
-      html += '<div class="slack-card">';
-      html += '<div class="meta">#' + escapeHtml(sm.channel || '?') + ' · by ' + escapeHtml(sm.user || '?') + ' · ' + escapeHtml(sm.ts_text || '') + '</div>';
-      if (sm.original) html += '<div class="original">"' + escapeHtml(sm.original) + '"</div>';
-      if (sm.permalink) html += '<div class="actions"><a href="' + escapeHtml(sm.permalink) + '" target="_blank">Open in Slack ↗</a></div>';
-      html += '</div>';
-    }
-    html += '</div>';
-  }
+  // Live activity feed: GHL notes, latest call recording, Slack mentions
+  html += renderActivity(activity, slackMentions);
 
   html += '</div>';
 
@@ -548,13 +634,19 @@ async function main() {
   // Pull all Slack mentions from the latest weekly snapshot to enrich each card
   let slackMentions = [];
   try {
-    // Find latest week file
     const idx = await fetch('weekly/index.json', {cache:'no-store'}).then(r => r.json());
     if (idx.weeks && idx.weeks.length) {
       const latest = await fetch('weekly/' + idx.weeks[0] + '.json', {cache:'no-store'}).then(r => r.json());
       slackMentions = latest.slack_mentions || [];
     }
   } catch (e) { /* slack enrichment optional */ }
+
+  // Pull priority_activity.json (notes + calls + slack per CID, cached by cron)
+  let activityByCid = {};
+  try {
+    const act = await fetch('priority_activity.json', {cache:'no-store'}).then(r => r.json());
+    activityByCid = act.contacts || {};
+  } catch (e) { /* activity feed optional */ }
 
   // Group by priority
   const byPri = {1: [], 2: [], 3: [], 4: []};
@@ -572,7 +664,8 @@ async function main() {
       const lead = findInState(state, deal.search_query);
       const cid  = lead && lead.cid;
       const sms  = cid ? slackMentions.filter(s => s.cid === cid) : [];
-      html += renderDeal(deal, lead, sms);
+      const act  = cid ? activityByCid[cid] : null;
+      html += renderDeal(deal, lead, sms, act);
     }
     html += '</div></section>';
   }
