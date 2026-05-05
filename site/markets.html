@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atom Property Group — Market Analysis</title>
+<style>
+:root {
+  --ink: #0A1F44;
+  --ink-soft: #1A3A7A;
+  --gold: #F5C518;
+  --gold-soft: #FFE58A;
+  --gold-wash: #FFF6D0;
+  --cream: #FAF7EC;
+  --cream-deep: #F3EED8;
+  --paper: #FFFFFF;
+  --rule: #C9C2A8;
+  --rule-soft: #E5E0C8;
+  --muted: #5A6786;
+  --text: #101827;
+  --good:    #10B981;
+  --neutral: #6B625A;
+  --bad:     #B91C1C;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; background: var(--cream); color: var(--text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px; line-height: 1.6;
+}
+.shell { max-width: 1240px; margin: 0 auto; padding: 40px 64px 120px; background: var(--paper); min-height: 100vh; }
+@media (max-width: 820px) { .shell { padding: 32px 24px 80px; } }
+
+.masthead {
+  border-top: 5px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 28px 0 24px; margin-bottom: 24px; position: relative;
+}
+.masthead::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: 160px; height: 5px; background: var(--gold);
+}
+.brandrow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+}
+.brand { color: var(--ink); font-weight: 700; }
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 54px; line-height: 1.04; letter-spacing: -0.015em;
+  margin: 0 0 14px; color: var(--ink); font-weight: 700;
+}
+h1 .accent { color: var(--gold); font-style: italic; }
+.dek {
+  font-family: Georgia, serif; font-style: italic; font-size: 18px;
+  line-height: 1.5; color: var(--ink-soft); max-width: 820px; margin: 10px 0 0;
+}
+
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 236, 0.96); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 -64px 28px; padding: 10px 64px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  display: flex; gap: 18px; overflow-x: auto; white-space: nowrap;
+}
+@media (max-width: 820px) { .topnav { margin: 0 -24px 24px; padding: 10px 24px; } }
+.topnav a { color: var(--ink-soft); text-decoration: none; font-weight: 700; padding: 4px 0; border-bottom: 2px solid transparent; }
+.topnav a:hover, .topnav a.active { color: var(--ink); border-bottom: 2px solid var(--gold); }
+
+section { margin: 40px 0; }
+h2 {
+  font-family: Georgia, serif; font-size: 26px; color: var(--ink);
+  margin: 0 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--ink);
+  letter-spacing: -0.01em; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+h2 .num {
+  display: inline-block; min-width: 34px; padding: 4px 10px;
+  background: var(--gold); color: var(--ink);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px; font-weight: 700; text-align: center; letter-spacing: 0.04em;
+}
+
+.kpi-strip {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px; margin: 24px 0;
+}
+.kpi {
+  background: var(--cream); border: 1px solid var(--rule);
+  border-left: 4px solid var(--gold); padding: 14px 18px;
+}
+.kpi .l { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.kpi .v { font-family: Georgia, serif; font-size: 26px; color: var(--ink); margin-top: 6px; line-height: 1.1; }
+.kpi .s { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+.methodology {
+  background: var(--cream); border: 1px solid var(--rule); padding: 16px 20px;
+  font-size: 13px; line-height: 1.6;
+}
+.methodology h3 { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 700; }
+.methodology ul { margin: 6px 0; padding-left: 22px; }
+.methodology li { margin: 4px 0; color: var(--ink); }
+.methodology .src { color: var(--muted); font-size: 12px; font-style: italic; }
+
+table.markets {
+  width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px;
+}
+table.markets thead th {
+  background: var(--ink); color: var(--gold);
+  font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 10px 12px; text-align: left; cursor: pointer; user-select: none;
+  border-right: 1px solid var(--ink-soft);
+}
+table.markets thead th:hover { background: var(--ink-soft); }
+table.markets thead th.sort-asc::after  { content: " ▲"; color: var(--gold); }
+table.markets thead th.sort-desc::after { content: " ▼"; color: var(--gold); }
+table.markets tbody td {
+  padding: 10px 12px; border-bottom: 1px dashed var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+table.markets tbody tr:hover { background: var(--cream); }
+table.markets tbody tr.tier-1 { border-left: 4px solid var(--good); }
+table.markets tbody tr.tier-2 { border-left: 4px solid var(--gold); }
+table.markets tbody tr.neutral { border-left: 4px solid var(--neutral); }
+table.markets tbody tr.tenant { border-left: 4px solid var(--bad); opacity: 0.6; }
+
+.rank {
+  display: inline-block; min-width: 28px; padding: 2px 6px;
+  background: var(--ink); color: var(--gold);
+  font-size: 11px; font-weight: 800; text-align: center;
+  letter-spacing: 0.04em;
+}
+.tier-pill {
+  font-size: 10px; padding: 2px 8px; letter-spacing: 0.06em;
+  text-transform: uppercase; font-weight: 700;
+}
+.tier-pill.t1 { background: var(--good); color: white; }
+.tier-pill.t2 { background: var(--gold); color: var(--ink); }
+.tier-pill.tn { background: var(--neutral); color: white; }
+.tier-pill.tt { background: var(--bad); color: white; }
+
+.score-bar {
+  display: inline-block; width: 80px; height: 8px; background: var(--rule-soft);
+  vertical-align: middle; margin-right: 6px; position: relative;
+}
+.score-bar > span {
+  position: absolute; left: 0; top: 0; height: 100%;
+}
+.score-bar.pos > span { background: var(--good); }
+.score-bar.neg > span { background: var(--bad); }
+
+.tier-filter {
+  display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0;
+}
+.tier-filter button {
+  padding: 6px 12px; border: 1px solid var(--rule); background: var(--paper);
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+  font-weight: 700; cursor: pointer; color: var(--ink);
+}
+.tier-filter button.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
+
+.empty-state { font-style: italic; color: var(--muted); font-size: 13px; padding: 8px 0; }
+
+.footer {
+  margin-top: 56px; padding-top: 20px; border-top: 3px double var(--ink);
+  display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; flex-wrap: wrap; gap: 12px;
+}
+.footer .gold-stamp {
+  display: inline-block; padding: 4px 10px;
+  background: var(--gold); color: var(--ink); letter-spacing: 0.14em;
+}
+
+.scope-note {
+  background: var(--gold-wash); border: 1px solid var(--gold-soft);
+  padding: 12px 16px; margin: 14px 0;
+  font-size: 13px; color: var(--ink);
+}
+.scope-note strong { font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div class="brandrow">
+      <span class="brand">Atom Property Group · Market Analysis</span>
+      <span id="brandMeta">Loading…</span>
+    </div>
+    <h1>Where to point <span class="accent">marketing</span> next.</h1>
+    <p class="dek">Top US states ranked for cold-call and SMS marketing — composite score combining landlord-friendliness, days-on-market, price reductions, listing density, and home-value sweet-spot. Refreshed weekly.</p>
+  </header>
+
+  <nav class="topnav">
+    <a href="index.html">Follow-Ups</a>
+    <a href="deals.html">Deals</a>
+    <a href="weekly.html">Weekly</a>
+    <a href="priorities.html">Priority</a>
+    <a href="markets.html" class="active">Markets</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <div id="content"><div class="empty-state" style="text-align:center;padding:60px">Loading market analysis…</div></div>
+
+  <div class="footer">
+    <span>Free public data · Realtor.com Research + Zillow Research + hardcoded landlord/tenant tier</span>
+    <span class="gold-stamp" id="updatedStamp">Loading…</span>
+  </div>
+
+</div>
+
+<script>
+const MARKETS_URL = 'markets.json';
+let markets = null;
+let sortKey = 'composite_score';
+let sortDir = 'desc';
+let tierFilter = 'all';
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function fmt(v, dp=0) {
+  if (v == null) return '—';
+  v = parseFloat(v); if (isNaN(v)) return '—';
+  return v.toLocaleString(undefined, {minimumFractionDigits: dp, maximumFractionDigits: dp});
+}
+function fmtMoney(v) {
+  if (v == null) return '—';
+  v = parseFloat(v); if (isNaN(v)) return '—';
+  if (v >= 1_000_000) return '$' + (v/1_000_000).toFixed(2) + 'M';
+  if (v >= 1_000)     return '$' + Math.round(v/1_000) + 'k';
+  return '$' + Math.round(v).toLocaleString();
+}
+function fmtPct(v, dp=1) {
+  if (v == null) return '—';
+  v = parseFloat(v); if (isNaN(v)) return '—';
+  return v.toFixed(dp) + '%';
+}
+
+function tierClass(tier) {
+  if (!tier) return 'neutral';
+  if (tier.includes('Tier 1')) return 'tier-1';
+  if (tier.includes('Tier 2')) return 'tier-2';
+  if (tier.includes('AVOID') || tier.includes('Tenant')) return 'tenant';
+  return 'neutral';
+}
+function tierPill(tier) {
+  if (tier && tier.includes('Tier 1')) return '<span class="tier-pill t1">L · Tier 1</span>';
+  if (tier && tier.includes('Tier 2')) return '<span class="tier-pill t2">L · Tier 2</span>';
+  if (tier && (tier.includes('AVOID') || tier.includes('Tenant'))) return '<span class="tier-pill tt">Avoid</span>';
+  return '<span class="tier-pill tn">Neutral</span>';
+}
+function scoreBar(v, max=80) {
+  const cls = v >= 0 ? 'pos' : 'neg';
+  const w   = Math.min(100, Math.abs(v) / max * 100);
+  return '<span class="score-bar ' + cls + '"><span style="width:' + w + '%"></span></span>' + (v > 0 ? '+' : '') + v;
+}
+
+function passesFilter(s) {
+  if (tierFilter === 'all') return true;
+  if (tierFilter === 't1')  return (s.tier || '').includes('Tier 1');
+  if (tierFilter === 't2')  return (s.tier || '').includes('Tier 2');
+  if (tierFilter === 'avoid') return (s.tier || '').includes('AVOID') || (s.tier || '').includes('Tenant');
+  return true;
+}
+
+function sortStates(states) {
+  return states.slice().sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (av == null) av = -Infinity;
+    if (bv == null) bv = -Infinity;
+    if (sortDir === 'asc')  return av - bv;
+    return bv - av;
+  });
+}
+
+function renderTable() {
+  const filtered = markets.states.filter(passesFilter);
+  const sorted   = sortStates(filtered);
+
+  const cols = [
+    { key: 'rank',                 label: '#',          fmt: s => '<span class="rank">' + s.rank + '</span>' },
+    { key: 'name',                 label: 'State',      fmt: s => '<strong>' + escapeHtml(s.abbr) + '</strong> · ' + escapeHtml(s.name) },
+    { key: 'tier_score',           label: 'Tier',       fmt: s => tierPill(s.tier) },
+    { key: 'composite_score',      label: 'Composite',  fmt: s => '<strong>' + scoreBar(s.composite_score) + '</strong>' },
+    { key: 'days_on_market',       label: 'DOM',        fmt: s => fmt(s.days_on_market) + ' d' },
+    { key: 'price_reduced_share',  label: 'Reduced %',  fmt: s => fmtPct(s.price_reduced_share, 1) },
+    { key: 'active_listing_count', label: 'Active',     fmt: s => fmt(s.active_listing_count) },
+    { key: 'zhvi',                 label: 'Median Val', fmt: s => fmtMoney(s.zhvi) },
+    { key: 'median_listing_price', label: 'List Price', fmt: s => fmtMoney(s.median_listing_price) },
+  ];
+
+  let html = '<table class="markets"><thead><tr>';
+  for (const c of cols) {
+    const cls = sortKey === c.key ? (sortDir === 'asc' ? 'sort-asc' : 'sort-desc') : '';
+    html += '<th class="' + cls + '" data-key="' + c.key + '">' + c.label + '</th>';
+  }
+  html += '</tr></thead><tbody>';
+
+  if (!sorted.length) {
+    html += '<tr><td colspan="' + cols.length + '" class="empty-state" style="text-align:center">No states match this filter.</td></tr>';
+  } else {
+    for (const s of sorted) {
+      html += '<tr class="' + tierClass(s.tier) + '">';
+      for (const c of cols) {
+        html += '<td>' + c.fmt(s) + '</td>';
+      }
+      html += '</tr>';
+    }
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderKPIs() {
+  if (!markets || !markets.states.length) return '';
+  const top   = markets.states[0];
+  const avoid = markets.states.filter(s => (s.tier || '').includes('AVOID')).length;
+  const tier1 = markets.states.filter(s => (s.tier || '').includes('Tier 1')).length;
+  const med   = markets.states.filter(s => s.days_on_market != null);
+  const slowest = med.slice().sort((a, b) => (b.days_on_market || 0) - (a.days_on_market || 0))[0];
+
+  let html = '<div class="kpi-strip">';
+  html += '<div class="kpi"><div class="l">Top State</div><div class="v">' + escapeHtml(top.name) + '</div><div class="s">score ' + top.composite_score + ' · DOM ' + fmt(top.days_on_market) + ' d</div></div>';
+  html += '<div class="kpi"><div class="l">Tier-1 States</div><div class="v">' + tier1 + '</div><div class="s">most landlord-friendly</div></div>';
+  if (slowest) html += '<div class="kpi"><div class="l">Slowest market (best for distressed)</div><div class="v">' + escapeHtml(slowest.name) + '</div><div class="s">' + fmt(slowest.days_on_market) + ' days on market</div></div>';
+  html += '<div class="kpi"><div class="l">States to avoid</div><div class="v">' + avoid + '</div><div class="s">tenant-friendly · slow eviction</div></div>';
+  html += '</div>';
+  return html;
+}
+
+function renderMethodology() {
+  const m = markets.methodology || {};
+  let html = '<div class="methodology">';
+  html += '<h3>Methodology</h3>';
+  html += '<p><strong>Decision driver:</strong> ' + escapeHtml(m.decision_driver || '') + '</p>';
+  html += '<ul>';
+  for (const i of m.inputs || []) html += '<li>' + escapeHtml(i) + '</li>';
+  html += '</ul>';
+  html += '<p class="src">Sources: ' + (m.sources || []).map(escapeHtml).join(' · ') + '</p>';
+  html += '</div>';
+  return html;
+}
+
+function renderAll() {
+  const c = document.getElementById('content');
+  let html = '';
+  html += '<section>';
+  html += '<h2><span class="num">01</span>At a Glance</h2>';
+  html += renderKPIs();
+  html += renderMethodology();
+  html += '</section>';
+
+  html += '<section>';
+  html += '<h2><span class="num">02</span>State Rankings <span style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-left:auto">' + markets.states.length + ' states</span></h2>';
+  html += '<div class="scope-note"><strong>v1 scope:</strong> state-level rankings only. v2 will add city / MSA breakdowns within the top states. v3 will add ZIP-level drill-down.</div>';
+  html += '<div class="tier-filter">';
+  html += '<button data-filter="all"   class="' + (tierFilter==='all'?'active':'') + '">All states</button>';
+  html += '<button data-filter="t1"    class="' + (tierFilter==='t1'?'active':'') + '">Tier 1 only</button>';
+  html += '<button data-filter="t2"    class="' + (tierFilter==='t2'?'active':'') + '">Tier 1 + 2</button>';
+  html += '<button data-filter="avoid" class="' + (tierFilter==='avoid'?'active':'') + '">Tenant-friendly (avoid)</button>';
+  html += '</div>';
+  html += renderTable();
+  html += '</section>';
+
+  c.innerHTML = html;
+}
+
+document.addEventListener('click', (e) => {
+  const th = e.target.closest('table.markets thead th');
+  if (th) {
+    const k = th.dataset.key;
+    if (sortKey === k) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortKey = k;
+      sortDir = (k === 'rank' || k === 'name') ? 'asc' : 'desc';
+    }
+    renderAll();
+    return;
+  }
+  const f = e.target.closest('.tier-filter button');
+  if (f) {
+    tierFilter = f.dataset.filter;
+    renderAll();
+  }
+});
+
+async function main() {
+  try {
+    markets = await fetch(MARKETS_URL, {cache:'no-store'}).then(r => r.json());
+  } catch (e) {
+    document.getElementById('content').innerHTML = '<div class="empty-state">Failed to load markets.json — has the workflow run yet?</div>';
+    return;
+  }
+  document.getElementById('brandMeta').textContent = markets.states.length + ' states · updated ' + (markets.updated_at || '?').slice(0, 10);
+  document.getElementById('updatedStamp').textContent = (markets.updated_at || '').slice(0, 10);
+  renderAll();
+}
+main();
+</script>
+</body>
+</html>

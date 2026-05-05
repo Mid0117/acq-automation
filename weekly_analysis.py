@@ -894,6 +894,7 @@ a:hover { color: var(--ink); }
     <a href="deals.html">Deals</a>
     <a href="weekly.html" class="active">Weekly</a>
     <a href="priorities.html">Priority</a>
+    <a href="markets.html">Markets</a>
     <a href="about.html">About</a>
     <span class="spacer"></span>
     <span class="week-pick">
