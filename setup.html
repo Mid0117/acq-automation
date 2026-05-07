@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>APG Dashboard — One-time Setup</title>
+<style>
+body {
+  margin: 0; padding: 60px 24px;
+  font-family: Georgia, "Times New Roman", serif;
+  background: #FAF7EC; color: #0A1F44;
+  text-align: center;
+}
+.box {
+  max-width: 540px; margin: 0 auto;
+  background: #FFFFFF; padding: 32px 36px;
+  border-top: 5px solid #0A1F44;
+  border-bottom: 1px solid #C9C2A8;
+  position: relative;
+}
+.box::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: 160px; height: 5px; background: #F5C518;
+}
+h1 { font-size: 28px; margin: 0 0 16px; }
+h1 .accent { color: #F5C518; font-style: italic; }
+p { font-size: 15px; line-height: 1.55; color: #1A3A7A; }
+.status {
+  margin-top: 22px; padding: 14px 18px;
+  background: #FFF6D0; border-left: 3px solid #F5C518;
+  font-family: ui-monospace, monospace; font-size: 13px;
+  color: #0A1F44; text-align: left;
+}
+.status.ok    { background: #ECFDF5; border-left-color: #10B981; color: #065F46; }
+.status.error { background: #FEF2F2; border-left-color: #B91C1C; color: #7F1D1D; }
+a {
+  display: inline-block; margin-top: 22px;
+  padding: 10px 18px; background: #0A1F44; color: #F5C518;
+  text-decoration: none; font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+a:hover { background: #F5C518; color: #0A1F44; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>APG Dashboard <span class="accent">Setup.</span></h1>
+    <p>This page stores your GHL Private Integration token in your browser so the "Apply to GHL" buttons on the dashboard work without re-prompting.</p>
+    <div class="status" id="status">Reading token from URL…</div>
+    <a id="continue" href="weekly.html">Continue to dashboard</a>
+  </div>
+
+<script>
+(function(){
+  const status = document.getElementById('status');
+  const cont   = document.getElementById('continue');
+
+  // Parse token from URL hash (#token=pit-...). Hash is never sent to the server.
+  const hash = window.location.hash || '';
+  const m = hash.match(/token=([^&]+)/);
+  if (!m) {
+    status.className = 'status error';
+    status.textContent = 'No token found in URL. Append #token=pit-... and reload, or click Apply on the dashboard to enter it manually.';
+    return;
+  }
+  const token = decodeURIComponent(m[1]).trim();
+  if (!token.startsWith('pit-')) {
+    status.className = 'status error';
+    status.textContent = 'Token does not look right (should start with "pit-").';
+    return;
+  }
+
+  // Save to localStorage (per-origin: mid0117.github.io)
+  try {
+    localStorage.setItem('apg_ghl_token_v1', token);
+    // Wipe the hash from the URL so it's not bookmarkable / share-able
+    if (history && history.replaceState) {
+      history.replaceState(null, '', window.location.pathname);
+    }
+    status.className = 'status ok';
+    status.innerHTML = '✓ Token stored in browser. Length: ' + token.length + ' · prefix: ' + token.slice(0, 8) + '…<br>You can close this tab or click below to go to the weekly dashboard.';
+    // Auto-redirect after 1.5s
+    setTimeout(() => { window.location.href = 'weekly.html'; }, 1500);
+  } catch (e) {
+    status.className = 'status error';
+    status.textContent = 'Failed to save token: ' + e.message;
+  }
+})();
+</script>
+</body>
+</html>

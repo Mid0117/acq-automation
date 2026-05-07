@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" aria-label="Atom Property Group">
+  <defs>
+    <style>
+      .ink   { fill: #1A2840; }
+      .gold  { fill: #FFC72C; }
+      .stroke{ stroke: #FFC72C; stroke-width: 5; fill: none; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <!-- "AT" -->
+  <text x="60" y="115" font-family="Arial Black, Helvetica, sans-serif"
+        font-weight="900" font-size="100" class="ink" letter-spacing="-2">AT</text>
+
+  <!-- Atom emblem in place of the O -->
+  <g transform="translate(255, 75)">
+    <!-- 3 elliptical orbits -->
+    <ellipse class="stroke" cx="40" cy="40" rx="38" ry="14" />
+    <ellipse class="stroke" cx="40" cy="40" rx="38" ry="14" transform="rotate(60 40 40)" />
+    <ellipse class="stroke" cx="40" cy="40" rx="38" ry="14" transform="rotate(-60 40 40)" />
+    <!-- Small electron dots, one on each orbit, evenly spaced -->
+    <circle class="gold" cx="78" cy="40" r="4.5" />
+    <circle class="gold" cx="21" cy="73" r="4.5" />
+    <circle class="gold" cx="21" cy="7"  r="4.5" />
+    <!-- Nucleus -->
+    <circle class="gold" cx="40" cy="40" r="9" />
+  </g>
+
+  <!-- "M" -->
+  <text x="345" y="115" font-family="Arial Black, Helvetica, sans-serif"
+        font-weight="900" font-size="100" class="ink" letter-spacing="-2">M</text>
+
+  <!-- "PROPERTY GROUP" -->
+  <text x="60" y="170" font-family="Arial, Helvetica, sans-serif"
+        font-weight="700" font-size="22" class="ink" letter-spacing="9">PROPERTY GROUP</text>
+</svg>

@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atom Property Group — Priority Deals</title>
+<style>
+:root {
+  --ink: #0A1F44;
+  --ink-deep: #061331;
+  --ink-soft: #1A3A7A;
+  --gold: #F5C518;
+  --gold-soft: #FFE58A;
+  --gold-wash: #FFF6D0;
+  --cream: #FAF7EC;
+  --cream-deep: #F3EED8;
+  --paper: #FFFFFF;
+  --rule: #C9C2A8;
+  --rule-soft: #E5E0C8;
+  --muted: #5A6786;
+  --text: #101827;
+  --s-uc:   #B91C1C;
+  --s-live: #10B981;
+  --s-warm: #EA580C;
+  --s-hold: #EAB308;
+  --s-dead: #6B625A;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; background: var(--cream); color: var(--text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px; line-height: 1.6;
+}
+.shell { max-width: 1240px; margin: 0 auto; padding: 40px 64px 120px; background: var(--paper); min-height: 100vh; }
+@media (max-width: 820px) { .shell { padding: 32px 24px 80px; } }
+
+.masthead {
+  border-top: 5px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 28px 0 24px; margin-bottom: 24px; position: relative;
+}
+.masthead::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: 160px; height: 5px; background: var(--gold);
+}
+.brandrow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+}
+.brand { color: var(--ink); font-weight: 700; }
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 54px; line-height: 1.04; letter-spacing: -0.015em;
+  margin: 0 0 14px; color: var(--ink); font-weight: 700;
+}
+h1 .accent { color: var(--gold); font-style: italic; }
+.dek {
+  font-family: Georgia, serif; font-style: italic; font-size: 18px;
+  line-height: 1.5; color: var(--ink-soft); max-width: 780px; margin: 10px 0 0;
+}
+
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 236, 0.96); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 -64px 28px; padding: 10px 64px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  display: flex; gap: 18px; overflow-x: auto; white-space: nowrap;
+}
+@media (max-width: 820px) { .topnav { margin: 0 -24px 24px; padding: 10px 24px; } }
+.topnav a { color: var(--ink-soft); text-decoration: none; font-weight: 700; padding: 4px 0; border-bottom: 2px solid transparent; }
+.topnav a:hover, .topnav a.active { color: var(--ink); border-bottom: 2px solid var(--gold); }
+
+section { margin: 40px 0; }
+h2 {
+  font-family: Georgia, serif; font-size: 26px; color: var(--ink);
+  margin: 0 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--ink);
+  letter-spacing: -0.01em; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+h2 .num {
+  display: inline-block; min-width: 34px; padding: 4px 10px;
+  background: var(--gold); color: var(--ink);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px; font-weight: 700; text-align: center; letter-spacing: 0.04em;
+}
+h2 .sec-count { margin-left: auto; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+
+.deal-grid { display: grid; gap: 18px; margin-top: 18px; }
+.deal {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 5px solid var(--gold); transition: box-shadow .2s ease;
+}
+.deal:hover { box-shadow: 0 8px 28px -18px rgba(10,31,68,0.25); }
+.deal.p1 { border-top-color: var(--s-uc); }
+.deal.p2 { border-top-color: var(--s-warm); }
+.deal.p3 { border-top-color: var(--s-hold); }
+.deal.p4 { border-top-color: var(--muted); }
+
+.deal-head {
+  padding: 18px 24px;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 16px;
+  align-items: center; border-bottom: 1px solid var(--rule);
+}
+@media (max-width: 700px) {
+  .deal-head { grid-template-columns: auto 1fr; }
+  .deal-head .deal-pri { grid-column: 1/-1; }
+}
+.deal-num {
+  font-family: Georgia, serif; font-size: 18px; font-weight: 700;
+  color: var(--ink); background: var(--gold); padding: 6px 12px;
+  letter-spacing: 0.02em; line-height: 1;
+}
+.deal.p1 .deal-num { background: var(--s-uc); color: #fff; }
+.deal-title h3 {
+  font-family: Georgia, serif; font-size: 22px; margin: 0 0 4px; color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.deal-title .place {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px; color: var(--muted); margin: 0; line-height: 1.4;
+  letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700;
+}
+.deal-pri {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--ink); color: var(--gold); padding: 8px 12px;
+  font-size: 11px; line-height: 1.3; border-left: 3px solid var(--gold);
+  white-space: nowrap; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700;
+}
+.deal.p1 .deal-pri { background: var(--s-uc); color: #fff; }
+.deal.p2 .deal-pri { background: var(--s-warm); color: #fff; }
+.deal.p3 .deal-pri { background: var(--s-hold); color: var(--ink); }
+.deal.p4 .deal-pri { background: var(--muted); color: #fff; }
+
+.deal-body { padding: 22px 24px 28px; }
+.deal-body-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
+@media (max-width: 820px) { .deal-body-grid { grid-template-columns: 1fr; } }
+
+.field h4 {
+  font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-soft); margin: 0 0 8px; font-weight: 700;
+}
+.field p { margin: 0 0 8px; color: #2b3856; font-size: 14px; line-height: 1.55; }
+.field.full { grid-column: 1/-1; }
+
+.summary-box {
+  background: var(--gold-wash); border-left: 3px solid var(--gold);
+  padding: 12px 16px; font-size: 14px; color: #24314e; line-height: 1.55;
+}
+.summary-box strong {
+  display: block; color: var(--ink); font-size: 10.5px;
+  text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 4px; font-weight: 700;
+}
+
+.next-action {
+  background: var(--cream); border: 1px solid var(--rule); padding: 12px 16px;
+  font-size: 13px; color: var(--ink); margin-top: 10px; line-height: 1.5;
+}
+.next-action strong {
+  display: block; color: var(--gold-deep, #C9A52A); font-size: 10.5px;
+  text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 4px; font-weight: 700;
+  color: var(--ink);
+}
+
+.num-table {
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 13px;
+}
+.num-table .k {
+  font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; padding: 6px 0;
+  border-top: 1px dashed var(--rule);
+}
+.num-table .v {
+  color: var(--ink); font-weight: 700; padding: 6px 0;
+  border-top: 1px dashed var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+.num-table .k:first-of-type, .num-table .v:first-of-type { border-top: none; }
+.num-table .v.green { color: var(--s-live); }
+.num-table .v.red   { color: var(--s-uc); }
+.num-table .v .src  { color: var(--muted); font-weight: 500; font-size: 11px; font-style: italic; margin-left: 6px; }
+.num-table .v .dead-offer { text-decoration: line-through; color: var(--muted); }
+
+.contact {
+  background: var(--cream); border: 1px solid var(--rule);
+  padding: 8px 12px; margin-top: 8px;
+  font-size: 13px; line-height: 1.6; color: var(--ink);
+}
+.contact a { color: var(--ink-soft); text-decoration: none; font-weight: 700; }
+.contact a:hover { color: var(--ink); text-decoration: underline; }
+
+.slack-card {
+  background: var(--gold-wash); border: 1px solid var(--gold-soft);
+  border-left: 3px solid var(--gold); padding: 10px 14px; margin-top: 8px;
+}
+.slack-card .meta {
+  font-size: 10px; color: var(--muted); margin-bottom: 4px;
+  letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700;
+}
+.slack-card .original {
+  font-family: Georgia, serif; font-style: italic; font-size: 13px;
+  color: #2b3856; padding: 2px 0 2px 10px; border-left: 2px solid var(--rule);
+  margin: 4px 0;
+}
+.slack-card .actions { margin-top: 4px; }
+.slack-card .actions a {
+  font-size: 10px; padding: 3px 8px; background: var(--ink); color: var(--gold);
+  text-decoration: none; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.feedback-box {
+  margin-top: 16px; padding: 14px 16px;
+  background: var(--paper); border: 2px solid var(--ink);
+  border-left: 4px solid var(--gold);
+}
+.feedback-box label {
+  display: block; font-size: 10.5px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ink); font-weight: 700; margin-bottom: 8px;
+}
+.feedback-box textarea {
+  width: 100%; min-height: 70px; padding: 10px 12px;
+  border: 1px solid var(--rule); background: var(--cream);
+  font-family: Georgia, serif; font-size: 14px; color: var(--ink);
+  resize: vertical;
+}
+.feedback-box textarea:focus { outline: none; border-color: var(--ink); }
+.feedback-box .row {
+  display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap;
+}
+.feedback-box select {
+  padding: 7px 10px; border: 1px solid var(--rule); background: var(--paper);
+  font-family: inherit; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink);
+}
+.feedback-box button {
+  padding: 8px 16px; background: var(--ink); color: var(--gold);
+  border: 1px solid var(--ink); cursor: pointer;
+  font-family: inherit; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.feedback-box button:hover { background: var(--gold); color: var(--ink); }
+.feedback-box button:disabled { opacity: 0.6; cursor: not-allowed; }
+.feedback-box .status { font-size: 12px; color: var(--muted); }
+
+.empty-state {
+  font-style: italic; color: var(--muted); font-size: 13px;
+  padding: 8px 0;
+}
+
+.activity {
+  margin-top: 14px;
+}
+.activity h4 {
+  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink); font-weight: 700; margin: 0 0 8px;
+}
+.event {
+  border-left: 3px solid var(--rule);
+  padding: 8px 12px; margin-bottom: 8px; background: var(--cream);
+  font-size: 13px; line-height: 1.5;
+}
+.event.note   { border-left-color: var(--ink); }
+.event.slack  { border-left-color: var(--gold); }
+.event.call   { border-left-color: #3b6e8c; }
+.event.feedback { border-left-color: #b03030; background: #fff8f4; }
+.event .ev-meta {
+  font-size: 10px; color: var(--muted); letter-spacing: 0.08em;
+  text-transform: uppercase; font-weight: 700; margin-bottom: 3px;
+}
+.event .ev-body {
+  white-space: pre-wrap;
+  font-family: Georgia, serif; color: var(--ink);
+}
+.event .ev-body a { color: var(--ink-soft); }
+.event.call audio { width: 100%; max-width: 380px; margin-top: 4px; }
+
+.footer {
+  margin-top: 56px; padding-top: 20px;
+  border-top: 3px double var(--ink);
+  display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; flex-wrap: wrap; gap: 12px;
+}
+.footer .gold-stamp {
+  display: inline-block; padding: 4px 10px;
+  background: var(--gold); color: var(--ink); letter-spacing: 0.14em;
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div class="brandrow">
+      <span class="brand">Atom Property Group · ACQ Operations</span>
+      <span id="brandMeta">Priority Deals</span>
+    </div>
+    <h1>Priority <span class="accent">Action.</span></h1>
+    <p class="dek">The deals that need a decision or a touch this week. Curated from Slack + meetings. Type Adam's feedback below any deal — it lands in the GHL contact's notes within seconds.</p>
+  </header>
+
+  <nav class="topnav">
+    <a href="index.html">Follow-Ups</a>
+    <a href="deals.html">Deals</a>
+    <a href="weekly.html">Weekly</a>
+    <a href="priorities.html" class="active">Priority</a>
+    <a href="markets.html">Markets</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <div id="content"><div class="empty-state" style="text-align:center;padding:60px">Loading priority deals…</div></div>
+
+  <div class="footer">
+    <span>Manually curated · Auto-enriched with GHL + Slack</span>
+    <span class="gold-stamp" id="updatedStamp">Loading…</span>
+  </div>
+
+</div>
+
+<script>
+const REPO        = 'Mid0117/acq-automation';
+const PAT_KEY     = 'apg_gh_pat_v1';
+const GHL_BASE    = 'https://app.gohighlevel.com/v2/location/RCkiUmWqXX4BYQ39JXmm/contacts/detail';
+const PRIORITIES_URL = 'priorities.json';
+const STATE_URL      = 'weekly/_state.json';
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function fmtMoney(v) {
+  if (v == null || v === '') return '—';
+  v = parseFloat(v); if (isNaN(v)) return '—';
+  const a = Math.abs(v);
+  if (a >= 1_000_000) return '$' + (v/1_000_000).toFixed(2) + 'M';
+  if (a >= 100_000)   return '$' + Math.round(v/1_000) + 'k';
+  if (a >= 1_000) {
+    const k = v / 1_000;
+    return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k';
+  }
+  return '$' + Math.round(v).toLocaleString();
+}
+
+function findInState(state, query) {
+  // Match by name OR address fragment, case-insensitive
+  const q = (query || '').toLowerCase();
+  for (const cid of Object.keys(state)) {
+    const lead = state[cid];
+    const blob = ((lead.name || '') + ' ' + (lead.addr || '') + ' ' + (lead.place || '')).toLowerCase();
+    if (q && blob.includes(q)) return lead;
+  }
+  return null;
+}
+
+function fmtTime(ts) {
+  if (!ts) return '?';
+  try {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return ts;
+    const now = new Date();
+    const diffH = (now - d) / 3600000;
+    if (diffH < 24)  return d.toLocaleTimeString(undefined, {hour:'numeric',minute:'2-digit'}) + ' today';
+    if (diffH < 48)  return 'yesterday ' + d.toLocaleTimeString(undefined, {hour:'numeric',minute:'2-digit'});
+    return d.toLocaleDateString(undefined, {month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined, {hour:'numeric',minute:'2-digit'});
+  } catch(e) { return ts; }
+}
+
+function renderActivity(act, slackMentions) {
+  if (!act && (!slackMentions || !slackMentions.length)) return '';
+  const events = [];
+
+  for (const n of (act && act.notes) || []) {
+    const isFeedback = (n.by || '').match(/^(Adam|Mido|Jeff|Mike)$/);
+    events.push({
+      type: isFeedback ? 'feedback' : 'note',
+      ts:   n.ts,
+      label: n.by || 'GHL note',
+      body: n.body,
+    });
+  }
+  for (const sm of (act && act.slack) || slackMentions || []) {
+    events.push({
+      type: 'slack',
+      ts:   sm.ts,
+      label: 'Slack #' + (sm.channel || '?') + ' · ' + (sm.user || ''),
+      body: sm.text || sm.original || '',
+      link: sm.permalink || '',
+      tsText: sm.ts_text || '',
+    });
+  }
+  if (act && act.call_recording) {
+    events.push({
+      type: 'call',
+      ts:   '',
+      label: 'Latest call recording',
+      body: '',
+      audioUrl: act.call_recording,
+    });
+  }
+
+  events.sort((a,b) => {
+    if (a.type === 'call') return -1;
+    if (b.type === 'call') return 1;
+    return (b.ts || '').localeCompare(a.ts || '');
+  });
+
+  if (!events.length) return '';
+  let html = '<div class="activity"><h4>Activity (notes · calls · slack)</h4>';
+  for (const e of events.slice(0, 8)) {
+    html += '<div class="event ' + e.type + '">';
+    html += '<div class="ev-meta">' + escapeHtml(e.label) + (e.ts ? ' · ' + escapeHtml(fmtTime(e.ts)) : (e.tsText ? ' · ' + escapeHtml(e.tsText) : '')) + '</div>';
+    if (e.audioUrl) {
+      html += '<audio controls preload="none" src="' + escapeHtml(e.audioUrl) + '"></audio>';
+    } else {
+      html += '<div class="ev-body">' + escapeHtml(e.body) + '</div>';
+    }
+    if (e.link) html += '<div style="margin-top:4px"><a href="' + escapeHtml(e.link) + '" target="_blank" style="font-size:10px;color:var(--ink-soft)">Open in Slack ↗</a></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderDeal(deal, lead, slackMentions, activity) {
+  const cls = 'p' + Math.min(4, deal.priority || 4);
+  const cid = lead && lead.cid ? lead.cid : '';
+  const ghl = cid ? GHL_BASE + '/' + cid : '';
+
+  let html = '<article class="deal ' + cls + '">';
+
+  // Head
+  html += '<div class="deal-head">';
+  html += '<div class="deal-num">' + escapeHtml(String(deal.id || '').toUpperCase()) + '</div>';
+  html += '<div class="deal-title">';
+  html += '<h3>' + escapeHtml(deal.address || 'Untitled') + '</h3>';
+  html += '<p class="place">' + escapeHtml(deal.place || '');
+  if (lead && lead.name) html += ' · Owner: ' + escapeHtml(lead.name);
+  html += '</p></div>';
+  html += '<div class="deal-pri">Priority ' + (deal.priority || '?') + ' · ' + escapeHtml(deal.tag || '') + '</div>';
+  html += '</div>';
+
+  // Body
+  html += '<div class="deal-body"><div class="deal-body-grid">';
+
+  // LEFT column: situation + numbers
+  html += '<div>';
+  html += '<div class="field"><h4>Situation</h4>';
+  html += '<div class="summary-box"><strong>What\'s going on</strong>' + escapeHtml(deal.summary || '') + '</div>';
+  if (deal.next_action) {
+    html += '<div class="next-action"><strong>Next action</strong>' + escapeHtml(deal.next_action) + '</div>';
+  }
+  html += '</div>';
+
+  // Live activity feed: GHL notes, latest call recording, Slack mentions
+  html += renderActivity(activity, slackMentions);
+
+  html += '</div>';
+
+  // RIGHT column: GHL data
+  html += '<div>';
+  html += '<div class="field"><h4>GHL Data</h4>';
+  if (!lead) {
+    html += '<div class="empty-state">No matching contact found in GHL state. Search query: <code>' + escapeHtml(deal.search_query || '') + '</code></div>';
+  } else {
+    const nums = deal.numbers || {};
+    const asking = (nums.asking != null) ? nums.asking : lead.asking;
+    const arv    = (nums.arv != null)    ? nums.arv    : lead.arv;
+    const hasCurated = Object.keys(nums).length > 0;
+    html += '<div class="num-table">';
+    html += '<div class="k">Stage</div><div class="v">' + escapeHtml(lead.stage_label || '?') + '</div>';
+    if (asking)             html += '<div class="k">Asking</div><div class="v">' + fmtMoney(asking) + (nums.asking != null ? ' <span class="src">(curated)</span>' : '') + '</div>';
+    if (nums.list_target)   html += '<div class="k">List Target</div><div class="v">' + fmtMoney(nums.list_target) + ' <span class="src">(curated)</span></div>';
+    if (nums.our_offer != null) {
+      html += '<div class="k">Our Offer</div><div class="v">' + fmtMoney(nums.our_offer);
+      if (nums.our_offer_status) html += ' <span class="src">' + escapeHtml(nums.our_offer_status) + '</span>';
+      html += '</div>';
+    }
+    if (Array.isArray(nums.offers) && nums.offers.length) {
+      html += '<div class="k">Buyer Offers</div><div class="v">';
+      const lines = nums.offers.map(o => {
+        const dead = (o.status || '').toLowerCase().includes('passed') || (o.status || '').toLowerCase().includes('dropped');
+        const inner = escapeHtml(o.name || 'Buyer') + ' ' + fmtMoney(o.amount) + (o.status ? ' <span class="src">' + escapeHtml(o.status) + '</span>' : '');
+        return dead ? '<span class="dead-offer">' + inner + '</span>' : inner;
+      });
+      html += lines.join('<br>');
+      html += '</div>';
+    } else if (nums.best_buyer_offer != null) {
+      html += '<div class="k">Best Buyer</div><div class="v">' + fmtMoney(nums.best_buyer_offer);
+      if (nums.best_buyer_status) html += ' <span class="src">' + escapeHtml(nums.best_buyer_status) + '</span>';
+      html += '</div>';
+    }
+    if (arv)           html += '<div class="k">ARV</div><div class="v">' + fmtMoney(arv) + '</div>';
+    if (lead.mao && !hasCurated) html += '<div class="k">70% MAO</div><div class="v">' + fmtMoney(lead.mao) + '</div>';
+    if (lead.spread != null && lead.arv && !hasCurated) {
+      const cls2 = lead.spread >= 0 ? 'green' : 'red';
+      const sign = lead.spread >= 0 ? '+' : '';
+      html += '<div class="k">Spread</div><div class="v ' + cls2 + '">' + sign + fmtMoney(lead.spread) + '</div>';
+    }
+    if (lead.rating != null) html += '<div class="k">Call Rating</div><div class="v">' + lead.rating + '/10</div>';
+    if (lead.temp)           html += '<div class="k">Lead Temp</div><div class="v">' + escapeHtml(lead.temp) + '</div>';
+    html += '</div>';
+
+    if (lead.phone) {
+      html += '<div class="contact">';
+      html += '☎ <a href="tel:' + escapeHtml(lead.phone_e164 || lead.phone) + '">' + escapeHtml(lead.phone) + '</a>';
+      html += ' · <a href="sms:' + escapeHtml(lead.phone_e164 || lead.phone) + '">Text</a>';
+      if (ghl) html += ' · <a href="' + ghl + '" target="_blank">Open in GHL</a>';
+      html += '</div>';
+    }
+  }
+  html += '</div>';
+  html += '</div>';  // end right col
+  html += '</div>';  // end body-grid
+
+  // Adam's feedback box
+  if (cid) {
+    html += '<div class="feedback-box" data-cid="' + escapeHtml(cid) + '" data-deal="' + escapeHtml(deal.id) + '">';
+    html += '<label>Adam\'s feedback — saves to GHL note</label>';
+    html += '<textarea placeholder="e.g. Send the contract today. Cyrus committed to $14K. Walk Wednesday at 4 PM."></textarea>';
+    html += '<div class="row">';
+    html += '<select class="who-sel" title="Who is this from">';
+    html += '<option value="Adam">From Adam</option>';
+    html += '<option value="Mido">From Mido</option>';
+    html += '<option value="Jeff">From Jeff</option>';
+    html += '<option value="Mike">From Mike</option>';
+    html += '</select>';
+    html += '<button class="submit-btn" type="button">Save to GHL</button>';
+    html += '<span class="status"></span>';
+    html += '</div></div>';
+  } else {
+    html += '<div class="feedback-box"><div class="empty-state">Can\'t add feedback until the lead matches in GHL state. Update the search_query in priorities.json to point to an actual lead.</div></div>';
+  }
+
+  html += '</div>';  // end deal-body
+  html += '</article>';
+  return html;
+}
+
+async function dispatchAddNote(cid, who, body) {
+  let pat = localStorage.getItem(PAT_KEY);
+  if (!pat) {
+    pat = prompt('Saving feedback to GHL needs a GitHub PAT (one-time setup, same as the Refresh button on the Weekly page).\n\n' +
+                 '1. https://github.com/settings/tokens?type=beta\n' +
+                 '2. Repo: Mid0117/acq-automation, Permissions: Actions = Read+Write\n' +
+                 '3. Paste it here.');
+    if (!pat) throw new Error('No token');
+    localStorage.setItem(PAT_KEY, pat.trim());
+  }
+  const url = 'https://api.github.com/repos/' + REPO + '/actions/workflows/add_note.yml/dispatches';
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + pat,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ref: 'main', inputs: {cid: String(cid), who: String(who), body: String(body)}}),
+  });
+  if (r.status === 204) return true;
+  if (r.status === 401 || r.status === 403) {
+    localStorage.removeItem(PAT_KEY);
+    throw new Error('GitHub token rejected');
+  }
+  const t = await r.text();
+  throw new Error(r.status + ': ' + t.slice(0, 200));
+}
+
+async function pollLatestRun(workflowName, sinceMs, maxMs=90000) {
+  const pat = localStorage.getItem(PAT_KEY);
+  const url = 'https://api.github.com/repos/' + REPO + '/actions/runs?per_page=10';
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    const r = await fetch(url, {headers: {'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json'}});
+    if (r.ok) {
+      const js = await r.json();
+      const run = (js.workflow_runs || []).find(rr =>
+        rr.name === workflowName && new Date(rr.created_at).getTime() > sinceMs - 5000
+      );
+      if (run && run.status === 'completed') return run;
+    }
+    await new Promise(res => setTimeout(res, 4000));
+  }
+  return null;
+}
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.feedback-box .submit-btn');
+  if (!btn) return;
+  const box = btn.closest('.feedback-box');
+  const cid = box.dataset.cid;
+  const who = box.querySelector('.who-sel').value;
+  const txt = box.querySelector('textarea').value.trim();
+  const status = box.querySelector('.status');
+  if (!txt) { status.textContent = 'Type something first.'; return; }
+  btn.disabled = true; status.textContent = 'Saving…';
+  const startedAt = Date.now();
+  try {
+    await dispatchAddNote(cid, who, txt);
+    status.textContent = 'Workflow firing…';
+    const run = await pollLatestRun('Add Note to GHL Contact', startedAt);
+    if (run && run.conclusion === 'success') {
+      status.textContent = '✓ Saved to GHL note';
+      box.querySelector('textarea').value = '';
+      box.style.borderLeftColor = 'var(--s-live)';
+    } else if (run) {
+      status.textContent = '⚠ workflow ' + (run.conclusion || 'unknown');
+    } else {
+      status.textContent = '⚠ timeout — check Actions tab';
+    }
+  } catch (err) {
+    status.textContent = '⚠ ' + (err.message || err);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+async function main() {
+  const c = document.getElementById('content');
+  let priorities, state;
+  try {
+    [priorities, state] = await Promise.all([
+      fetch(PRIORITIES_URL, {cache:'no-store'}).then(r => r.json()),
+      fetch(STATE_URL, {cache:'no-store'}).then(r => r.json()),
+    ]);
+  } catch (e) {
+    c.innerHTML = '<div class="empty-state">Failed to load: ' + e.message + '</div>';
+    return;
+  }
+
+  document.getElementById('brandMeta').textContent = priorities.deals.length + ' deals · updated ' + (priorities.updated_at || '?');
+  document.getElementById('updatedStamp').textContent = priorities.updated_by + ' · ' + priorities.updated_at;
+
+  // Pull all Slack mentions from the latest weekly snapshot to enrich each card
+  let slackMentions = [];
+  try {
+    const idx = await fetch('weekly/index.json', {cache:'no-store'}).then(r => r.json());
+    if (idx.weeks && idx.weeks.length) {
+      const latest = await fetch('weekly/' + idx.weeks[0] + '.json', {cache:'no-store'}).then(r => r.json());
+      slackMentions = latest.slack_mentions || [];
+    }
+  } catch (e) { /* slack enrichment optional */ }
+
+  // Pull priority_activity.json (notes + calls + slack per CID, cached by cron)
+  let activityByCid = {};
+  try {
+    const act = await fetch('priority_activity.json', {cache:'no-store'}).then(r => r.json());
+    activityByCid = act.contacts || {};
+  } catch (e) { /* activity feed optional */ }
+
+  // Group by priority
+  const byPri = {1: [], 2: [], 3: [], 4: []};
+  for (const deal of priorities.deals || []) byPri[Math.min(4, deal.priority || 4)].push(deal);
+
+  let html = '';
+  const priLabels = {1: 'Priority 1 — Act this week', 2: 'Priority 2 — Active', 3: 'Priority 3 — Stalled', 4: 'Priority 4 — Low Interest'};
+  let secNum = 1;
+  for (const pri of [1,2,3,4]) {
+    const deals = byPri[pri];
+    if (!deals.length) continue;
+    html += '<section><h2><span class="num">' + String(secNum++).padStart(2,'0') + '</span>' + priLabels[pri] + '<span class="sec-count">' + deals.length + ' deal' + (deals.length===1?'':'s') + '</span></h2>';
+    html += '<div class="deal-grid">';
+    for (const deal of deals) {
+      const lead = findInState(state, deal.search_query);
+      const cid  = lead && lead.cid;
+      const sms  = cid ? slackMentions.filter(s => s.cid === cid) : [];
+      const act  = cid ? activityByCid[cid] : null;
+      html += renderDeal(deal, lead, sms, act);
+    }
+    html += '</div></section>';
+  }
+  if (!html) html = '<div class="empty-state">No priority deals configured. Edit site/priorities.json.</div>';
+  c.innerHTML = html;
+}
+main();
+</script>
+</body>
+</html>

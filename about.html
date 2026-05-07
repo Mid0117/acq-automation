@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>APG ACQ — How the Automation Works</title>
+<style>
+:root {
+  --ink: #0A1F44;
+  --ink-deep: #061331;
+  --ink-soft: #1A3A7A;
+  --gold: #F5C518;
+  --gold-soft: #FFE58A;
+  --gold-wash: #FFF6D0;
+  --cream: #FAF7EC;
+  --cream-deep: #F3EED8;
+  --paper: #FFFFFF;
+  --rule: #C9C2A8;
+  --rule-soft: #E5E0C8;
+  --muted: #5A6786;
+  --muted-soft: #8A93AA;
+  --text: #101827;
+  --s-uc:   #B91C1C;
+  --s-live: #10B981;
+  --s-warm: #EA580C;
+  --s-hold: #EAB308;
+  --s-dead: #6B625A;
+  /* legacy aliases — keep older selectors working */
+  --bg: var(--cream);
+  --paper-border: var(--rule);
+  --panel: var(--paper);
+  --panel-border: var(--rule);
+  --ink-mute: var(--muted);
+  --gold-deep: var(--ink);
+  --rule-strong: var(--ink);
+  --green: var(--s-live);
+  --hot:   var(--s-uc);
+  --warm:  var(--s-warm);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 28px 36px 80px; }
+
+/* ── Top meta line ─────────────────────────────────────────── */
+.meta-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 4px solid var(--ink);
+  padding: 14px 0 0;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-soft);
+}
+
+/* ── Document header ───────────────────────────────────────── */
+.doc-header { padding: 36px 0 28px; }
+.doc-header h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600; font-style: normal;
+  font-size: 56px; line-height: 1.05; letter-spacing: -0.01em;
+  margin: 0 0 14px; color: var(--ink);
+}
+.doc-header h1 .accent {
+  font-style: italic; color: var(--gold-deep);
+}
+.doc-header .lede {
+  font-family: Georgia, "Times New Roman", serif; font-style: italic;
+  font-size: 17px; color: var(--ink-soft); max-width: 640px; margin: 0;
+  line-height: 1.55;
+}
+.doc-header hr {
+  border: 0; border-top: 1px solid var(--rule);
+  margin: 32px 0 0;
+}
+
+/* ── Logo block (small, top-of-doc) ────────────────────────── */
+.logo-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.logo-svg { width: 200px; height: auto; }
+.logo-svg .atom-orbit { stroke: var(--gold-deep); stroke-width: 2.6; fill: none; }
+.logo-svg .atom-core  { fill: var(--gold-deep); }
+.logo-svg .brand-main { fill: var(--ink); }
+.logo-svg .brand-sub  { fill: var(--ink-soft); letter-spacing: 4px; }
+
+/* ── Section tag (00 · The Frame) ──────────────────────────── */
+.sec {
+  margin: 56px 0 22px;
+}
+.sec .tag-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+}
+.sec .num {
+  display: inline-block;
+  background: var(--gold); color: var(--ink);
+  font-weight: 800; font-size: 12px; letter-spacing: 0.04em;
+  padding: 3px 8px; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", monospace;
+}
+.sec h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600; font-size: 26px; letter-spacing: -0.005em;
+  margin: 0; color: var(--ink);
+}
+.sec hr {
+  border: 0; border-top: 1px solid var(--rule);
+  margin: 0 0 20px;
+}
+
+/* ── Callout box (yellow-tinted) ───────────────────────────── */
+.callout {
+  background: var(--gold-soft);
+  border-left: 3px solid var(--gold);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  border-radius: 2px;
+}
+.callout p { margin: 0 0 10px; color: var(--ink); font-size: 15px; }
+.callout p:last-child { margin-bottom: 0; }
+.callout .rule-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold-deep);
+  margin-bottom: 8px;
+}
+
+/* ── Card grid (the 3 workers) ─────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px; margin-top: 16px;
+}
+.mini-card {
+  background: var(--paper); border: 1px solid var(--rule-strong);
+  border-radius: 4px; padding: 14px 16px;
+  border-top: 3px solid var(--ink);
+  transition: transform .12s ease;
+}
+.mini-card:hover { transform: translateY(-2px); }
+.mini-card .num {
+  font-size: 11px; color: var(--ink-mute);
+  font-family: ui-monospace, monospace; margin-bottom: 6px;
+}
+.mini-card .title {
+  font-weight: 700; font-size: 16px; margin-bottom: 8px;
+  line-height: 1.25;
+}
+.mini-card .freq-badge {
+  display: inline-block;
+  background: var(--gold); color: var(--ink);
+  font-weight: 800; font-size: 10px; letter-spacing: 0.06em;
+  padding: 3px 8px; border-radius: 3px; margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.mini-card .specs {
+  font-size: 12px; color: var(--ink-soft); line-height: 1.5;
+}
+.mini-card .specs span { display: inline-block; margin-right: 8px; }
+.mini-card .specs strong { color: var(--ink); font-weight: 600; }
+
+/* ── Detail card (full worker / detail block) ──────────────── */
+.detail {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 0;
+  margin-bottom: 18px; overflow: hidden;
+}
+.detail .head {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(232,197,71,0.04);
+}
+.detail .num-big {
+  font-family: ui-monospace, monospace; font-size: 20px;
+  color: var(--gold-deep); font-weight: 700;
+}
+.detail .head h3 {
+  margin: 0; font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600; font-size: 22px; color: var(--ink);
+  flex: 1; min-width: 0;
+}
+.detail .head .pill {
+  font-family: ui-monospace, monospace;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+  padding: 3px 8px; border-radius: 3px;
+  background: var(--gold); color: var(--ink);
+  text-transform: uppercase;
+}
+.detail .head .pill.green { background: rgba(47,125,91,0.15); color: var(--green); }
+.detail .head .pill.subtle {
+  background: transparent; color: var(--ink-mute);
+  border: 1px solid var(--rule-strong);
+}
+.detail .body {
+  padding: 18px 22px;
+}
+.detail .body .lead-line {
+  font-style: italic; font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink-soft); border-left: 3px solid var(--gold);
+  padding: 4px 0 4px 14px; margin: 0 0 14px; font-size: 14px;
+}
+.detail .body h4 {
+  margin: 18px 0 8px; font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600; font-size: 18px; color: var(--ink);
+}
+.detail .body ul { margin: 0; padding-left: 22px; }
+.detail .body li { margin-bottom: 6px; font-size: 14px; color: var(--ink); }
+.detail .body li strong { color: var(--ink); font-weight: 700; }
+code {
+  font-family: ui-monospace, monospace; font-size: 12px;
+  background: var(--gold-soft); padding: 1px 5px; border-radius: 3px;
+  color: var(--ink);
+}
+
+/* ── Stat block row (KPIs / What it saves) ─────────────────── */
+.stat-row {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-top: 14px;
+}
+.stat {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 3px solid var(--gold);
+  border-radius: 3px; padding: 16px 18px;
+}
+.stat .lab {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px;
+}
+.stat .v {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px; font-weight: 600; color: var(--ink);
+  line-height: 1.05;
+}
+.stat .sub {
+  font-size: 12px; color: var(--ink-soft); margin-top: 6px; line-height: 1.4;
+}
+.stat.green { border-top-color: var(--green); }
+.stat.green .v { color: var(--green); }
+.stat.hot { border-top-color: var(--hot); }
+.stat.hot .v { color: var(--hot); }
+
+/* ── Where revenue / costs lives bullets ───────────────────── */
+.where-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  margin-top: 16px;
+}
+@media (max-width: 700px) { .where-grid { grid-template-columns: 1fr; } }
+.where-grid .col .heading {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--green); margin-bottom: 8px;
+}
+.where-grid .col.before .heading { color: var(--hot); }
+.where-grid ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink); }
+.where-grid li { margin-bottom: 4px; }
+
+/* ── Cost table ────────────────────────────────────────────── */
+table {
+  width: 100%; border-collapse: collapse; font-size: 14px;
+  background: var(--paper); margin-top: 14px;
+  border: 1px solid var(--rule);
+}
+th { text-align: left; padding: 10px 16px;
+     background: var(--gold-soft);
+     color: var(--ink); font-size: 11px;
+     text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; }
+td { padding: 10px 16px; border-top: 1px solid var(--rule); }
+td.num { font-variant-numeric: tabular-nums; text-align: right; font-weight: 700; }
+tr.total td {
+  font-weight: 800; background: rgba(232,197,71,0.10);
+  border-top: 2px solid var(--gold);
+}
+.tag {
+  display: inline-block; padding: 2px 7px; font-size: 10px; font-weight: 700;
+  border-radius: 3px; background: rgba(181,122,26,0.15); color: var(--warm);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ── Roadmap ───────────────────────────────────────────────── */
+.section-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 24px 0 12px;
+  font-size: 11px; font-weight: 800; color: var(--ink-soft);
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.section-divider::before,
+.section-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--rule);
+}
+.section-divider.now { color: var(--green); }
+.section-divider.now::before,
+.section-divider.now::after { background: rgba(47,125,91,0.3); }
+
+.roadmap {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.roadmap .item {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink);
+  padding: 14px 18px; border-radius: 3px;
+}
+.roadmap .item.now { border-left-color: var(--green); background: rgba(47,125,91,0.04); }
+.roadmap .item h4 {
+  margin: 0 0 6px; font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600; font-size: 16px; color: var(--ink);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.roadmap .item p { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+.priority {
+  font-size: 9px; padding: 2px 7px; border-radius: 3px;
+  font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.priority.now    { background: rgba(47,125,91,0.18); color: var(--green); }
+.priority.medium { background: rgba(181,122,26,0.18); color: var(--warm); }
+.priority.future { background: rgba(26,40,64,0.10); color: var(--ink-soft); }
+
+/* ── Team / States grids ───────────────────────────────────── */
+.team-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.team-row .person {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 3px;
+  background: var(--paper); border: 1px solid var(--rule); font-size: 13px;
+}
+.team-row .person .initial {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--gold); color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+}
+.team-row .person .role { color: var(--ink-mute); font-size: 11px; }
+
+.state-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+  gap: 6px; margin-top: 12px;
+}
+.state-grid .st {
+  padding: 8px 10px; background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 3px; text-align: center;
+}
+.state-grid .st .code { font-size: 13px; font-weight: 800; color: var(--ink); }
+.state-grid .st .num { font-size: 10px; color: var(--ink-mute); margin-top: 2px;
+                       font-family: ui-monospace, monospace; }
+
+/* ── Tech stack pills ──────────────────────────────────────── */
+.stack {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px; margin-top: 14px;
+}
+.stack .pill {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 3px; padding: 10px 12px; text-align: center;
+}
+.stack .pill .name { font-weight: 700; font-size: 12px; margin-bottom: 2px; color: var(--ink); }
+.stack .pill .role { font-size: 10px; color: var(--ink-mute); }
+
+/* ── Nav ───────────────────────────────────────────────────── */
+.nav-mini { display: flex; gap: 6px; }
+.nav-mini a {
+  padding: 6px 12px; border-radius: 3px;
+  background: transparent; border: 1px solid var(--rule);
+  color: var(--ink-soft); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+  transition: all .12s;
+}
+.nav-mini a:hover { color: var(--ink); border-color: var(--ink); }
+.nav-mini a.active { background: var(--ink); color: var(--gold); border-color: var(--ink); }
+
+footer {
+  color: var(--ink-mute); font-size: 11px; text-align: center;
+  margin-top: 64px; padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  letter-spacing: 0.04em;
+}
+a { color: var(--gold-deep); }
+a:hover { color: var(--ink); }
+
+/* ── Animations & micro-interactions ─────────────────────── */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.fade-in-up { animation: fade-in-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.fade-in    { animation: fade-in 0.4s ease-out backwards; }
+
+/* Smooth filter transitions */
+.card, .lead-line, .stat, .bucket, .chart-card, .roadmap .item, .cron-card {
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card.filtered-out, .lead-line.filtered-out {
+  opacity: 0; transform: scale(0.96) translateY(-4px); pointer-events: none;
+}
+
+/* Hover lift for clickable cards */
+.card { will-change: transform; }
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(26,40,64,0.08);
+}
+.bucket .lead-line { transition: background 0.15s ease, transform 0.15s ease; }
+.bucket .lead-line:hover { transform: translateX(2px); }
+
+/* Filter chip + button micro-interactions */
+.filter-chip, .nav a, .btn, .ghl-link {
+  transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.filter-chip:active { transform: scale(0.96); }
+.btn:active, .ghl-link:active { transform: scale(0.97); }
+
+/* Stat KPI value entrance */
+.stat .v { transition: color 0.3s ease; }
+
+/* Smooth section reveal (set via JS-applied stagger) */
+.bucket, .stat, .card { animation-fill-mode: backwards; }
+
+
+/* ── MEETING-BRIEF MASTHEAD ────────────────────────── */
+body { background: var(--cream); color: var(--text); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+.container, .shell { max-width: 1240px; margin: 0 auto; padding: 40px 64px 120px; background: var(--paper); min-height: 100vh; }
+@media (max-width: 820px) { .container, .shell { padding: 32px 24px 80px; } }
+.masthead {
+  border-top: 5px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 28px 0 24px; margin-bottom: 24px; position: relative;
+}
+.masthead::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: 160px; height: 5px; background: var(--gold);
+}
+.brandrow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+}
+.brand { color: var(--ink); font-weight: 700; }
+.masthead h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 54px; line-height: 1.04; letter-spacing: -0.015em;
+  margin: 0 0 14px; color: var(--ink); font-weight: 700;
+}
+.masthead h1 .accent { color: var(--gold); font-style: italic; }
+.masthead .dek {
+  font-family: Georgia, serif; font-style: italic; font-size: 18px;
+  line-height: 1.5; color: var(--ink-soft); max-width: 780px; margin: 10px 0 0;
+}
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 236, 0.96); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 -64px 28px; padding: 10px 64px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  display: flex; gap: 18px; overflow-x: auto; white-space: nowrap;
+  align-items: center;
+}
+@media (max-width: 820px) { .topnav { margin: 0 -24px 24px; padding: 10px 24px; } }
+.topnav a {
+  color: var(--ink-soft); text-decoration: none; font-weight: 700; padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+.topnav a:hover, .topnav a.active { color: var(--ink); border-bottom: 2px solid var(--gold); }
+section h2, h2 {
+  font-family: Georgia, serif; font-size: 26px; color: var(--ink);
+  border-bottom: 2px solid var(--ink); padding-bottom: 10px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  letter-spacing: -0.01em;
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="masthead">
+    <div class="brandrow">
+      <span class="brand">Atom Property Group · ACQ Operations</span>
+      <span>Walkthrough · v1</span>
+    </div>
+    <h1>The Three <span class="accent">Robots.</span></h1>
+    <p class="dek">A read on how APG's acquisitions automation actually works. What runs, what it costs, what it saves the team — and what we'd build next.</p>
+  </header>
+
+  <nav class="topnav">
+    <a href="index.html">Follow-Ups</a>
+    <a href="deals.html">Deals</a>
+    <a href="weekly.html">Weekly</a>
+    <a href="priorities.html">Priority</a>
+    <a href="markets.html">Markets</a>
+    <a href="about.html" class="active">About</a>
+  </nav>
+
+  <!-- ── 00 · THE FRAME ────────────────────────────────────── -->
+  <section class="sec" id="frame">
+    <div class="tag-row">
+      <span class="num">00</span>
+      <h2>The Frame</h2>
+    </div>
+    <hr>
+
+    <div class="callout">
+      <p><strong>Three crons run on Microsoft's servers</strong> (free, public repo). They handle every step that used to need a human: transcribing calls, scoring leads, building rehab reports, sending follow-up SMS, classifying replies, advancing stages, and pricing properties. Two live dashboards — Follow-Ups and Deals — show what's happening and what needs attention.</p>
+      <p><strong style="color:var(--gold-deep)">Net result.</strong> Jeff calls people who actually want to talk. Mike reviews instead of doing data entry. Cold leads stop clogging the qualified queue. ARV gets calculated automatically. The team only sees what needs a human decision.</p>
+    </div>
+
+    <div class="callout">
+      <div class="rule-label">DESIGN RULE</div>
+      <p><strong>Trust the AI for routing, never for closing.</strong> Calls get analyzed, leads get classified, stages get auto-routed when the system is confident — but a deal never moves from LAO → DD → MAO → Contract without a human signing off. The automation handles the noise so humans handle the signal.</p>
+    </div>
+
+    <p style="font-size: 14px; color: var(--ink-soft); margin-top: 18px">Three workers running 24/7. Tap any card to jump.</p>
+
+    <div class="card-grid">
+      <a href="#worker-01" style="text-decoration:none;color:inherit">
+        <div class="mini-card">
+          <div class="num">01</div>
+          <div class="title">Call Recording Pipeline</div>
+          <div class="freq-badge">EVERY 15 MIN</div>
+          <div class="specs"><span><strong>Audio</strong> · Deepgram</span><span><strong>Analysis</strong> · Claude</span></div>
+        </div>
+      </a>
+      <a href="#worker-02" style="text-decoration:none;color:inherit">
+        <div class="mini-card">
+          <div class="num">02</div>
+          <div class="title">SMS + Dashboards</div>
+          <div class="freq-badge">EVERY 30 MIN</div>
+          <div class="specs"><span><strong>Sends</strong> · State-routed</span><span><strong>Replies</strong> · Classified</span></div>
+        </div>
+      </a>
+      <a href="#worker-03" style="text-decoration:none;color:inherit">
+        <div class="mini-card">
+          <div class="num">03</div>
+          <div class="title">Slack Scraper</div>
+          <div class="freq-badge">EVERY 60 MIN</div>
+          <div class="specs"><span><strong>4 channels</strong></span><span><strong>Audit trail</strong> · GHL notes</span></div>
+        </div>
+      </a>
+    </div>
+
+    <div class="callout" style="margin-top: 22px">
+      <div class="rule-label">BUILT FOR APG SPECIFICALLY</div>
+      <div class="team-row">
+        <div class="person"><div class="initial">J</div> Jeff <span class="role">Acquisitions calls</span></div>
+        <div class="person"><div class="initial">M</div> Mike <span class="role">Review · QA</span></div>
+        <div class="person"><div class="initial">A</div> Adam <span class="role">Pipeline owner</span></div>
+      </div>
+      <p style="margin-top:14px"><strong>Markets we cover.</strong> Each state has its own primary SMS number with an automatic secondary swap on touches 4-6 so we don't look like one spammer:</p>
+      <div class="state-grid">
+        <div class="st"><div class="code">NJ</div><div class="num">Jeff (lead)</div></div>
+        <div class="st"><div class="code">PA</div><div class="num">+1-267…</div></div>
+        <div class="st"><div class="code">OH</div><div class="num">+1-440…</div></div>
+        <div class="st"><div class="code">IN</div><div class="num">+1-260…</div></div>
+        <div class="st"><div class="code">AL</div><div class="num">+1-256…</div></div>
+        <div class="st"><div class="code">GA</div><div class="num">+1-470…</div></div>
+        <div class="st"><div class="code">SC</div><div class="num">+1-803…</div></div>
+        <div class="st"><div class="code">TN</div><div class="num">+1-901…</div></div>
+        <div class="st"><div class="code">WI</div><div class="num">+1-414…</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 01 · CALL RECORDING PIPELINE ──────────────────────── -->
+  <section class="sec" id="worker-01">
+    <div class="detail">
+      <div class="head">
+        <div class="num-big">01</div>
+        <h3>Call Recording Pipeline</h3>
+        <span class="pill green">EVERY 15 MIN</span>
+        <span class="pill subtle">acq_automation.py</span>
+      </div>
+      <div class="body">
+        <p class="lead-line">"Find new recordings. Transcribe them. Extract everything that matters. Route the lead. Move on."</p>
+
+        <h4>Quick model</h4>
+        <p>Recording-driven enrichment. Every 15 min, the cron checks GHL for new call recordings on stages 1-4. Each one runs through Deepgram → Claude → Apify → GHL writeback in under a minute. Side effect: the lead gets its stage auto-routed based on the call's outcome, and a clean "APG Lead Summary" note replaces the old freeform clutter.</p>
+
+        <div class="stat-row">
+          <div class="stat">
+            <div class="lab">Per-recording cost</div>
+            <div class="v">~$0.04</div>
+            <div class="sub">Deepgram transcription + Claude analysis + Apify enrichment, all-in.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">Time recovered</div>
+            <div class="v">~30 min/call</div>
+            <div class="sub">Mike's old job: listen, type, look up Zillow, write summary, set fields.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">Coverage</div>
+            <div class="v">100%</div>
+            <div class="sub">Every recording analyzed. Old workflow caught maybe 10-20%.</div>
+          </div>
+        </div>
+
+        <div class="where-grid">
+          <div class="col">
+            <div class="heading">What flows IN</div>
+            <ul>
+              <li>Call recording URL from GHL</li>
+              <li>Contact's existing custom fields</li>
+              <li>Apify Zillow detail (beds/baths/sqft/year)</li>
+              <li>Apify sold comps in the same ZIP</li>
+            </ul>
+          </div>
+          <div class="col">
+            <div class="heading">What flows OUT</div>
+            <ul>
+              <li>Transcript stored on contact</li>
+              <li>16 GHL custom fields populated</li>
+              <li>"APG Lead Summary" note (upserted)</li>
+              <li>Rehab Report Google Doc</li>
+              <li>Auto-routed stage + Lead Type</li>
+              <li>Tasks for Jeff/Adam/Mike (if Hot)</li>
+            </ul>
+          </div>
+        </div>
+
+        <h4>Auto-routing logic</h4>
+        <ul>
+          <li><strong>Hot</strong> → moves Stage 1 → Stage 2 (LAO), creates Jeff/Adam/Mike tasks (4h due), sets Lead Type = "Hot Lead".</li>
+          <li><strong>Warm</strong> → stays in Stage 1, sets Lead Type = "Warm Lead". Still in qualified queue.</li>
+          <li><strong>Nurture</strong> → moves to Stage 0 (Unqualified), sets Lead Type = "Nurture Lead". Silent demotion.</li>
+          <li><strong>Cold</strong> → moves to Stage 0 (Unqualified), sets Lead Type = "Cold Lead". Silent demotion.</li>
+        </ul>
+        <p style="font-size:13px;color:var(--ink-soft);margin-top:8px">Stages 2-4 are never auto-reversed. Once a lead is a real deal, only humans move it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 · SMS + DASHBOARDS ─────────────────────────────── -->
+  <section class="sec" id="worker-02">
+    <div class="detail">
+      <div class="head">
+        <div class="num-big">02</div>
+        <h3>SMS Follow-Up + Dashboards</h3>
+        <span class="pill green">EVERY 30 MIN</span>
+        <span class="pill subtle">sms_followup.py + 3 dashboards</span>
+      </div>
+      <div class="body">
+        <p class="lead-line">"The right SMS, at the right time, on the right number. Filter the noise. Push the signal to Jeff."</p>
+
+        <h4>Quick model</h4>
+        <p>Cadence-driven outbound. The cron walks every active lead in stages 1-4 + the three reactivation stages, checks where they are in the SMS sequence, and sends the next message if it's due. Inbound replies get classified by Claude before Jeff sees anything — STOP/hostile/wrong-number all auto-DND silently. Only positive/neutral replies reach Jeff's task list.</p>
+
+        <div class="stat-row">
+          <div class="stat green">
+            <div class="lab">Hours/week saved</div>
+            <div class="v">25-40h</div>
+            <div class="sub">Jeff + Mike's combined manual SMS + reply triage time.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">From-numbers</div>
+            <div class="v">9</div>
+            <div class="sub">8 state-routed primaries + Jeff NJ. Secondary swap on touches 4-6.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">Reply latency</div>
+            <div class="v">≤ 30 min</div>
+            <div class="sub">Bounded by cron tick. Webhooks would push this to seconds.</div>
+          </div>
+        </div>
+
+        <div class="where-grid">
+          <div class="col before">
+            <div class="heading">Before — manual</div>
+            <ul>
+              <li>SMS sent by hand, missed days, typos</li>
+              <li>Replies trickle in, Jeff scrambles</li>
+              <li>STOP requests sometimes ignored (legal risk)</li>
+              <li>No record of which from-number was used</li>
+            </ul>
+          </div>
+          <div class="col">
+            <div class="heading">After — automated</div>
+            <ul>
+              <li>Right SMS, right time, right state-routed number</li>
+              <li>Replies classified before Jeff sees them</li>
+              <li>"Reply STOP to opt out" appended on touches 1, 4, last</li>
+              <li>Negative replies auto-DND, never escalated</li>
+            </ul>
+          </div>
+        </div>
+
+        <h4>Reply classifier (Claude Haiku)</h4>
+        <ul>
+          <li><strong>STOP / hostile</strong> → set GHL DND, tag <code>dnd-opt-out</code>, no Jeff task.</li>
+          <li><strong>Wrong number</strong> → set GHL DND, tag <code>wrong-number</code>, no task.</li>
+          <li><strong>Not interested</strong> (polite no) → tag <code>not-interested</code>, no Jeff task. Re-touch eligible later.</li>
+          <li><strong>Positive / neutral</strong> → Jeff callback task + Mike review task, both with reply text inline.</li>
+        </ul>
+
+        <h4>Dashboards (also produced here)</h4>
+        <ul>
+          <li><strong>Google Sheet</strong> — raw rows, kill-switch toggle, live-editable templates.</li>
+          <li><strong>Follow-Ups HTML</strong> — action queue: Replied / Dormant / Active.</li>
+          <li><strong>Deals HTML</strong> — property cards: ARV, 70% MAO, assignment fee, call rating.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 · SLACK SCRAPER ───────────────────────────────── -->
+  <section class="sec" id="worker-03">
+    <div class="detail">
+      <div class="head">
+        <div class="num-big">03</div>
+        <h3>Slack Scraper</h3>
+        <span class="pill green">EVERY 60 MIN</span>
+        <span class="pill subtle">slack_scraper.py</span>
+      </div>
+      <div class="body">
+        <p class="lead-line">"Watch the team chatter. When someone mentions a lead, capture it before it's lost in the channel."</p>
+
+        <h4>Quick model</h4>
+        <p>Channel-driven enrichment. Every hour, the cron pulls new messages from 4 APG Slack channels, locally scores them against the contact index (no LLM call until there's a candidate hit — keeps cost down), then sends matched candidates to Claude for confidence-rated info extraction. High-confidence updates auto-apply to GHL fields; medium-confidence becomes an audit-trail note.</p>
+
+        <div class="stat-row">
+          <div class="stat">
+            <div class="lab">Channels watched</div>
+            <div class="v">4</div>
+            <div class="sub"><code>#base0-hot-warm-nurture-fu</code>, <code>#base1-sms-leadgen</code>, <code>#base4-dispo</code>, <code>#construction-services</code></div>
+          </div>
+          <div class="stat">
+            <div class="lab">Local pre-filter</div>
+            <div class="v">~98%</div>
+            <div class="sub">Of messages skip Claude entirely (no candidate match). Keeps cost per match low.</div>
+          </div>
+          <div class="stat">
+            <div class="lab">Auto-update threshold</div>
+            <div class="v">High only</div>
+            <div class="sub">Medium gets a note. Low/none gets nothing. No silent overwrites.</div>
+          </div>
+        </div>
+
+        <p style="font-size:13px;color:var(--ink-soft);margin-top:14px">Respects Slack's May 2025 rate limits (limit=15 per page, 2s sleep between pages).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 · THE STACK ────────────────────────────────────── -->
+  <section class="sec">
+    <div class="tag-row">
+      <span class="num">04</span>
+      <h2>The Stack</h2>
+    </div>
+    <hr>
+    <p style="color:var(--ink-soft);font-size:14px">Eight services, all integrated. Nothing custom-hosted — everything runs on managed infrastructure with predictable per-event pricing.</p>
+    <div class="stack">
+      <div class="pill"><div class="name">GitHub Actions</div><div class="role">Cron runner</div></div>
+      <div class="pill"><div class="name">GoHighLevel</div><div class="role">CRM + ACQ pipeline</div></div>
+      <div class="pill"><div class="name">Anthropic Claude</div><div class="role">Analysis · classification</div></div>
+      <div class="pill"><div class="name">Deepgram</div><div class="role">Audio → transcript</div></div>
+      <div class="pill"><div class="name">Apify (Zillow)</div><div class="role">Property + comps</div></div>
+      <div class="pill"><div class="name">Google Sheets / Drive</div><div class="role">Sheet + Rehab Reports</div></div>
+      <div class="pill"><div class="name">Slack API</div><div class="role">Channel scraping</div></div>
+      <div class="pill"><div class="name">GitHub Pages</div><div class="role">Dashboards hosting</div></div>
+    </div>
+  </section>
+
+  <!-- ── 05 · MONTHLY COSTS ────────────────────────────────── -->
+  <section class="sec" id="costs">
+    <div class="tag-row">
+      <span class="num">05</span>
+      <h2>Monthly Cost Breakdown</h2>
+    </div>
+    <hr>
+
+    <p style="color:var(--ink-soft);font-size:14px">All-in. Apify capped, Claude predictable, Deepgram pay-as-you-go, everything else free.</p>
+
+    <table>
+      <thead><tr><th>Service</th><th>What it does</th><th class="num">Cost / mo</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Apify <span class="tag">capped</span></td>
+          <td>Zillow property data + sold comps</td>
+          <td class="num">$50</td>
+        </tr>
+        <tr>
+          <td>Anthropic Claude</td>
+          <td>Call analysis · ARV · reply classification · Slack extraction</td>
+          <td class="num">$10–25</td>
+        </tr>
+        <tr>
+          <td>Deepgram</td>
+          <td>Call audio → transcript</td>
+          <td class="num">$5–15</td>
+        </tr>
+        <tr>
+          <td>GitHub Actions</td>
+          <td>Runs all 3 crons (free for public repo)</td>
+          <td class="num">$0</td>
+        </tr>
+        <tr>
+          <td>Google · GHL · Slack</td>
+          <td>Already in APG's existing subscriptions</td>
+          <td class="num">$0</td>
+        </tr>
+        <tr class="total">
+          <td>Total</td>
+          <td>Realistic monthly</td>
+          <td class="num">$65–90</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout" style="margin-top:18px">
+      <div class="rule-label">COST GUARDRAILS</div>
+      <p>The Apify budget guard checks remaining monthly limit before every call. Once we're $1 from the cap, all enrichment stops cleanly — no surprise overruns. Claude usage scales linearly with call volume; predictable. Deepgram is pay-as-you-go so it tracks call minutes 1:1.</p>
+      <p style="margin-bottom:0"><strong>For context:</strong> a single hour of Jeff's time replaced by automation pays for the entire system for a month.</p>
+    </div>
+  </section>
+
+  <!-- ── 06 · ROADMAP ──────────────────────────────────────── -->
+  <section class="sec" id="roadmap">
+    <div class="tag-row">
+      <span class="num">06</span>
+      <h2>Roadmap</h2>
+    </div>
+    <hr>
+
+    <div class="section-divider now">▸ Now Building</div>
+
+    <div class="roadmap">
+      <div class="item now">
+        <h4>A/B template testing <span class="priority now">In Progress</span></h4>
+        <p>Tag every send with which template variant fired. Track reply rate per variant in the dashboard. After ~200 sends per variant we'll know which copy converts. Foundation for ML-driven copy optimization later.</p>
+      </div>
+
+      <div class="item now">
+        <h4>Predictive lead scoring <span class="priority now">In Progress</span></h4>
+        <p>Score every new lead 0-100 before the first call using property + motivation + timeline + market signals. Jeff prioritizes by score. Heuristic version ships now; ML-trained version once APG hits ~50 closed deals as training data.</p>
+      </div>
+
+      <div class="item now">
+        <h4>Cold lead reactivation <span class="priority now">In Progress</span></h4>
+        <p>Properties that went Dead 6+ months ago — life events change. Re-touch sequence with property-specific Zestimate updates ("market's up 8% in your area, want a new number?"). Builds on the existing Follow Up cadence with smarter copy.</p>
+      </div>
+
+      <div class="item now">
+        <h4>Auto rehab scope from photos <span class="priority now">In Progress</span></h4>
+        <p>Pull listing photos via Apify, send to Claude vision → automatic repair scope per room + a rough $/sqft repair estimate. Replaces ~30 min of manual estimator time per property and feeds straight into the existing Rehab Report doc.</p>
+      </div>
+    </div>
+
+    <div class="section-divider">▸ Future</div>
+
+    <div class="roadmap">
+      <div class="item">
+        <h4>Real-time reply detection <span class="priority medium">Medium</span></h4>
+        <p>Switch the SMS reply path from 30-min polling to a GHL webhook for sub-second detection. Means Jeff can call back while the seller is still thinking about it.</p>
+      </div>
+
+      <div class="item">
+        <h4>Calendly auto-booking <span class="priority medium">Medium</span></h4>
+        <p>When a positive reply comes in, parse the seller's stated availability. Send back a Calendly link pre-filtered to matching slots. Saves Jeff a round-trip.</p>
+      </div>
+
+      <div class="item">
+        <h4>Multi-language SMS <span class="priority future">Future</span></h4>
+        <p>Detect seller's preferred language. Maintain Spanish + Portuguese template tracks for relevant markets (NJ has heavy Hispanic + Brazilian populations).</p>
+      </div>
+
+      <div class="item">
+        <h4>Voice AI cold caller <span class="priority future">Future</span></h4>
+        <p>For "Call Needed" leads with no recording yet — AI voice agent makes the first qualifying call. Only escalates to Jeff if Hot. Tackles the biggest remaining bottleneck.</p>
+      </div>
+
+      <div class="item">
+        <h4>Cash buyer dashboard <span class="priority future">Future</span></h4>
+        <p>Mirror the ACQ deals dashboard for the Cash Buyer pipeline (OH/PA/NJ/AL). Track buyer engagement, last contact, capacity per buyer.</p>
+      </div>
+
+      <div class="item">
+        <h4>Spend-per-deal analytics <span class="priority future">Future</span></h4>
+        <p>Break down Apify + Claude + Deepgram spend per lead. Calculate APG's true cost-per-closed-deal. Tells us which lead sources are profitable.</p>
+      </div>
+
+      <div class="item">
+        <h4>Construction services pipeline <span class="priority future">Future</span></h4>
+        <p>Same call → transcript → analyze flow but for the Construction Services pipeline. Different prompt, different fields, different routing — same infrastructure.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 07 · WHERE THE CODE LIVES ─────────────────────────── -->
+  <section class="sec">
+    <div class="tag-row">
+      <span class="num">07</span>
+      <h2>Where the Code Lives</h2>
+    </div>
+    <hr>
+
+    <div class="callout">
+      <p>All scripts and workflows are in the public repo at <a href="https://github.com/Mid0117/acq-automation" target="_blank">github.com/Mid0117/acq-automation</a>. Every cron run is logged at <a href="https://github.com/Mid0117/acq-automation/actions" target="_blank">github.com/Mid0117/acq-automation/actions</a>.</p>
+      <p style="margin-bottom:0">Secrets (API tokens) are encrypted by GitHub and never appear in code. The repo is public so the code is auditable; only the API tokens are hidden.</p>
+    </div>
+
+    <p style="margin-top:18px;font-size:14px"><strong>Live dashboards:</strong> <a href="index.html">Follow-Ups</a> · <a href="deals.html">Deals</a></p>
+  </section>
+
+  <footer>
+    APG Acquisition Automation · Built on GitHub Actions + GHL + Claude + Apify + Deepgram
+  </footer>
+
+</div>
+<script>
+// ── Animation runtime (count-up + stagger) ──────────────────
+function animateNumber(el, durationMs) {
+  durationMs = durationMs || 700;
+  const original = el.textContent.trim();
+  const m = original.match(/-?\d+(?:\.\d+)?/);
+  if (!m) return;
+  const target = parseFloat(m[0]);
+  const decimals = (m[0].split('.')[1] || '').length;
+  if (target === 0) return;  // nothing to animate
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min(1, (now - start) / durationMs);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const current = (target * eased).toFixed(decimals);
+    el.textContent = original.replace(/-?\d+(?:\.\d+)?/, current);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = original;
+  }
+  requestAnimationFrame(tick);
+}
+
+function staggerIn(selector, baseDelay) {
+  baseDelay = baseDelay || 0;
+  document.querySelectorAll(selector).forEach((el, i) => {
+    el.style.animationDelay = (baseDelay + i * 35) + 'ms';
+    el.classList.add('fade-in-up');
+  });
+}
+
+function runEntranceAnimations(root) {
+  root = root || document;
+  root.querySelectorAll('.stat .v').forEach(el => animateNumber(el));
+  // Stagger top-level grid children within key containers
+  ['.stat-row', '.charts-grid', '.kpi-row'].forEach(sel => {
+    root.querySelectorAll(sel).forEach(parent => {
+      Array.from(parent.children).forEach((el, i) => {
+        el.style.animationDelay = (i * 50) + 'ms';
+        el.classList.add('fade-in-up');
+      });
+    });
+  });
+  ['.bucket', '.cron-card', '.roadmap .item', '.grid > .card'].forEach(sel => {
+    root.querySelectorAll(sel).forEach((el, i) => {
+      el.style.animationDelay = (i * 30) + 'ms';
+      el.classList.add('fade-in-up');
+    });
+  });
+}
+
+// Run once on initial load. For pages that re-render content (weekly,
+// follow-ups), they should call this again after replacing the DOM.
+document.addEventListener('DOMContentLoaded', () => runEntranceAnimations());
+window.runEntranceAnimations = runEntranceAnimations;  // expose for re-render
+</script>
+</body>
+</html>
