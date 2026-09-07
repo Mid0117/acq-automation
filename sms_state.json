@@ -439,10 +439,10 @@
   "3cTZ8j8B127o06NKUKEa": {
     "dormant": false,
     "last_from_number": "+19013138258",
-    "last_sms_at": "2026-08-31T16:36:26.883632+00:00",
+    "last_sms_at": "2026-09-07T20:03:11.102336+00:00",
     "replied": false,
     "replied_at": null,
-    "sms_count": 5,
+    "sms_count": 6,
     "stage_entered_at": "2026-07-27T14:03:56.389354+00:00",
     "stage_name": "qualified"
   },
@@ -555,7 +555,7 @@
     "reply_text": "Ok",
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:16:50.159790+00:00",
+    "stage_entered_at": "2026-09-07T20:10:16.594978+00:00",
     "stage_name": "dead"
   },
   "4NR4VCH3YMuN368SyTtT": {
@@ -779,7 +779,7 @@
     "reply_text": "4600$ a month",
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:18:03.578155+00:00",
+    "stage_entered_at": "2026-09-07T20:11:33.049298+00:00",
     "stage_name": "dead"
   },
   "5hMOvFFJdmcB48iYUbY9": {
@@ -823,10 +823,10 @@
   "5uAvxtH6LI3vodD7WS6t": {
     "dormant": false,
     "last_from_number": "+12676197270",
-    "last_sms_at": "2026-08-31T16:36:23.588392+00:00",
+    "last_sms_at": "2026-09-07T20:03:08.414734+00:00",
     "replied": false,
     "replied_at": null,
-    "sms_count": 4,
+    "sms_count": 5,
     "stage_entered_at": "2026-07-27T14:03:54.886002+00:00",
     "stage_name": "qualified"
   },
@@ -1034,7 +1034,7 @@
     "replied": false,
     "replied_at": null,
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:14:10.305525+00:00",
+    "stage_entered_at": "2026-09-07T20:07:54.693573+00:00",
     "stage_name": "dead"
   },
   "7soqLBHcZHreXlJNPF7t": {
@@ -1094,10 +1094,10 @@
   "8SW87e3yuyGqZcycrrpS": {
     "dormant": false,
     "last_from_number": "+16094388996",
-    "last_sms_at": "2026-08-31T16:35:43.358916+00:00",
+    "last_sms_at": "2026-09-07T20:02:35.552793+00:00",
     "replied": false,
     "replied_at": null,
-    "sms_count": 2,
+    "sms_count": 3,
     "stage_entered_at": "2026-08-13T18:13:30.574604+00:00",
     "stage_name": "qualified"
   },
@@ -1158,10 +1158,10 @@
   "8dB4aEBID0mO7FzdgjnD": {
     "dormant": false,
     "last_from_number": "+12676197270",
-    "last_sms_at": "2026-08-31T16:36:33.639588+00:00",
+    "last_sms_at": "2026-09-07T20:03:16.943683+00:00",
     "replied": false,
     "replied_at": null,
-    "sms_count": 4,
+    "sms_count": 5,
     "stage_entered_at": "2026-07-30T15:09:29.872522+00:00",
     "stage_name": "qualified"
   },
@@ -2196,7 +2196,7 @@
     "reply_text": "No we just invested in a lot of upgrades and aren't interested in a low ball offer.",
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:12:03.452748+00:00",
+    "stage_entered_at": "2026-09-07T20:05:55.316132+00:00",
     "stage_name": "dead"
   },
   "GdoPFapfkMCtT2MEQ11w": {
@@ -2277,7 +2277,7 @@
     "replied": false,
     "replied_at": null,
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:10:46.103990+00:00",
+    "stage_entered_at": "2026-09-07T20:04:43.294514+00:00",
     "stage_name": "dead"
   },
   "Gzku9tYtjeNGHHJFOfAU": {
@@ -2890,7 +2890,7 @@
     "replied_at": null,
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:14:38.377784+00:00",
+    "stage_entered_at": "2026-09-07T20:08:20.199999+00:00",
     "stage_name": "dead"
   },
   "MZY6nvM07fNAcxyrcbpR": {
@@ -3015,10 +3015,10 @@
   "NLMyUucsKGq0Tu4qOlSN": {
     "dormant": false,
     "last_from_number": "+16094388996",
-    "last_sms_at": "2026-08-31T16:36:00.119464+00:00",
+    "last_sms_at": "2026-09-07T20:02:49.942588+00:00",
     "replied": false,
     "replied_at": null,
-    "sms_count": 1,
+    "sms_count": 2,
     "stage_entered_at": "2026-08-24T16:01:21.021065+00:00",
     "stage_name": "qualified"
   },
@@ -3450,10 +3450,10 @@
   "QLpzBpQOyYetqGvY82q1": {
     "dormant": false,
     "last_from_number": "+12676197270",
-    "last_sms_at": "2026-08-31T16:36:30.188335+00:00",
+    "last_sms_at": "2026-09-07T20:03:13.166701+00:00",
     "replied": false,
     "replied_at": null,
-    "sms_count": 5,
+    "sms_count": 6,
     "stage_entered_at": "2026-07-27T14:03:57.068514+00:00",
     "stage_name": "qualified"
   },
@@ -3728,6 +3728,16 @@
     "sms_count": 0,
     "stage_entered_at": "2026-08-18T17:05:47.526671+00:00",
     "stage_name": "dead"
+  },
+  "S6K4R9cV9YLKrHnCxAaC": {
+    "dormant": false,
+    "last_from_number": null,
+    "last_sms_at": null,
+    "replied": false,
+    "replied_at": null,
+    "sms_count": 0,
+    "stage_entered_at": "2026-09-07T20:01:47.950826+00:00",
+    "stage_name": "qualified"
   },
   "SNwfSwaTlXMs4YNPbs1V": {
     "dormant": false,
@@ -4337,7 +4347,7 @@
     "reply_text": "Afternoon",
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:11:17.706354+00:00",
+    "stage_entered_at": "2026-09-07T20:05:09.074393+00:00",
     "stage_name": "dead"
   },
   "YAINV7hCi7H1c7OQhaQR": {
@@ -4799,7 +4809,7 @@
     "replied": false,
     "replied_at": null,
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:10:12.724748+00:00",
+    "stage_entered_at": "2026-09-07T20:04:13.163467+00:00",
     "stage_name": "dead"
   },
   "azlTSIIrdlWcQStOxOLF": {
@@ -5509,7 +5519,7 @@
     "replied_at": null,
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:18:24.598353+00:00",
+    "stage_entered_at": "2026-09-07T20:11:53.661749+00:00",
     "stage_name": "dead"
   },
   "gZBc0lSSpZCAGdU5iAkF": {
@@ -5788,6 +5798,16 @@
     "sms_count": 0,
     "stage_entered_at": "2026-08-18T16:57:32.129910+00:00",
     "stage_name": "dead"
+  },
+  "iQXJxAGJZVTxHihwK3Xh": {
+    "dormant": false,
+    "last_from_number": null,
+    "last_sms_at": null,
+    "replied": false,
+    "replied_at": null,
+    "sms_count": 0,
+    "stage_entered_at": "2026-09-07T20:01:45.025152+00:00",
+    "stage_name": "qualified"
   },
   "iSGPij5Edzhg2LPS0kgQ": {
     "dormant": false,
@@ -6464,7 +6484,7 @@
     "reply_text": "I'm entertaining offers at $750k as is. Thx",
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:17:44.251218+00:00",
+    "stage_entered_at": "2026-09-07T20:11:06.556612+00:00",
     "stage_name": "dead"
   },
   "nCO0yg05Zdy7RDvsxtpu": {
@@ -6490,6 +6510,16 @@
     "sms_count": 0,
     "stage_entered_at": "2026-08-18T17:00:46.945847+00:00",
     "stage_name": "dead"
+  },
+  "nLwAB7cWZUDxNC9mBsAG": {
+    "dormant": false,
+    "last_from_number": null,
+    "last_sms_at": null,
+    "replied": false,
+    "replied_at": null,
+    "sms_count": 0,
+    "stage_entered_at": "2026-09-07T20:01:45.793645+00:00",
+    "stage_name": "qualified"
   },
   "nNid7hGTgX1SOeOwNege": {
     "dormant": false,
@@ -6683,7 +6713,7 @@
     "replied": false,
     "replied_at": null,
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:10:43.139855+00:00",
+    "stage_entered_at": "2026-09-07T20:04:41.326243+00:00",
     "stage_name": "dead"
   },
   "p6oqAEarL8xigyeKmJql": {
@@ -6763,10 +6793,10 @@
   "piXBUYrRLecTHL0l2IQe": {
     "dormant": false,
     "last_from_number": "+12676197270",
-    "last_sms_at": "2026-08-31T16:36:07.801685+00:00",
+    "last_sms_at": "2026-09-07T20:02:54.399650+00:00",
     "replied": false,
     "replied_at": null,
-    "sms_count": 4,
+    "sms_count": 5,
     "stage_entered_at": "2026-07-30T15:08:56.824825+00:00",
     "stage_name": "qualified"
   },
@@ -6998,7 +7028,7 @@
     "reply_text": "DnD enabled by customer",
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:17:57.849398+00:00",
+    "stage_entered_at": "2026-09-07T20:11:25.844846+00:00",
     "stage_name": "dead"
   },
   "rQ1EwW0Yr7FlS4AA76aJ": {
@@ -7297,7 +7327,7 @@
     "replied_at": null,
     "skip_reason": "tag-already-routed",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:16:40.024117+00:00",
+    "stage_entered_at": "2026-09-07T20:10:09.746354+00:00",
     "stage_name": "dead"
   },
   "u7zwS8I6wHAkfSOUGKrY": {
@@ -7901,6 +7931,16 @@
     "stage_entered_at": "2026-08-24T16:03:13.576300+00:00",
     "stage_name": "dead"
   },
+  "yWwjMREo4SKCVEYPTkxe": {
+    "dormant": false,
+    "last_from_number": null,
+    "last_sms_at": null,
+    "replied": false,
+    "replied_at": null,
+    "sms_count": 0,
+    "stage_entered_at": "2026-09-07T20:01:47.120479+00:00",
+    "stage_name": "qualified"
+  },
   "ycNhuekZBk9DuxUmpan7": {
     "dormant": false,
     "last_from_number": null,
@@ -7911,7 +7951,7 @@
     "reply_class": "NEUTRAL",
     "reply_text": "",
     "sms_count": 0,
-    "stage_entered_at": "2026-09-07T16:10:22.449716+00:00",
+    "stage_entered_at": "2026-09-07T20:04:23.487241+00:00",
     "stage_name": "dead"
   },
   "ycucJNQR1Cps8idBB6df": {
