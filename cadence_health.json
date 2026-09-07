@@ -147,7 +147,7 @@
     },
     {
       "date": "2026-09-07",
-      "had_business_hour_run": false,
+      "had_business_hour_run": true,
       "sends": 0
     }
   ],
