@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script>(function(){var h=location.hostname;if(h.indexOf('github.io')>-1||h.indexOf('githubusercontent')>-1){document.documentElement.style.display='none';location.replace('https://apg-dashboard.mithchell.workers.dev/login?next='+encodeURIComponent('/'));}})();</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atom Investments — Roadmap</title>
+<meta property="og:site_name" content="Atom Investments">
+<meta property="og:title" content="Atom Investments — Roadmap">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<meta name="theme-color" content="#0A1F44">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/atom.css">
+<script src="js/atom.js" defer></script>
+<style>
+/* Tokens + base + nav from css/atom.css. Page-specific styles only. */
+
+/* Nav, brand, tabs, avatars all in css/atom.css. */
+
+.shell { max-width: 1320px; margin: 0 auto; padding: 28px 28px 96px; }
+.page-head { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom: 22px; gap:16px; }
+.page-title { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+.page-sub { margin: 4px 0 0; color: var(--text-3); font-size: 13.5px; }
+.eyebrow { font-family:"JetBrains Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-3); font-weight: 500; margin-bottom: 6px; }
+.btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:var(--radius-sm); font-size:13px; font-weight:500; border:1px solid var(--rule); background:var(--surface); color:var(--text); transition: background 120ms, border-color 120ms; }
+.btn:hover { background:var(--surface-3); border-color:var(--ink-3); }
+
+.project-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--rule); margin-bottom: 22px; }
+.pt {
+  padding: 10px 18px 12px; font-size: 13.5px; font-weight: 500; color: var(--text-3);
+  border-bottom: 2px solid transparent; cursor: pointer; transition: color 120ms, border-color 120ms;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.pt:hover { color: var(--text); }
+.pt .dot { width: 8px; height: 8px; border-radius: 50%; }
+.pt.is-active { color: var(--text); border-bottom-color: var(--ink); }
+.pt.apg .dot { background: var(--gold); }
+.pt.kin .dot { background: var(--violet); }
+.pt.is-active.apg { border-bottom-color: var(--gold); }
+.pt.is-active.kin { border-bottom-color: var(--violet); }
+
+.level-bar { display: flex; gap: 4px; padding: 4px; background: var(--surface-3); border-radius: var(--radius-sm); width: fit-content; margin-bottom: 18px; }
+.level { padding: 5px 11px; font-size: 12px; font-weight: 500; color: var(--text-2); border-radius: var(--radius-sm); cursor: pointer; transition: background 120ms, color 120ms; }
+.level:hover { color: var(--text); }
+.level.is-active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-1); }
+
+.q-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 980px) { .q-grid { grid-template-columns: repeat(2, 1fr); } }
+.q-card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 20px;
+  transition: border-color 140ms, transform 140ms, box-shadow 140ms; cursor: pointer;
+  position: relative;
+}
+.q-card:hover { transform: translateY(-2px); border-color: var(--ink-3); box-shadow: var(--shadow-2); }
+.q-card.apg::before, .q-card.kin::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:3px;
+}
+.q-card.apg::before { background: var(--gold); }
+.q-card.kin::before { background: var(--violet); }
+.q-label { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; }
+.q-title { margin: 10px 0 8px; font-size: 16px; font-weight: 600; letter-spacing: -0.015em; }
+.q-bar { background: var(--surface-3); height: 4px; border-radius: 999px; overflow: hidden; margin: 12px 0; }
+.q-bar > span { display: block; height: 100%; background: var(--ink); }
+.q-card.apg .q-bar > span { background: var(--gold); }
+.q-card.kin .q-bar > span { background: var(--violet); }
+.q-meta { display:flex; gap:14px; font-size: 11.5px; color: var(--text-3); font-family: "JetBrains Mono", monospace; }
+.q-meta .v { color: var(--text); font-weight: 600; }
+
+.phase-row { display: flex; gap: 16px; align-items: stretch; }
+.phase-card {
+  flex: 1; background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 18px;
+}
+.phase-card h4 { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.phase-when { font-size: 11.5px; color: var(--text-3); font-family: "JetBrains Mono", monospace; margin-top: 2px; }
+.phase-items { list-style: none; margin: 14px 0 0; padding: 0; }
+.phase-items li { padding: 6px 0; border-top: 1px solid var(--rule-2); font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 8px; }
+.phase-items li::before { content: "·"; color: var(--text-3); }
+
+.task-list { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+.task-row { display: grid; grid-template-columns: 14px 1fr 110px 96px 90px; align-items: center; gap: 12px; padding: 11px 18px; border-bottom: 1px solid var(--rule-2); cursor: pointer; transition: background 100ms; }
+.task-row:last-child { border-bottom: none; }
+.task-row:hover { background: var(--surface-3); }
+.task-dot { width: 8px; height: 8px; border-radius: 50%; }
+.task-dot.apg { background: var(--gold); }
+.task-dot.kin { background: var(--violet); }
+.task-title { font-size: 13.5px; font-weight: 500; }
+.task-pillar { font-size: 10.5px; color: var(--text-3); font-family: "JetBrains Mono", monospace; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.1em; }
+.task-status { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-sm); font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-family: "JetBrains Mono", monospace; }
+.task-status.inflight { background: #FFF8DA; color: #8C5F00; }
+.task-status.notstart { background: var(--surface-3); color: var(--text-3); }
+.task-status.blocked  { background: #FCE6E6; color: #8B1F1F; }
+.task-status.done     { background: #E5F6EE; color: #0E6B43; }
+.task-date { font-size: 11.5px; color: var(--text-3); font-family: "JetBrains Mono", monospace; text-align: right; }
+.task-owner { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+.task-owner .avatar { width: 18px; height: 18px; font-size: 8.5px; }
+
+.roster-strip { display: flex; gap: 10px; align-items: center; margin-bottom: 22px; }
+.roster-strip .avatar { width: 30px; height: 30px; font-size: 11px; border: 2px solid var(--surface); }
+.roster-strip .add-mem { width:30px; height:30px; border-radius:50%; border:1px dashed var(--rule); display:flex; align-items:center; justify-content:center; color: var(--text-3); cursor: pointer; transition: border-color 120ms, color 120ms; }
+.roster-strip .add-mem:hover { border-color: var(--ink); color: var(--text); }
+
+.empty { padding: 60px 20px; text-align: center; color: var(--text-3); }
+.empty-mark { width: 44px; height: 44px; margin: 0 auto 12px; border: 1px dashed var(--rule); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><span></span><i></i></span>
+      <span class="brand-name">
+        <span class="top">Atom Investments</span>
+        <span class="sub">Operations</span>
+      </span>
+    </a>
+    <div class="tabs">
+      <a class="tab" href="index.html">Overview</a>
+      <a class="tab" href="projects.html">Projects</a>
+      <a class="tab is-active" href="roadmap.html">Roadmap</a>
+      <a class="tab" href="team.html">Team</a>
+    </div>
+    <div class="nav-actions">
+      <button class="profile-pill" type="button" data-profile-trigger aria-label="Open profile menu">
+        <span class="avatar mido">MY</span>
+        <span>Mido Yasser</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="shell">
+
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">Roadmap · drill-down</div>
+      <h1 class="page-title">Roadmap</h1>
+      <p class="page-sub">Pick a project, then drill down: quarter → month → day → task.</p>
+    </div>
+  </div>
+
+  <!-- project tabs -->
+  <div class="project-tabs" id="projtabs"></div>
+
+  <!-- level switch -->
+  <div class="level-bar">
+    <div class="level is-active" data-level="quarter">Quarter</div>
+    <div class="level" data-level="month">Month</div>
+    <div class="level" data-level="phase">Phases</div>
+    <div class="level" data-level="task">Tasks</div>
+  </div>
+
+  <!-- roster strip -->
+  <div class="roster-strip" id="rosterStrip"></div>
+
+  <div id="canvas"></div>
+
+  <div style="margin-top: 32px; padding: 16px; background: var(--surface); border: 1px solid var(--rule-2); border-radius: var(--radius); font-size: 12.5px; color: var(--text-3); font-family: 'JetBrains Mono', monospace;">
+    Roadmap Q→M→D→Task drill-down (full Google-Calendar-style view) is shipping across sessions. This page shows the project selector + level switch + phase view + flat task list now; the calendar grid + drawer come in Session 4 per the dashboard rebuild plan.
+  </div>
+</main>
+
+<script>
+let PROJECTS = [], ROSTER = [];
+const STATE = { project: null, level: "phase" };
+
+async function load() {
+  const [r, p] = await Promise.all([
+    fetch("data/roster.json").then(r => r.json()),
+    fetch("data/projects.json").then(r => r.json()),
+  ]);
+  ROSTER = r.people;
+  PROJECTS = p.projects;
+  // honor ?p= URL param
+  const url = new URL(location.href);
+  const initial = url.searchParams.get("p");
+  STATE.project = PROJECTS.find(x => x.id === initial)?.id || PROJECTS[0].id;
+  renderProjectTabs();
+  renderRoster();
+  renderCanvas();
+}
+
+function renderProjectTabs() {
+  const el = document.getElementById("projtabs");
+  el.innerHTML = PROJECTS.map(p => `
+    <div class="pt ${p.id} ${p.id === STATE.project ? 'is-active' : ''}" data-id="${p.id}">
+      <span class="dot"></span>
+      <strong>${p.name}</strong>
+      <span style="color:var(--text-3); font-weight:400">· ${(p.tasks || []).length} tasks</span>
+    </div>
+  `).join("");
+  el.querySelectorAll(".pt").forEach(t => t.addEventListener("click", () => {
+    STATE.project = t.dataset.id;
+    renderProjectTabs();
+    renderRoster();
+    renderCanvas();
+  }));
+}
+
+function renderRoster() {
+  const p = PROJECTS.find(x => x.id === STATE.project);
+  const members = (p.members || []).map(id => ROSTER.find(u => u.id === id)).filter(Boolean);
+  const html = members.map(m => `<span class="avatar ${m.id}" title="${m.name} · ${m.role}">${m.initials}</span>`).join("");
+  document.getElementById("rosterStrip").innerHTML = html + `<div class="add-mem" onclick="addMember()" title="Add member">+</div><span style="color:var(--text-3); font-size:12px; margin-left:6px">${members.length} ${members.length === 1 ? 'member' : 'members'} on ${p.name}</span>`;
+}
+
+function renderCanvas() {
+  document.querySelectorAll(".level").forEach(l => l.classList.toggle("is-active", l.dataset.level === STATE.level));
+  const p = PROJECTS.find(x => x.id === STATE.project);
+  const c = document.getElementById("canvas");
+  if (STATE.level === "quarter") c.innerHTML = renderQuarterView(p);
+  else if (STATE.level === "month") c.innerHTML = renderMonthView(p);
+  else if (STATE.level === "phase") c.innerHTML = renderPhaseView(p);
+  else c.innerHTML = renderTaskList(p);
+}
+
+function renderQuarterView(p) {
+  const tasks = p.tasks || [];
+  const quarters = ["2026-Q2", "2026-Q3", "2026-Q4", "2027-Q1"];
+  return `<div class="q-grid">${quarters.map(q => {
+    const [yr, qn] = q.split("-Q");
+    const startM = (parseInt(qn) - 1) * 3;
+    const inQ = tasks.filter(t => {
+      if (!t.end) return false;
+      const d = new Date(t.end);
+      return d.getFullYear() === parseInt(yr) && Math.floor(d.getMonth() / 3) === parseInt(qn) - 1;
+    });
+    const done = inQ.filter(t => t.status === "done").length;
+    const pct = inQ.length ? Math.round((done / inQ.length) * 100) : 0;
+    return `
+      <div class="q-card ${p.id}" onclick="STATE.level='month'; renderCanvas()">
+        <div class="q-label">${q}</div>
+        <h3 class="q-title">${qLabel(q)}</h3>
+        <div class="q-bar"><span style="width:${pct}%"></span></div>
+        <div class="q-meta">
+          <span><span class="v">${inQ.length}</span> tasks</span>
+          <span><span class="v">${inQ.filter(t => t.status === 'inflight').length}</span> live</span>
+          <span><span class="v">${inQ.filter(t => t.status === 'blocked').length}</span> blocked</span>
+        </div>
+      </div>`;
+  }).join("")}</div>`;
+}
+
+function qLabel(q) {
+  const map = { "2026-Q2": "Apr — Jun '26", "2026-Q3": "Jul — Sep '26", "2026-Q4": "Oct — Dec '26", "2027-Q1": "Jan — Mar '27" };
+  return map[q] || q;
+}
+
+function renderMonthView(p) {
+  const tasks = p.tasks || [];
+  const months = ["2026-06", "2026-07", "2026-08", "2026-09"];
+  return `<div class="q-grid" style="grid-template-columns: repeat(2,1fr)">${months.map(m => {
+    const inM = tasks.filter(t => (t.end || "").startsWith(m));
+    return `
+      <div class="q-card ${p.id}" onclick="STATE.level='task'; renderCanvas()">
+        <div class="q-label">${m}</div>
+        <h3 class="q-title">${monthLabel(m)}</h3>
+        <div class="q-meta" style="margin-top:8px"><span><span class="v">${inM.length}</span> tasks</span></div>
+        <ul style="list-style:none; padding:0; margin: 14px 0 0;">
+          ${inM.slice(0, 4).map(t => `<li style="padding:5px 0; border-top:1px solid var(--rule-2); font-size:13px;">${t.title}</li>`).join("")}
+        </ul>
+      </div>`;
+  }).join("")}</div>`;
+}
+
+function monthLabel(m) {
+  const [y, mo] = m.split("-");
+  const names = ["", "January","February","March","April","May","June","July","August","September","October","November","December"];
+  return names[parseInt(mo)] + " '" + y.slice(2);
+}
+
+function renderPhaseView(p) {
+  const phases = p.roadmap || [];
+  if (!phases.length) return `<div class="empty"><div class="empty-mark">∅</div>No phases defined yet.</div>`;
+  return `<div class="phase-row" style="flex-wrap:wrap">${phases.map(ph => `
+    <div class="phase-card" style="min-width: 260px">
+      <h4>${ph.name}</h4>
+      <div class="phase-when">${ph.when}</div>
+      <ul class="phase-items">
+        ${(ph.items || []).map(i => `<li>${i}</li>`).join("")}
+      </ul>
+    </div>`).join("")}</div>`;
+}
+
+function renderTaskList(p) {
+  const tasks = p.tasks || [];
+  if (!tasks.length) return `<div class="empty"><div class="empty-mark">∅</div>No tasks yet.</div>`;
+  return `<div class="task-list">${tasks.map(t => {
+    const owner = ROSTER.find(u => u.id === t.owner);
+    const ownerHtml = owner
+      ? `<span class="avatar ${owner.id}">${owner.initials}</span><span>${owner.name.split(' ')[0]}</span>`
+      : `<span style="color:var(--text-3)">${t.owner_label || '—'}</span>`;
+    return `
+      <div class="task-row">
+        <span class="task-dot ${t.project_id}"></span>
+        <div><span class="task-title">${t.title}</span><span class="task-pillar">${t.pillar}</span></div>
+        <span class="task-owner">${ownerHtml}</span>
+        <span class="task-status ${t.status}">${t.status}</span>
+        <span class="task-date">${t.end || '—'}</span>
+      </div>`;
+  }).join("")}</div>`;
+}
+
+document.querySelectorAll(".level").forEach(l => l.addEventListener("click", () => {
+  STATE.level = l.dataset.level;
+  renderCanvas();
+}));
+
+function addMember() {
+  Atom.openAddMemberModal({ projectId: STATE.project });
+}
+
+load().catch(e => {
+  document.getElementById("canvas").innerHTML = `<div class="empty">Failed to load: ${e.message}</div>`;
+});
+</script>
+</body>
+</html>

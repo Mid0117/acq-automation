@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-label="Atom Investments">
+  <defs>
+    <style>
+      .ink   { fill: #1A2840; }
+      .gold  { fill: #FFC72C; }
+      .orbit { stroke: #FFC72C; stroke-width: 12; fill: none; stroke-linecap: round; }
+    </style>
+  </defs>
+  <!-- Square white background so it renders cleanly on dark and light browser chrome -->
+  <rect width="256" height="256" fill="#FFFFFF" rx="36" />
+  <!-- Three crossed elliptical orbits -->
+  <g transform="translate(128, 128)">
+    <ellipse class="orbit" cx="0" cy="0" rx="92" ry="34" />
+    <ellipse class="orbit" cx="0" cy="0" rx="92" ry="34" transform="rotate(60)" />
+    <ellipse class="orbit" cx="0" cy="0" rx="92" ry="34" transform="rotate(-60)" />
+    <!-- Electrons -->
+    <circle class="gold" cx="92" cy="0"   r="11" />
+    <circle class="gold" cx="-46" cy="80" r="11" />
+    <circle class="gold" cx="-46" cy="-80" r="11" />
+    <!-- Nucleus -->
+    <circle class="ink" cx="0" cy="0" r="22" />
+  </g>
+</svg>

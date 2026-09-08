@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "generated": "2026-09-08T05:24:45Z",
+    "source": "vault_to_dashboard.py · roster()",
+    "note": "Single source of truth for dashboard access + Team tab + roadmap assignee avatars."
+  },
+  "people": [
+    {
+      "id": "mido",
+      "name": "Mido Yasser",
+      "role": "Operator",
+      "title": "PM · Marketing Systems",
+      "email": "mido@atompropertygroup.org",
+      "projects": [
+        "apg",
+        "kin"
+      ],
+      "color": "#0A1F44",
+      "initials": "MY",
+      "last_active": "2026-09-08T05:24:45Z",
+      "permissions": {
+        "can_add_project": true,
+        "can_add_member": true,
+        "can_view_all": true
+      }
+    },
+    {
+      "id": "adam",
+      "name": "Adam Chodes",
+      "role": "CEO",
+      "title": "Founder · Atom Investments",
+      "email": "adam@atompropertygroup.org",
+      "projects": [
+        "apg",
+        "kin"
+      ],
+      "color": "#F5C518",
+      "initials": "AC",
+      "last_active": "2026-09-08T05:24:45Z",
+      "permissions": {
+        "can_add_project": true,
+        "can_add_member": true,
+        "can_view_all": true
+      }
+    },
+    {
+      "id": "kabrina",
+      "name": "Kabrina",
+      "role": "Co-founder Kin",
+      "title": "Product · Kin",
+      "email": "kabrina@atominvestments.org",
+      "projects": [
+        "kin"
+      ],
+      "color": "#7C5CD1",
+      "initials": "K",
+      "last_active": "2026-09-08T05:24:45Z",
+      "permissions": {
+        "can_add_project": true,
+        "can_add_member": true,
+        "can_view_all": true
+      }
+    }
+  ]
+}

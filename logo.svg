@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet" aria-label="Atom Investments">
+  <defs>
+    <style>
+      .ink   { fill: #1A2840; }
+      .gold  { fill: #FFC72C; }
+      .orbit { stroke: #FFC72C; stroke-width: 6.5; fill: none; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <!-- "AT" — baseline at y=130, cap-height ~100, visual center ~y=80 -->
+  <text x="40" y="130" font-family="Arial Black, Helvetica, sans-serif"
+        font-weight="900" font-size="120" class="ink" letter-spacing="-3">AT</text>
+
+  <!-- Atom emblem replacing the "O". Group is centered at (340, 80) — the
+       visual center of the cap-height, not the baseline. Was the bug in v1. -->
+  <g transform="translate(340, 80)">
+    <ellipse class="orbit" cx="0" cy="0" rx="56" ry="20" />
+    <ellipse class="orbit" cx="0" cy="0" rx="56" ry="20" transform="rotate(60)" />
+    <ellipse class="orbit" cx="0" cy="0" rx="56" ry="20" transform="rotate(-60)" />
+    <circle class="gold" cx="56" cy="0"   r="7" />
+    <circle class="gold" cx="-28" cy="48.5" r="7" />
+    <circle class="gold" cx="-28" cy="-48.5" r="7" />
+    <circle class="ink"  cx="0"  cy="0"   r="13" />
+  </g>
+
+  <!-- "M" -->
+  <text x="416" y="130" font-family="Arial Black, Helvetica, sans-serif"
+        font-weight="900" font-size="120" class="ink" letter-spacing="-3">M</text>
+
+  <!-- "INVESTMENTS" -->
+  <text x="40" y="195" font-family="Arial, Helvetica, sans-serif"
+        font-weight="700" font-size="26" class="ink" letter-spacing="11">INVESTMENTS</text>
+</svg>

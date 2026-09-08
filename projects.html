@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script>(function(){var h=location.hostname;if(h.indexOf('github.io')>-1||h.indexOf('githubusercontent')>-1){document.documentElement.style.display='none';location.replace('https://apg-dashboard.mithchell.workers.dev/login?next='+encodeURIComponent('/'));}})();</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atom Investments — Projects</title>
+<meta property="og:site_name" content="Atom Investments">
+<meta property="og:title" content="Atom Investments — Projects">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<meta name="theme-color" content="#0A1F44">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/atom.css">
+<script src="js/atom.js" defer></script>
+<style>
+  .shell { max-width: 1320px; margin: 0 auto; padding: 32px 28px 96px; }
+  .page-head { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px; gap:16px; }
+  .page-head .actions { display:flex; gap:8px; }
+
+  .project-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 760px) { .project-grid { grid-template-columns: 1fr; } }
+
+  .proj-card {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+    padding: 22px; position: relative; overflow: hidden;
+    transition: border-color 140ms, transform 140ms, box-shadow 140ms;
+    display: flex; flex-direction: column; gap: 14px; cursor: pointer;
+    color: var(--text);
+  }
+  .proj-card:hover { transform: translateY(-2px); border-color: var(--ink-3); box-shadow: var(--shadow-2); }
+  .proj-card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent, var(--ink));
+  }
+  .proj-card.apg { --accent: var(--gold); }
+  .proj-card.kin { --accent: var(--violet); }
+  .proj-card.add { border-style: dashed; align-items: center; justify-content: center; text-align: center; color: var(--text-3); font: inherit; }
+  .proj-card.add:hover { border-color: var(--ink); color: var(--text); background: var(--surface); }
+  button.proj-card { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px;
+    padding: 22px; cursor: pointer; align-items: center; justify-content: center; text-align: center;
+    background: var(--surface); border: 1px dashed var(--rule); border-radius: var(--radius);
+    color: var(--text-3); position: relative; overflow: hidden;
+    transition: border-color 140ms, color 140ms, transform 140ms;
+  }
+  button.proj-card:hover { border-color: var(--ink); color: var(--text); transform: translateY(-2px); }
+
+  .proj-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .proj-head-left { display: flex; gap: 14px; align-items: center; }
+  .proj-mark {
+    width: 36px; height: 36px; border-radius: var(--radius);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 14px;
+    letter-spacing: -0.02em;
+  }
+  .proj-card.apg .proj-mark { background: var(--gold-soft); color: #6B4E00; border: 1px solid #F0DC8F; }
+  .proj-card.kin .proj-mark { background: var(--violet-soft); color: #4A2D9C; border: 1px solid #D5C7F3; }
+  [data-theme="dark"] .proj-card.apg .proj-mark { color: var(--gold); border-color: #5A4910; }
+  [data-theme="dark"] .proj-card.kin .proj-mark { color: var(--violet); border-color: #3A2F66; }
+
+  .proj-name { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.015em; color: var(--text); }
+  .proj-full { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+  .proj-lede { font-size: 13.5px; color: var(--text-2); line-height: 1.55; }
+
+  .proj-progress {
+    display: flex; gap: 16px; align-items: center;
+    padding: 14px 0; border-top: 1px solid var(--rule-2); border-bottom: 1px solid var(--rule-2);
+  }
+  .proj-progress .ring-wrap { display: flex; align-items: center; gap: 12px; }
+  .proj-progress .ring-meta {
+    display: flex; flex-direction: column; gap: 2px;
+    font-size: 11.5px; color: var(--text-3); font-family: "JetBrains Mono", monospace;
+  }
+  .proj-progress .ring-meta .q-key { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .proj-progress .ring-meta .q-counts { color: var(--text); font-weight: 500; }
+
+  .proj-stats { display: flex; gap: 24px; padding-top: 12px; }
+  .proj-stat { display: flex; flex-direction: column; }
+  .proj-stat .v {
+    font-size: 18px; font-weight: 600;
+    font-family: "JetBrains Mono", monospace; letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .proj-stat .l {
+    font-size: 10.5px; color: var(--text-3); text-transform: uppercase;
+    letter-spacing: 0.14em; font-family: "JetBrains Mono", monospace; margin-top: 2px;
+  }
+  .proj-team { display: flex; align-items: center; gap: 6px; }
+  .proj-team .avatar { width: 24px; height: 24px; font-size: 9.5px; border: 2px solid var(--surface); margin-left: -6px; }
+  .proj-team .avatar:first-child { margin-left: 0; }
+
+  .add-plus { width: 44px; height: 44px; border-radius: 50%; border: 1px dashed var(--rule); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 300; color: var(--text-3); margin-bottom: 4px; }
+
+  .proj-card.apg .q-ring { --accent: var(--gold); }
+  .proj-card.kin .q-ring { --accent: var(--violet); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><span></span><i></i></span>
+      <span class="brand-name">
+        <span class="top">Atom Investments</span>
+        <span class="sub">Operations</span>
+      </span>
+    </a>
+    <div class="tabs">
+      <a class="tab" href="index.html">Overview</a>
+      <a class="tab is-active" href="projects.html">Projects</a>
+      <a class="tab" href="roadmap.html">Roadmap</a>
+      <a class="tab" href="team.html">Team</a>
+    </div>
+    <div class="nav-actions">
+      <button class="profile-pill" type="button" data-profile-trigger aria-label="Open profile menu">
+        <span class="avatar mido">MY</span>
+        <span>Mido Yasser</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="shell">
+
+  <div class="page-head">
+    <div>
+      <div class="eyebrow" id="eyebrow">Projects · loading</div>
+      <h1 class="page-title">Projects</h1>
+      <p class="page-sub">Every initiative under Atom Investments. Click a card to open its dashboard.</p>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="addProjectBtn">+ Add project</button>
+    </div>
+  </div>
+
+  <div class="project-grid" id="grid"></div>
+
+</main>
+
+<script>
+let ROSTER = [];
+let PROJECTS = [];
+
+async function load() {
+  const [r, p] = await Promise.all([
+    fetch("data/roster.json").then(r => r.json()),
+    fetch("data/projects.json").then(r => r.json()),
+  ]);
+  ROSTER = r.people;
+  PROJECTS = p.projects;
+  document.getElementById("eyebrow").textContent = `Projects · ${PROJECTS.length} active`;
+  render();
+}
+
+function render() {
+  const grid = document.getElementById("grid");
+  const curQ = Atom.currentQuarterKey();
+  const cards = PROJECTS.map(p => {
+    const members = (p.members || []).map(id => ROSTER.find(u => u.id === id)).filter(Boolean);
+    const avatars = members.map(m => `<span class="avatar ${m.id}" title="${m.name}">${m.initials}</span>`).join("");
+    const tasks = p.tasks || [];
+    const tasksTotal = tasks.length;
+    const inflight = tasks.filter(t => t.status === "inflight").length;
+    const blocked = tasks.filter(t => t.status === "blocked").length;
+    const qProg = Atom.quarterProgress(tasks, curQ);
+    const blocker = Atom.topBlocker(tasks);
+    const ringHtml = Atom.renderQuarterRing(qProg.pct, { size: 48, stroke: 4 });
+    const blockerLine = blocker
+      ? `<div class="q-block-line" title="Top blocker">${blocker.title}</div>`
+      : `<div class="q-block-line empty">No active blockers</div>`;
+    return `
+      <a class="proj-card ${p.id}" href="p/${p.id}.html">
+        <div class="proj-head">
+          <div class="proj-head-left">
+            <div class="proj-mark">${p.name[0]}</div>
+            <div>
+              <h3 class="proj-name">${p.name}</h3>
+              <div class="proj-full">${p.full_name || ''}</div>
+            </div>
+          </div>
+          <span class="pill ${p.status}">${p.status}</span>
+        </div>
+        <p class="proj-lede">${p.lede || ''}</p>
+        <div class="proj-progress">
+          <div class="ring-wrap">
+            ${ringHtml}
+            <div class="ring-meta">
+              <span class="q-key">${curQ} progression</span>
+              <span class="q-counts">${qProg.done}/${qProg.total} done · ${qProg.inflight} live · ${qProg.blocked} blocked</span>
+            </div>
+          </div>
+        </div>
+        ${blockerLine}
+        <div class="proj-stats">
+          <div class="proj-stat"><span class="v">${tasksTotal}</span><span class="l">tasks</span></div>
+          <div class="proj-stat"><span class="v">${inflight}</span><span class="l">in flight</span></div>
+          <div class="proj-stat"><span class="v">${blocked}</span><span class="l">blocked</span></div>
+          <div class="proj-stat" style="margin-left:auto; align-items:flex-end">
+            <div class="proj-team">${avatars}</div>
+            <span class="l" style="margin-top:6px">team</span>
+          </div>
+        </div>
+      </a>`;
+  }).join("");
+  const addCard = `
+    <button type="button" class="proj-card add" id="addProjectCard" aria-label="Add a new project">
+      <div class="add-plus">+</div>
+      <div style="font-weight:600; color:var(--text)">Add a new project</div>
+      <div style="font-size:12.5px; margin-top:4px">A new initiative under the Atom Investments umbrella</div>
+    </button>`;
+  grid.innerHTML = cards + addCard;
+  document.getElementById("addProjectCard").addEventListener("click", openAddModal);
+}
+
+function openAddModal() {
+  Atom.openAddProjectModal({
+    roster: ROSTER,
+    onCreate: async (payload) => {
+      // Stub until add_project.yml ships. Surfaces payload to console + user.
+      console.info("[projects] add_project payload", payload);
+      alert("Project drafted locally — workflow_dispatch endpoint `add_project.yml` ships next session.\n\nPayload:\n" + JSON.stringify(payload, null, 2));
+    },
+  });
+}
+
+document.getElementById("addProjectBtn").addEventListener("click", openAddModal);
+
+load().catch(e => {
+  document.getElementById("grid").innerHTML =
+    `<div style="padding:40px;color:var(--text-3)">Failed to load: ${e.message}</div>`;
+});
+</script>
+</body>
+</html>

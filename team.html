@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script>(function(){var h=location.hostname;if(h.indexOf('github.io')>-1||h.indexOf('githubusercontent')>-1){document.documentElement.style.display='none';location.replace('https://apg-dashboard.mithchell.workers.dev/login?next='+encodeURIComponent('/'));}})();</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atom Investments — Team</title>
+<meta property="og:site_name" content="Atom Investments">
+<meta property="og:title" content="Atom Investments — Team">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<meta name="theme-color" content="#0A1F44">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/atom.css">
+<script src="js/atom.js" defer></script>
+<style>
+/* Tokens + base + nav from css/atom.css. Page-specific styles only. */
+
+/* Nav, brand, tabs, avatars all in css/atom.css. */
+
+.shell { max-width: 1320px; margin: 0 auto; padding: 32px 28px 96px; }
+.page-head { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px; gap:16px; }
+.page-title { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+.page-sub { margin: 4px 0 0; color: var(--text-3); font-size: 13.5px; }
+.eyebrow { font-family:"JetBrains Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-3); font-weight: 500; margin-bottom: 6px; }
+.btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:var(--radius-sm); font-size:13px; font-weight:500; border:1px solid var(--rule); background:var(--surface); color:var(--text); transition: background 120ms, border-color 120ms; }
+.btn:hover { background:var(--surface-3); border-color:var(--ink-3); }
+.btn-primary { background:var(--ink); color:#fff; border-color:var(--ink); }
+.btn-primary:hover { background:#061331; border-color:#061331; }
+
+.team-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 760px) { .team-grid { grid-template-columns: 1fr; } }
+
+.member-card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 22px;
+  display: flex; gap: 18px; align-items: flex-start;
+  transition: border-color 140ms, transform 140ms, box-shadow 140ms;
+  position: relative; overflow: hidden;
+}
+.member-card:hover { transform: translateY(-2px); border-color: var(--ink-3); box-shadow: var(--shadow-2); }
+.member-card::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent);
+}
+.member-card.mido { --accent: var(--ink); }
+.member-card.adam { --accent: var(--gold); }
+.member-card.kabrina { --accent: var(--violet); }
+.member-card.add { border-style: dashed; align-items: center; justify-content: center; text-align: center; cursor: pointer; color: var(--text-3); }
+.member-card.add:hover { border-color: var(--ink); color: var(--text); }
+.member-body { flex: 1; min-width: 0; }
+.member-name { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; }
+.member-role { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.member-meta { display: flex; gap: 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule-2); font-size: 12px; color: var(--text-3); font-family: "JetBrains Mono", monospace; flex-wrap: wrap; }
+.member-meta .k { color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; font-size: 10.5px; }
+.member-meta .v { color: var(--text); }
+.member-projects { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.proj-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; font-size: 11.5px; border-radius: var(--radius-sm); border: 1px solid var(--rule); background: var(--surface); font-weight: 500; }
+.proj-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+.proj-chip.apg .dot { background: var(--gold); }
+.proj-chip.kin .dot { background: var(--violet); }
+
+.add-plus { width: 44px; height: 44px; border-radius: 50%; border: 1px dashed var(--rule); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 300; color: var(--text-3); margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><span></span><i></i></span>
+      <span class="brand-name">
+        <span class="top">Atom Investments</span>
+        <span class="sub">Operations</span>
+      </span>
+    </a>
+    <div class="tabs">
+      <a class="tab" href="index.html">Overview</a>
+      <a class="tab" href="projects.html">Projects</a>
+      <a class="tab" href="roadmap.html">Roadmap</a>
+      <a class="tab is-active" href="team.html">Team</a>
+    </div>
+    <div class="nav-actions">
+      <button class="profile-pill" type="button" data-profile-trigger aria-label="Open profile menu">
+        <span class="avatar mido">MY</span>
+        <span>Mido Yasser</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="shell">
+
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">Team · 3 members</div>
+      <h1 class="page-title">Team</h1>
+      <p class="page-sub">Who's building what. Permissions and project access are managed here.</p>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-primary" onclick="addMember()">+ Add Member</button>
+    </div>
+  </div>
+
+  <div class="team-grid" id="grid"></div>
+
+</main>
+
+<script>
+let ROSTER = [], PROJECTS = [];
+
+async function load() {
+  const [r, p] = await Promise.all([
+    fetch("data/roster.json").then(r => r.json()),
+    fetch("data/projects.json").then(r => r.json()),
+  ]);
+  ROSTER = r.people;
+  PROJECTS = p.projects;
+  render();
+}
+
+function render() {
+  const grid = document.getElementById("grid");
+  const cards = ROSTER.map(m => {
+    const projs = (m.projects || []).map(pid => PROJECTS.find(x => x.id === pid)).filter(Boolean);
+    const chips = projs.map(p => `<span class="proj-chip ${p.id}"><span class="dot"></span>${p.name}</span>`).join("");
+    return `
+      <div class="member-card ${m.id}">
+        <span class="avatar xl ${m.id}">${m.initials}</span>
+        <div class="member-body">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+            <div>
+              <div class="member-name">${m.name}</div>
+              <div class="member-role">${m.role} · ${m.title}</div>
+            </div>
+          </div>
+          <div class="member-projects">${chips}</div>
+          <div class="member-meta">
+            <div><span class="k">Email</span><br><span class="v">${m.email}</span></div>
+            <div><span class="k">Last active</span><br><span class="v">${m.last_active.slice(0,10)}</span></div>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+  const add = `
+    <div class="member-card add" onclick="addMember()">
+      <div style="text-align:center">
+        <div class="add-plus">+</div>
+        <div style="font-weight:600; color:var(--text)">Invite a teammate</div>
+        <div style="font-size:12.5px; margin-top:4px">Send a magic link to add them to Atom Investments</div>
+      </div>
+    </div>`;
+  grid.innerHTML = cards + add;
+}
+
+function addMember() {
+  Atom.openAddMemberModal({});
+}
+
+load().catch(e => {
+  document.getElementById("grid").innerHTML = `<div style="padding:40px; color:var(--text-3)">Failed to load: ${e.message}</div>`;
+});
+</script>
+</body>
+</html>

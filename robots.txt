@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /
+
+# Canonical URL: https://apg-dashboard.mithchell.workers.dev
+# The github.io mirror is unmaintained and gated.

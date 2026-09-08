@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script>(function(){var h=location.hostname;if(h.indexOf('github.io')>-1||h.indexOf('githubusercontent')>-1){document.documentElement.style.display='none';location.replace('https://apg-dashboard.mithchell.workers.dev/login?next='+encodeURIComponent('/'));}})();</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>APG — Plan of Record</title>
+<style>
+:root {
+  --ink: #0A1F44;
+  --ink-deep: #061331;
+  --ink-soft: #1A3A7A;
+  --gold: #F5C518;
+  --gold-soft: #FFE58A;
+  --gold-wash: #FFF6D0;
+  --cream: #FAF7EC;
+  --cream-deep: #F3EED8;
+  --paper: #FFFFFF;
+  --rule: #C9C2A8;
+  --rule-soft: #E5E0C8;
+  --muted: #5A6786;
+  --muted-soft: #8A93AA;
+  --text: #101827;
+  --s-uc:   #B91C1C;
+  --s-live: #10B981;
+  --s-warm: #EA580C;
+  --s-hold: #EAB308;
+  --s-dead: #6B625A;
+  --bg: var(--cream);
+  --gold-deep: var(--ink);
+  --rule-strong: var(--ink);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 1080px; margin: 0 auto; padding: 28px 36px 80px; }
+
+.meta-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 4px solid var(--ink);
+  padding: 14px 0 0;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-soft);
+}
+.doc-header { padding: 30px 0 22px; }
+.doc-header h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  font-size: 56px; line-height: 1.05; letter-spacing: -0.01em;
+  margin: 0 0 14px; color: var(--ink);
+}
+.doc-header h1 .accent { font-style: italic; color: var(--gold-deep); }
+.doc-header .lede {
+  font-family: Georgia, "Times New Roman", serif; font-style: italic;
+  font-size: 17px; color: var(--ink-soft); max-width: 720px; margin: 0;
+  line-height: 1.55;
+}
+.doc-header hr { border: 0; border-top: 1px solid var(--rule); margin: 28px 0 0; }
+
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 236, 0.96); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 -36px 28px; padding: 10px 36px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  display: flex; gap: 18px; overflow-x: auto; white-space: nowrap;
+  align-items: center;
+}
+.topnav a {
+  color: var(--ink-soft); text-decoration: none; font-weight: 700;
+  padding: 4px 0; border-bottom: 2px solid transparent;
+}
+.topnav a:hover, .topnav a.active { color: var(--ink); border-bottom: 2px solid var(--gold); }
+
+.sec { margin: 48px 0 22px; }
+.sec .tag-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.sec .num {
+  display: inline-block; background: var(--gold); color: var(--ink);
+  font-weight: 800; font-size: 12px; letter-spacing: 0.04em;
+  padding: 3px 8px; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", monospace;
+}
+.sec h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600; font-size: 26px; letter-spacing: -0.005em;
+  margin: 0; color: var(--ink);
+}
+.sec hr { border: 0; border-top: 1px solid var(--rule); margin: 0 0 20px; }
+
+.callout {
+  background: var(--gold-soft);
+  border-left: 4px solid var(--gold-deep);
+  padding: 16px 20px; margin: 14px 0;
+  border-radius: 0 4px 4px 0;
+}
+.callout p { margin: 0 0 8px; }
+.callout p:last-child { margin-bottom: 0; }
+.rule-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px;
+}
+
+/* ── Roadmap timeline ──────────────────────────────────── */
+.timeline {
+  display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 14px;
+}
+.phase {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-left: 4px solid var(--ink);
+  padding: 16px 20px; border-radius: 0 4px 4px 0;
+}
+.phase .phase-head {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.phase .phase-name {
+  font-family: Georgia, serif; font-size: 19px; font-weight: 600; color: var(--ink);
+}
+.phase .phase-when {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700;
+}
+.phase ul { margin: 6px 0 0; padding-left: 18px; }
+.phase li { margin: 4px 0; font-size: 14px; }
+
+/* ── Status pills ──────────────────────────────────────── */
+.pill {
+  display: inline-block; padding: 2px 9px; border-radius: 999px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; vertical-align: middle;
+}
+.pill.shipped   { background: rgba(16,185,129,0.15); color: var(--s-live); }
+.pill.inflight  { background: rgba(245,197,24,0.25); color: #8a6d00; }
+.pill.notstart  { background: rgba(106,103,134,0.15); color: var(--muted); }
+.pill.blocked   { background: rgba(185,28,28,0.13); color: var(--s-uc); }
+.pill.hold      { background: rgba(234,179,8,0.18); color: #7c5a00; }
+.owner {
+  display: inline-block; background: var(--cream-deep);
+  border: 1px solid var(--rule);
+  font-size: 10px; font-weight: 700; padding: 2px 8px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-soft); border-radius: 3px;
+}
+
+/* ── Tables ────────────────────────────────────────────── */
+table.por {
+  width: 100%; border-collapse: collapse; margin: 14px 0 6px;
+  font-size: 13px; background: var(--paper);
+  border: 1px solid var(--rule);
+}
+table.por th, table.por td {
+  padding: 9px 12px; text-align: left; vertical-align: top;
+  border-bottom: 1px solid var(--rule-soft);
+}
+table.por th {
+  background: var(--cream-deep); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft);
+  font-weight: 800; border-bottom: 2px solid var(--ink);
+}
+table.por tr:last-child td { border-bottom: 0; }
+table.por td.who { white-space: nowrap; }
+table.por td.eff { white-space: nowrap; color: var(--muted); font-size: 12px; }
+
+/* ── Decisions log ─────────────────────────────────────── */
+.decisions { display: grid; gap: 10px; margin-top: 10px; }
+.decision {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-left: 4px solid var(--s-live);
+  padding: 12px 16px; border-radius: 0 4px 4px 0; font-size: 14px;
+}
+.decision.pending { border-left-color: var(--s-warm); }
+.decision .dec-head {
+  font-weight: 700; color: var(--ink);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.decision .dec-body { color: var(--ink-soft); margin-top: 4px; font-size: 13px; }
+
+/* ── Linked artifacts ──────────────────────────────────── */
+.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
+.links a {
+  display: block; background: var(--paper); border: 1px solid var(--rule);
+  padding: 10px 14px; text-decoration: none; color: var(--ink);
+  font-weight: 600; font-size: 13px; border-radius: 3px;
+}
+.links a:hover { border-color: var(--gold-deep); background: var(--gold-wash); }
+.links a .lbl {
+  display: block; font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 3px; font-weight: 700;
+}
+
+footer.foot {
+  margin-top: 60px; padding-top: 18px;
+  border-top: 3px double var(--ink);
+  display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; flex-wrap: wrap; gap: 12px;
+}
+footer.foot .gold-stamp {
+  display: inline-block; padding: 4px 10px;
+  background: var(--gold); color: var(--ink); letter-spacing: 0.14em;
+}
+</style>
+<!-- Microsoft Clarity (heatmaps + session recordings) -->
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){
+  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window,document,"clarity","script","wwbe84z9my"); // TODO: replace wwbe84z9my with real project id from clarity.microsoft.com
+</script>
+</head>
+<body>
+<div class="container">
+
+  <div class="meta-bar">
+    <span>Atom Investments · APG · Plan of Record</span>
+    <span>v1 · 2026-06-08</span>
+  </div>
+
+  <header class="doc-header">
+    <h1>The <span class="accent">Plan</span> of Record.</h1>
+    <p class="lede">What APG is building, in what order, who owns it, and where each piece stands today. Synthesized from the 2026-06-03 strategy call with Adam and Kebrina, the master roadmap, and the live workflow inventory.</p>
+    <hr>
+  </header>
+
+  <nav class="topnav">
+    <a href="/">Desk</a>
+    <a href="blake.html">Blake</a>
+    <a href="projects.html" class="active">Roadmap</a>
+    <a href="index.html">Follow-ups</a>
+    <a href="deals.html">Deals</a>
+    <a href="weekly.html">Docket</a>
+    <a href="priorities.html">Priority</a>
+    <a href="markets.html">Markets</a>
+    <a href="/insights">Insights</a>
+    <a href="sms-test.html">SMS Test</a>
+  </nav>
+
+  <!-- ── TABLE OF CONTENTS ─────────────────────────────── -->
+  <section class="sec" id="toc" style="margin-top: 6px;">
+    <div class="callout" style="background: var(--cream-deep); border-left-color: var(--ink);">
+      <div class="rule-label">Contents</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 6px 18px; font-size: 13px; margin-top: 6px;">
+        <a href="#frame">00 · The Frame</a>
+        <a href="#owners">01 · Owners</a>
+        <a href="#roadmap">02 · Roadmap Timeline</a>
+        <a href="#workstreams">03 · Workstreams &amp; Status</a>
+        <a href="#decisions">04 · Decisions Log</a>
+        <a href="#enhancements">05 · Enhancement Backlog</a>
+        <a href="#links">06 · Linked Artifacts</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 00 · FRAME ─────────────────────────────────────── -->
+  <section class="sec" id="frame">
+    <div class="tag-row"><span class="num">00</span><h2>The Frame</h2></div>
+    <hr>
+    <div class="callout">
+      <p><strong>The Plan of Record is the one place Adam, Kebrina, and the build team look to answer: "what are we doing, who's doing it, when does it land?"</strong> Every workstream below ties to one of the four pillars in the master roadmap (Blake voice agent, listing pipeline, vault + self-improvement, training videos) and one of the build asks from the 2026-06-03 strategy call.</p>
+      <p><strong style="color:var(--gold-deep)">Posture.</strong> Real-time, event-driven, no cron. Webhooks + Cloudflare Workers. The only periodic thing is the prompt-iteration loop, and even that fires on transcript volume, not the calendar.</p>
+    </div>
+    <div class="callout">
+      <div class="rule-label">From the 2026-06-03 call — Adam's build asks (treat as spec)</div>
+      <ol style="margin: 6px 0 0; padding-left: 18px;">
+        <li><strong>Appointment drill-down</strong> — click "36 appointments in contract" → view the individual profiles behind the number.</li>
+        <li><strong>Claude-assessed conversation ratings</strong> — individual metrics derived from the actual call audio, not a manual score.</li>
+        <li><strong>Success-rate-vs-target display</strong> — e.g. are we hitting 70% of the success measure for a given task.</li>
+        <li><strong>Calendar view preferred</strong> over a plain column view (to confirm).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ── 01 · OWNERS ────────────────────────────────────── -->
+  <section class="sec" id="owners">
+    <div class="tag-row"><span class="num">01</span><h2>Owners</h2></div>
+    <hr>
+    <table class="por">
+      <thead>
+        <tr><th>Person</th><th>Role</th><th>Lane</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Adam Chodes</strong></td><td>CEO · Founder</td><td>Strategy · Sign-off</td><td>Final call on offer, persona, and which pillar gets focus.</td></tr>
+        <tr><td><strong>Kebrina Richards</strong></td><td>Manager · Strategy partner</td><td>Concepts · Vault</td><td>Co-deciding the pivot question and the Legacy app concept.</td></tr>
+        <tr><td><strong>Mike Yasser</strong> (Mido)</td><td>Manager · Build</td><td>All builds</td><td>Dashboard suite, GHL workflows, Blake prompt, vault sync, infra.</td></tr>
+        <tr><td><strong>RJ</strong></td><td>Acquisitions Closer</td><td>Outbound · Dials</td><td>Currently sole human closer. Performance under review (see Decisions).</td></tr>
+        <tr><td><strong>Brady</strong></td><td>Construction Services lead</td><td>Construction</td><td>Owns the Construction Services GHL pipeline + Mario relationship handoff.</td></tr>
+        <tr><td><strong>Blake</strong> (AI)</td><td>Voice Agent</td><td>Outbound · Pillar A</td><td>ElevenLabs + Twilio. v4.0 prompt drafted, not deployed.</td></tr>
+        <tr><td><strong>Mario</strong> (vendor)</td><td>Hamilton vendor</td><td>231 Lafayette</td><td>$7,500 refund accepted; relationship amicable, project paused.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 02 · ROADMAP TIMELINE ──────────────────────────── -->
+  <section class="sec" id="roadmap">
+    <div class="tag-row"><span class="num">02</span><h2>Roadmap Timeline</h2></div>
+    <hr>
+    <div class="timeline">
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-name">Phase 0 — This Week (the "Do Today" box)</span>
+          <span class="phase-when">By 2026-06-13</span>
+        </div>
+        <ul>
+          <li><strong>RJ call-audio analysis</strong> — count calls &gt;5s, verify conversations are real <span class="owner">Mido</span> <span class="pill inflight">In Progress</span></li>
+          <li><strong>RJ direct conversation</strong> + decision (continue / terminate / Jef return) <span class="owner">Adam</span> <span class="pill inflight">In Progress</span></li>
+          <li><strong>Updated NDA signed</strong> → unlock the "powerful meeting" recording <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>Adam voice recording session booked</strong> — 30 min quiet room <span class="owner">Adam</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>Confirm APG-hold question with Kebrina</strong> — Sunday-night agreement <span class="owner">Adam · Kebrina</span> <span class="pill blocked">Blocked</span></li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-name">Phase 1 — Next 2 Weeks (Adam's dashboard asks)</span>
+          <span class="phase-when">By 2026-06-22</span>
+        </div>
+        <ul>
+          <li><strong>Appointment drill-down</strong> — number → individual profile links <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>Claude conversation-rating agent</strong> — per-call score from transcript <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>Success-rate-vs-target widget</strong> — % attainment per task/period <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>Calendar view</strong> on the PoR (quarter / month / day) <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>Permission tiers</strong> — exec/manager (Adam, Kebrina) vs employee <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-name">Phase 2 — Outbound Stack Rebuild</span>
+          <span class="phase-when">By 2026-07-15</span>
+        </div>
+        <ul>
+          <li><strong>Blake v4.0 deployed on Twilio number</strong> — gated by Adam voice clone <span class="owner">Mido</span> <span class="pill blocked">Blocked</span></li>
+          <li><strong>Cloudflare Workers event backbone</strong> — webhook fan-out <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>Pre-call context fetcher</strong> + post-call router <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>GHL workflow audit</strong> — kill 22 drafts → keep, publish, or delete <span class="owner">Mido</span> <span class="pill inflight">In Progress</span></li>
+          <li><strong>Call Incoming Notification → Slack</strong> (out of RJ's inbox) <span class="owner">Mido</span> <span class="pill notstart">Not Started</span></li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-name">Phase 3 — Realtor + Inbound Engine</span>
+          <span class="phase-when">By 2026-08-31</span>
+        </div>
+        <ul>
+          <li><strong>Zillow/Redfin → MAO → SMS-to-listing-agent</strong> hardening + reply routing <span class="owner">Mido</span> <span class="pill inflight">In Progress</span></li>
+          <li><strong>Realtor partner motion</strong> — turn one-touch SMS into a repeat affiliate channel <span class="owner">Adam · Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>Entry offer ("free 24-hr cash-offer range")</strong> as lead magnet, replace cold "we buy houses" <span class="owner">Adam · Mido</span> <span class="pill notstart">Not Started</span></li>
+          <li><strong>14-day close guarantee</strong> ($1k pay-out) — risk reversal as the wedge <span class="owner">Adam</span> <span class="pill notstart">Not Started</span></li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-name">Phase 4 — Pivot Concepts (NDA-gated, future scope)</span>
+          <span class="phase-when">2026-Q3+</span>
+        </div>
+        <ul>
+          <li><strong>The "powerful meeting" project</strong> — recording unlocked after NDA <span class="owner">Adam</span> <span class="pill hold">On Hold</span></li>
+          <li><strong>Dating app concept</strong> — scope TBD <span class="owner">Adam</span> <span class="pill hold">On Hold</span></li>
+          <li><strong>Legacy / memorialization app</strong> (Kebrina) — Legacy Book + Pocket Guide <span class="owner">Kebrina · Mido</span> <span class="pill hold">On Hold</span></li>
+          <li><strong>Vault architecture decision</strong> — one vault vs separate-per-idea on shared infra <span class="owner">Adam · Mido</span> <span class="pill blocked">Blocked</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 · WORKSTREAMS ──────────────────────────────── -->
+  <section class="sec" id="workstreams">
+    <div class="tag-row"><span class="num">03</span><h2>Workstreams &amp; Status</h2></div>
+    <hr>
+    <table class="por">
+      <thead>
+        <tr><th>Workstream</th><th>Pillar</th><th>Owner</th><th>Status</th><th>Effort</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Dashboard suite (4 pages live + PoR)</td><td>Vault / C</td><td class="who">Mido</td><td><span class="pill shipped">Shipped</span></td><td class="eff">—</td></tr>
+        <tr><td>About page — workflow inventory</td><td>Ops</td><td class="who">Mido</td><td><span class="pill shipped">Shipped</span></td><td class="eff">—</td></tr>
+        <tr><td>Plan-of-Record tab (this page)</td><td>Ops</td><td class="who">Mido</td><td><span class="pill shipped">Shipped</span></td><td class="eff">0.5d</td></tr>
+        <tr><td>Appointment drill-down view</td><td>Ops</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">2d</td></tr>
+        <tr><td>Claude conversation-rating agent</td><td>Blake / A</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">3d</td></tr>
+        <tr><td>Success-rate-vs-target widget</td><td>Ops</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">1d</td></tr>
+        <tr><td>Calendar view (quarter / month / day)</td><td>Ops</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">2d</td></tr>
+        <tr><td>Permission tiers (exec / manager / employee)</td><td>Ops</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">2d</td></tr>
+        <tr><td>RJ call-audio analysis (&gt;5s + conversation realness)</td><td>Outbound</td><td class="who">Mido</td><td><span class="pill inflight">In Progress</span></td><td class="eff">0.5d</td></tr>
+        <tr><td>Blake v4.0 family-company persona prompt</td><td>Blake / A</td><td class="who">Mido</td><td><span class="pill inflight">In Progress</span></td><td class="eff">1d</td></tr>
+        <tr><td>Adam ElevenLabs voice clone</td><td>Blake / A</td><td class="who">Adam</td><td><span class="pill blocked">Blocked</span></td><td class="eff">0.5d</td></tr>
+        <tr><td>Cloudflare Workers event backbone</td><td>Infra</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">4d</td></tr>
+        <tr><td>Zillow listing pipeline (MAO → SMS-to-realtor)</td><td>Listings / B</td><td class="who">Mido</td><td><span class="pill inflight">In Progress</span></td><td class="eff">2d</td></tr>
+        <tr><td>Realtor partner / affiliate motion</td><td>Listings / B</td><td class="who">Adam · Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">3d</td></tr>
+        <tr><td>Entry-offer lead magnet (24-hr cash-offer range)</td><td>Offer</td><td class="who">Adam · Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">2d</td></tr>
+        <tr><td>14-day close guarantee ($1k risk reversal)</td><td>Offer</td><td class="who">Adam</td><td><span class="pill notstart">Not Started</span></td><td class="eff">decide</td></tr>
+        <tr><td>GHL workflow audit (38 → publish/delete/rename)</td><td>Ops</td><td class="who">Mido</td><td><span class="pill inflight">In Progress</span></td><td class="eff">1d</td></tr>
+        <tr><td>Call Incoming Notification → Slack reroute</td><td>Ops</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">0.5d</td></tr>
+        <tr><td>Delete the two "New Workflow : 17770…" scratch drafts</td><td>Ops</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">15min</td></tr>
+        <tr><td>Vault sync daemon (Conversations / Calls / Listings)</td><td>Vault / C</td><td class="who">Mido</td><td><span class="pill shipped">Shipped</span></td><td class="eff">—</td></tr>
+        <tr><td>Prompt-iteration loop (volume-triggered, 50+ transcripts)</td><td>Vault / C</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">3d</td></tr>
+        <tr><td>SOP → Fal.AI training videos (Pillar D)</td><td>Training / D</td><td class="who">Mido</td><td><span class="pill notstart">Not Started</span></td><td class="eff">later</td></tr>
+        <tr><td>NDA-gated concepts (powerful meeting / dating / Legacy)</td><td>Concepts</td><td class="who">Adam · Kebrina</td><td><span class="pill hold">On Hold</span></td><td class="eff">~1yr</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 04 · DECISIONS LOG ────────────────────────────── -->
+  <section class="sec" id="decisions">
+    <div class="tag-row"><span class="num">04</span><h2>Decisions Log</h2></div>
+    <hr>
+    <div class="decisions">
+      <div class="decision">
+        <div class="dec-head">Dashboard build proceeds with Adam's three asks <span class="pill shipped">Decided 2026-06-03</span></div>
+        <div class="dec-body">Drill-down, Claude conversation ratings, success-rate-vs-target. Calendar view preferred over column view.</div>
+      </div>
+      <div class="decision">
+        <div class="dec-head">231 Lafayette — $7,500 refund accepted from Mario <span class="pill shipped">Decided 2026-06-03</span></div>
+        <div class="dec-body">Relationship kept amicable. Mido to sign updated NDA right away. Still $12k out of pocket on the project.</div>
+      </div>
+      <div class="decision pending">
+        <div class="dec-head">APG on hold to pivot toward the three concepts <span class="pill hold">Pending — confirm with Kebrina</span></div>
+        <div class="dec-body">Sunday-night agreement was meant to be the hold point. Adam wants to confirm directly with Kebrina before flipping the switch.</div>
+      </div>
+      <div class="decision pending">
+        <div class="dec-head">RJ likely terminated <span class="pill hold">Pending — direct conversation + audio analysis</span></div>
+        <div class="dec-body">Adam targeting Friday / "probably tomorrow." Mido's call-audio agent (&gt;5s call counts, conversation realness) is the tiebreaker between the SMS-saturation read and the operational-effectiveness read.</div>
+      </div>
+      <div class="decision pending">
+        <div class="dec-head">Bring Jef back on the leads? <span class="pill hold">Pending</span></div>
+        <div class="dec-body">Adam floated it — "he had that charm." Vault canonical: Jef = Jef De los Santos, prior closer, currently tombstoned. Reversal under consideration.</div>
+      </div>
+      <div class="decision pending">
+        <div class="dec-head">Vault architecture — one vault vs separate-per-idea <span class="pill hold">Pending</span></div>
+        <div class="dec-body">Leaning toward separate projects/grids on shared infrastructure. Not finalized.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 · ENHANCEMENT BACKLOG ─────────────────────── -->
+  <section class="sec" id="enhancements">
+    <div class="tag-row"><span class="num">05</span><h2>Enhancement Backlog — from the 2026-06-08 blend audit</h2></div>
+    <hr>
+
+    <h3 style="font-family: Georgia, serif; font-size: 19px; margin: 22px 0 10px; color: var(--ink);">5a · Outbound marketing blend (Blake / SMS / dialer)</h3>
+    <table class="por">
+      <thead>
+        <tr><th>#</th><th>Enhancement</th><th>Source</th><th>Owner</th><th>Effort</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>O1</td><td>Add risk-reversal guarantee to every outbound surface (Blake script, SMS, landing). "14-day close at agreed price or we pay you $1,000."</td><td>Hormozi</td><td class="who">Adam · Mido</td><td class="eff">1d</td></tr>
+        <tr><td>O2</td><td>Replace cold "we buy houses cash" SMS with entry-offer wedge: "free 24-hr written cash-offer range, no obligation."</td><td>Hormozi</td><td class="who">Mido</td><td class="eff">2d</td></tr>
+        <tr><td>O3</td><td>Niche down for next 90 days — pick roofing+siding Northern NJ OR MF 5+ HNW corridors. Stop being a generalist on the cold channel.</td><td>Hormozi</td><td class="who">Adam</td><td class="eff">decide</td></tr>
+        <tr><td>O4</td><td>Turn Zillow listing pipeline from one-touch SMS into a repeat realtor-affiliate motion (commission model, named partners, monthly digest).</td><td>Hormozi</td><td class="who">Adam · Mido</td><td class="eff">5d</td></tr>
+        <tr><td>O5</td><td>Pull RJ off cold 456-lead pile this week → put him on realtors who already replied to a Zillow SMS in last 30 days.</td><td>Hormozi</td><td class="who">RJ · Adam</td><td class="eff">0d (route)</td></tr>
+        <tr><td>O6</td><td>Cut every "warm / conversational / ethically honest" adjective from Blake's prompt. Replace with three specifics: what Blake <em>notices</em>, what he <em>refuses to do</em>, what he says when the conversation stops being about the house.</td><td>Rubin</td><td class="who">Mido</td><td class="eff">1d</td></tr>
+        <tr><td>O7</td><td>Rewrite first-touch SMS so it notices the specific property (address detail, board-up, listing age) instead of announcing the buyer.</td><td>Rubin</td><td class="who">Mido</td><td class="eff">1d</td></tr>
+        <tr><td>O8</td><td>Add a "what does Blake do when the seller says something that breaks his heart?" branch to the prompt — character, not posture.</td><td>Rubin</td><td class="who">Mido</td><td class="eff">0.5d</td></tr>
+        <tr><td>O9</td><td>Stand up a CLOSER-framework call card for RJ + Blake (Clarify · Label · Overview past pain · Sell the vacation · Explain · Reinforce).</td><td>Hormozi</td><td class="who">Mido · RJ</td><td class="eff">1d</td></tr>
+        <tr><td>O10</td><td>Engineer real scarcity on the Zillow-pipeline SMS — cap weekly offers at N realtors / N properties so the buyer feels selected, not blasted.</td><td>Hormozi</td><td class="who">Mido</td><td class="eff">0.5d</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family: Georgia, serif; font-size: 19px; margin: 28px 0 10px; color: var(--ink);">5b · Internal ops blend (dashboards / GH Actions / GHL workflows)</h3>
+    <table class="por">
+      <thead>
+        <tr><th>#</th><th>Enhancement</th><th>Source</th><th>Owner</th><th>Effort</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>I1</td><td>Reroute <em>Call Incoming Notification</em> from RJ's email to Slack <code>#base1-sms-leadgen</code>. Single morning digest replaces the per-call email blast.</td><td>about.html audit</td><td class="who">Mido</td><td class="eff">0.5d</td></tr>
+        <tr><td>I2</td><td>Delete <em>New Workflow : 1777068701780</em> and <em>New Workflow : 1777429426658</em> — abandoned scratch from 2026-04-24 / 2026-04-29.</td><td>about.html audit</td><td class="who">Mido</td><td class="eff">15min</td></tr>
+        <tr><td>I3</td><td>Publish the two SMS workflows that are currently DRAFT and ready (<em>CTA First msg</em>, <em>Auto Missed Call Text-Back</em>) once SMS halt lifts. Until then, document them as <em>paused-intentional</em> not <em>draft</em>.</td><td>about.html audit</td><td class="who">Mido</td><td class="eff">1d</td></tr>
+        <tr><td>I4</td><td>Retire the three GHL-native AI bot drafts (<em>2. Ai Appointment Booking</em>, <em>{VER 2}</em>, <em>3. Customer Replied - Auto Handling</em>) — superseded by Blake + the GH Actions Claude classifier. Delete or move to <em>Archive</em> folder.</td><td>about.html audit</td><td class="who">Mido</td><td class="eff">15min</td></tr>
+        <tr><td>I5</td><td>Decommission <code>sms_followup.py</code> cron (caused production fires per vault hard-rule #4). Move to event-driven via Cloudflare Worker on GHL <em>customer replied</em> webhook.</td><td>vault rule #4</td><td class="who">Mido</td><td class="eff">3d</td></tr>
+        <tr><td>I6</td><td>Add a "last viewed" timestamp + view-count tracker per dashboard tab. Tabs nobody opens for 30 days move to <code>/archive/</code>.</td><td>noise audit</td><td class="who">Mido</td><td class="eff">1d</td></tr>
+        <tr><td>I7</td><td>Consolidate <em>5. Testing Workflow</em> (56 versions deep) — extract anything still useful, kill the rest.</td><td>about.html audit</td><td class="who">Mido</td><td class="eff">0.5d</td></tr>
+        <tr><td>I8</td><td>Rename <em>Reactivaiton of all leads</em> draft (GHL-side typo) and decide: publish for ACQ dead-stage reactivation (legal — per <code>feedback_dead_deals.md</code>) or delete.</td><td>about.html audit</td><td class="who">Mido</td><td class="eff">15min</td></tr>
+        <tr><td>I9</td><td>Token audit on GH Actions — <code>acq.yml</code>, <code>weekly.yml</code>, <code>slack.yml</code> are the biggest LLM spenders. Cache transcripts + diff Slack pulls to cut Claude tokens ~40%.</td><td>cost audit</td><td class="who">Mido</td><td class="eff">2d</td></tr>
+        <tr><td>I10</td><td>Add an "ops health" sub-section to the PoR page (this page) that pulls live workflow run-counts + failure rates from GitHub API + GHL API. Self-policing dashboard.</td><td>self</td><td class="who">Mido</td><td class="eff">3d</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 06 · LINKED ARTIFACTS ─────────────────────────── -->
+  <section class="sec" id="links">
+    <div class="tag-row"><span class="num">06</span><h2>Linked Artifacts</h2></div>
+    <hr>
+    <div class="links">
+      <a href="priorities.html"><span class="lbl">Dashboard</span>Priority Deals — Adam's weekly action queue</a>
+      <a href="weekly.html"><span class="lbl">Dashboard</span>Weekly Snapshot — momentum + closed-pipeline math</a>
+      <a href="markets.html"><span class="lbl">Dashboard</span>Markets — Route 30 PA, Northern NJ corridors</a>
+      <a href="blake.html"><span class="lbl">Dashboard</span>Blake — voice-agent operations</a>
+      <a href="index.html"><span class="lbl">Dashboard</span>Follow-Ups — daily lead queue</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Auto-synced from the master roadmap · vault path: APG-Vault/_system/master-roadmap.md</span>
+    <span class="gold-stamp">v1 · 2026-06-08</span>
+  </footer>
+
+</div>
+</body>
+</html>

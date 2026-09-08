@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script>(function(){var h=location.hostname;if(h.indexOf('github.io')>-1||h.indexOf('githubusercontent')>-1){document.documentElement.style.display='none';location.replace('https://apg-dashboard.mithchell.workers.dev/login?next='+encodeURIComponent('/'));}})();</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atom Investments — SMS A/B/C Test</title>
+<style>
+:root {
+  --ink: #0A1F44; --ink-soft: #1A3A7A; --gold: #F5C518; --gold-soft: #FFE58A;
+  --gold-wash: #FFF6D0; --cream: #FAF7EC; --cream-deep: #F3EED8; --paper: #FFFFFF;
+  --rule: #C9C2A8; --rule-soft: #E5E0C8; --muted: #5A6786; --text: #101827;
+  --good: #10B981; --bad: #B91C1C;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--cream); color: var(--text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; }
+.shell { max-width: 1240px; margin: 0 auto; padding: 40px 64px 120px; background: var(--paper); min-height: 100vh; }
+@media (max-width: 820px) { .shell { padding: 32px 24px 80px; } }
+
+.masthead { border-top: 5px solid var(--ink); border-bottom: 1px solid var(--rule);
+  padding: 28px 0 24px; margin-bottom: 24px; position: relative; }
+.masthead::before { content: ""; position: absolute; left: 0; top: 0; width: 160px; height: 5px; background: var(--gold); }
+.brandrow { display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+.brand { color: var(--ink); font-weight: 700; }
+h1 { font-family: Georgia, "Times New Roman", serif; font-size: 54px; line-height: 1.04;
+  letter-spacing: -0.015em; margin: 0 0 14px; color: var(--ink); font-weight: 700; }
+h1 .accent { color: var(--gold); font-style: italic; }
+.dek { font-family: Georgia, serif; font-style: italic; font-size: 18px;
+  line-height: 1.5; color: var(--ink-soft); max-width: 820px; margin: 10px 0 0; }
+
+section { margin: 40px 0; }
+h2 { font-family: Georgia, serif; font-size: 26px; color: var(--ink);
+  margin: 0 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--ink);
+  letter-spacing: -0.01em; display: flex; align-items: center; gap: 14px; }
+h2 .num { display: inline-block; min-width: 34px; padding: 4px 10px;
+  background: var(--gold); color: var(--ink); font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px; font-weight: 700; text-align: center; letter-spacing: 0.04em; }
+
+.kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px; margin: 24px 0; }
+.kpi { background: var(--cream); border: 1px solid var(--rule);
+  border-left: 4px solid var(--gold); padding: 14px 18px; }
+.kpi .l { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.kpi .v { font-family: Georgia, serif; font-size: 26px; color: var(--ink); margin-top: 6px; line-height: 1.1; }
+.kpi .s { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+.paused-banner { background: var(--gold-wash); border: 1px solid var(--gold);
+  border-left: 4px solid var(--gold); padding: 14px 18px; margin: 16px 0 24px;
+  font-size: 13.5px; line-height: 1.55; color: var(--ink); }
+.paused-banner code { background: #fff; border: 1px solid var(--rule); padding: 1px 6px; font-size: 12.5px; }
+
+.variant-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; }
+@media (max-width: 980px) { .variant-grid { grid-template-columns: 1fr; } }
+.vcard { background: var(--paper); border: 1px solid var(--rule); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.vcard-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.vletter { font-family: Georgia, serif; font-size: 32px; color: var(--gold); font-weight: 700; }
+.vrates { font-size: 11px; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+.vtemplate { font-family: Georgia, serif; font-style: italic; font-size: 13.5px;
+  line-height: 1.5; color: var(--ink-soft); background: var(--cream);
+  border: 1px solid var(--rule-soft); padding: 10px 12px; }
+.vfunnel { display: flex; flex-direction: column; gap: 6px; }
+.funbar-label { font-size: 11px; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 2px; }
+.funbar-label strong { color: var(--ink); font-size: 12.5px; }
+.funbar-track { height: 8px; background: var(--cream-deep); border: 1px solid var(--rule-soft); position: relative; }
+.funbar-fill { height: 100%; transition: width 0.3s ease; }
+
+.sig { background: var(--cream); border: 1px solid var(--rule); padding: 16px 20px; margin: 16px 0; }
+.sig-head { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; font-weight: 700; }
+.sig-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sig-table th { text-align: left; color: var(--muted); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+.sig-table td { padding: 8px 10px; border-bottom: 1px dashed var(--rule-soft); }
+.sig-foot { margin-top: 12px; }
+.pill { display: inline-block; padding: 4px 10px; font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; font-weight: 700; }
+.pill-good { background: var(--good); color: #fff; }
+.pill-muted { background: var(--cream-deep); color: var(--ink); border: 1px solid var(--rule); }
+.muted { color: var(--muted); }
+
+.stopping { background: var(--cream); border: 1px solid var(--rule); padding: 16px 20px; margin: 16px 0; font-size: 13px; }
+.stopping h3 { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; font-weight: 700; }
+.stopping ul { margin: 6px 0 0; padding-left: 22px; }
+.stopping li { margin: 4px 0; }
+.foot { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 11px;
+  color: var(--muted); letter-spacing: 0.06em; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="masthead">
+    <div class="brandrow"><span class="brand">Atom Investments</span><span>SMS A/B/C Test</span></div>
+    <h1>O2 entry-offer <span class="accent">variants</span></h1>
+    <p class="dek">Three first-touch SMS variants compete on the fresh inbound pool. Reply / qualify / contract tracked per variant. Bayesian decisive-rule indicator below.</p>
+  </div>
+
+  <div class="paused-banner">SMS sends are <strong>PAUSED</strong> per APG Q2 strategy. Test infrastructure is fully wired — variant assignment, outcome tracking, and dashboard rendering all run. Flip <code>o2_test_config.json::global.sms_paused</code> to <code>false</code> to begin firing sends. Variant assignments computed during the pause are deterministic and survive the flip.</div>
+
+  
+        <section>
+          <h2><span class="num">01</span> O2 Entry Offer</h2>
+          <div class="kpi-strip">
+            <div class="kpi"><div class="l">Total sent</div><div class="v">0</div><div class="s">across A/B/C</div></div>
+            <div class="kpi"><div class="l">Days running</div><div class="v">0</div><div class="s">of 30-day cap</div></div>
+            <div class="kpi"><div class="l">Min per variant</div><div class="v">0</div><div class="s">target 200</div></div>
+            <div class="kpi"><div class="l">Status</div><div class="v" style="color:#B91C1C">PAUSED</div><div class="s">flip sms_paused=false to fire sends</div></div>
+          </div>
+          <div class="variant-grid">
+            
+    <div class="vcard">
+      <div class="vcard-head">
+        <span class="vletter">A</span>
+        <span class="vrates">0.0% reply · 0.0% qual · 0.0% contract</span>
+      </div>
+      <div class="vtemplate">Hi {first_name} â€” Blake with APG. I pulled a written cash-offer range for {address1} this morning. Want me to send it over? No commitment, no follow-up calls unless you ask. Reply STOP to opt out.</div>
+      <div class="vfunnel">
+        <div class="funbar"><div class="funbar-label">Sent <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--ink)"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Replied <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:#3B82F6"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Qualified <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--gold)"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Contract <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--good)"></div></div></div>
+      </div>
+    </div>
+    
+
+    <div class="vcard">
+      <div class="vcard-head">
+        <span class="vletter">B</span>
+        <span class="vrates">0.0% reply · 0.0% qual · 0.0% contract</span>
+      </div>
+      <div class="vtemplate">Hey {first_name}, Blake here. I had APG run a 24-hr cash-offer range on {address1} â€” looks like it'd land somewhere between {offer_low} and {offer_high}. Want the actual number? Reply STOP to opt out.</div>
+      <div class="vfunnel">
+        <div class="funbar"><div class="funbar-label">Sent <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--ink)"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Replied <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:#3B82F6"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Qualified <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--gold)"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Contract <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--good)"></div></div></div>
+      </div>
+    </div>
+    
+
+    <div class="vcard">
+      <div class="vcard-head">
+        <span class="vletter">C</span>
+        <span class="vrates">0.0% reply · 0.0% qual · 0.0% contract</span>
+      </div>
+      <div class="vtemplate">Hi {first_name} â€” Blake with APG. Saw {address1} is a {noticing} â€” those are the kind we put written offers on within 24 hours. Want me to send one? Reply STOP to opt out.</div>
+      <div class="vfunnel">
+        <div class="funbar"><div class="funbar-label">Sent <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--ink)"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Replied <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:#3B82F6"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Qualified <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--gold)"></div></div></div>
+        <div class="funbar"><div class="funbar-label">Contract <strong>0</strong> (0.0%)</div><div class="funbar-track"><div class="funbar-fill" style="width:0.0%;background:var(--good)"></div></div></div>
+      </div>
+    </div>
+    
+          </div>
+          
+    <div class="sig">
+      <div class="sig-head">Bayesian winner probability (Monte Carlo, n=5000)</div>
+      <table class="sig-table">
+        <thead><tr><th>Variant</th><th>P(best contract)</th><th>P(best qualify)</th></tr></thead>
+        <tbody><tr><td><strong>A</strong></td><td>33.8%</td><td>33.2%</td></tr><tr><td><strong>B</strong></td><td>32.7%</td><td>32.9%</td></tr><tr><td><strong>C</strong></td><td>33.5%</td><td>34.0%</td></tr></tbody>
+      </table>
+      <div class="sig-foot"><span class="pill pill-muted">Need 200 more sends to min sample (n=200)</span></div>
+    </div>
+    
+        </section>
+        
+
+  <section>
+    <h2><span class="num">SR</span> Stopping rules</h2>
+    <div class="stopping">
+      <h3>Decision protocol</h3>
+      <ul>
+        <li><strong>Minimum sample:</strong> 200 sends per variant before reading any results.</li>
+        <li><strong>Decisive lead:</strong> if one variant beats the others on contract rate by ≥ 3.0 percentage points at n ≥ 500/variant, declare winner.</li>
+        <li><strong>Time cap:</strong> 30 days from first send. Declare based on data even if inconclusive — and note the inconclusion.</li>
+        <li><strong>Bayesian read:</strong> P(best contract) reported per variant via Monte Carlo over Beta(1+x, 1+n-x) posteriors.</li>
+      </ul>
+      <p style="margin-top:10px;color:var(--muted);font-size:12px">Documented in <code>o2_test_config.json::global</code> and rendered above for visibility.</p>
+    </div>
+  </section>
+
+  <div class="foot">Generated 2026-06-09T19:48:24.890099+00:00 · sms_test_dashboard.py</div>
+</div>
+</body>
+</html>

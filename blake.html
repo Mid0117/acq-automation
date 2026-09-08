@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script>(function(){var h=location.hostname;if(h.indexOf('github.io')>-1||h.indexOf('githubusercontent')>-1){document.documentElement.style.display='none';location.replace('https://apg-dashboard.mithchell.workers.dev/login?next='+encodeURIComponent('/'));}})();</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atom Investments — Blake Live (APG)</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<meta name="theme-color" content="#1A2840">
+<script>
+  // If anyone hits this dashboard via github.io directly (bypassing the Worker
+  // auth gate at apg-dashboard.mithchell.workers.dev), redirect to /login.
+  // The canonical URL for this dashboard is the Worker route; github.io is
+  // a build artifact, not the supported entry point.
+  if (location.hostname === "atominvestments.github.io") {
+    location.replace("https://apg-dashboard.mithchell.workers.dev/login?next=/blake");
+  }
+</script>
+<style>
+:root {
+  --ink: #0A1F44;
+  --ink-deep: #061331;
+  --ink-soft: #1A3A7A;
+  --gold: #F5C518;
+  --gold-soft: #FFE58A;
+  --gold-wash: #FFF6D0;
+  --cream: #FAF7EC;
+  --cream-deep: #F3EED8;
+  --paper: #FFFFFF;
+  --rule: #C9C2A8;
+  --rule-soft: #E5E0C8;
+  --muted: #5A6786;
+  --muted-soft: #8A93AA;
+  --text: #101827;
+  --s-uc:   #B91C1C;
+  --s-live: #10B981;
+  --s-warm: #EA580C;
+  --s-hold: #EAB308;
+  --s-dead: #6B625A;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; background: var(--cream); color: var(--text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px; line-height: 1.6;
+}
+.shell {
+  max-width: 1240px; margin: 0 auto;
+  padding: 40px 64px 120px;
+  background: var(--paper); min-height: 100vh;
+}
+@media (max-width: 820px) { .shell { padding: 32px 24px 80px; } }
+
+.masthead {
+  border-top: 5px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 28px 0 24px; margin-bottom: 24px; position: relative;
+}
+.masthead::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: 160px; height: 5px; background: var(--gold);
+}
+.brandrow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+}
+.brand { color: var(--ink); font-weight: 700; }
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 54px; line-height: 1.04; letter-spacing: -0.015em;
+  margin: 0 0 14px; color: var(--ink); font-weight: 700;
+}
+h1 .accent { color: var(--gold); font-style: italic; }
+.dek {
+  font-family: Georgia, serif; font-style: italic; font-size: 18px;
+  line-height: 1.5; color: var(--ink-soft); max-width: 780px; margin: 10px 0 0;
+}
+
+.live-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 3px 10px;
+  background: var(--s-live); color: white; border-radius: 3px;
+  margin-left: 10px;
+}
+.live-pill .dot {
+  width: 8px; height: 8px; background: white; border-radius: 50%;
+  animation: blink 1.2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100% { opacity: 1 } 50% { opacity: 0.3 } }
+
+.live-pill.stale { background: var(--s-warm); }
+.live-pill.error { background: var(--s-uc); }
+
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 236, 0.96); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 -64px 28px; padding: 10px 64px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  display: flex; gap: 18px; overflow-x: auto; white-space: nowrap;
+}
+@media (max-width: 820px) { .topnav { margin: 0 -24px 24px; padding: 10px 24px; } }
+.topnav a { color: var(--ink-soft); text-decoration: none; font-weight: 700; padding: 4px 0; border-bottom: 2px solid transparent; }
+.topnav a:hover, .topnav a.active { color: var(--ink); border-bottom: 2px solid var(--gold); }
+
+section { margin: 40px 0; }
+h2 {
+  font-family: Georgia, serif; font-size: 26px; color: var(--ink);
+  margin: 0 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--ink);
+  letter-spacing: -0.01em; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+h2 .num {
+  display: inline-block; min-width: 34px; padding: 4px 10px;
+  background: var(--gold); color: var(--ink);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px; font-weight: 700; text-align: center; letter-spacing: 0.04em;
+}
+h2 .sec-count { margin-left: auto; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+
+.kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 18px; }
+@media (max-width: 1100px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px)  { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+.kpi {
+  background: var(--cream); border-top: 4px solid var(--gold);
+  border-bottom: 1px solid var(--rule); padding: 16px 18px 18px;
+  transition: background 0.2s;
+}
+.kpi.flash { background: var(--gold-wash); }
+.kpi .label {
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px; font-weight: 700;
+}
+.kpi .v {
+  font-family: Georgia, serif; font-size: 32px; font-weight: 700;
+  color: var(--ink); line-height: 1; margin: 0;
+}
+.kpi .v small { font-size: 14px; color: var(--muted); margin-left: 6px; }
+.kpi .sub    { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.kpi.live   { border-top-color: var(--s-live); } .kpi.live .v   { color: var(--s-live); }
+.kpi.warm   { border-top-color: var(--s-warm); } .kpi.warm .v   { color: var(--s-warm); }
+.kpi.uc     { border-top-color: var(--s-uc); }   .kpi.uc .v     { color: var(--s-uc); }
+
+.warmup-panel {
+  background: var(--cream); border-left: 4px solid var(--gold);
+  padding: 18px 22px; margin-top: 14px;
+}
+.warmup-panel h3 {
+  font-family: Georgia, serif; font-size: 18px; margin: 0 0 8px; color: var(--ink);
+}
+.warmup-bar {
+  height: 22px; background: var(--cream-deep); border: 1px solid var(--rule);
+  border-radius: 3px; position: relative; overflow: hidden; margin-top: 10px;
+}
+.warmup-bar .fill {
+  height: 100%; background: var(--gold); display: flex; align-items: center;
+  justify-content: center; color: var(--ink); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.06em; transition: width 0.4s;
+}
+.warmup-grid { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; margin-top: 12px; }
+.warmup-grid .day {
+  height: 26px; background: var(--cream-deep); border: 1px solid var(--rule);
+  font-size: 9.5px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+}
+.warmup-grid .day.today { background: var(--gold); color: var(--ink); }
+.warmup-grid .day.past  { background: var(--ink); color: var(--gold); }
+
+.calls-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; }
+.calls-table th {
+  text-align: left; padding: 10px 12px; background: var(--ink); color: var(--gold);
+  font-family: Helvetica, Arial, sans-serif; font-size: 9.5px;
+  letter-spacing: 0.10em; text-transform: uppercase; font-weight: 800;
+}
+.calls-table td { padding: 12px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.calls-table tr:hover td { background: var(--cream); }
+.calls-table tr.new td { background: var(--gold-wash); animation: rowflash 1.5s ease-out; }
+@keyframes rowflash { 0% { background: var(--gold); } 100% { background: var(--gold-wash); } }
+
+.outcome {
+  display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase; border-radius: 3px;
+}
+.outcome.hot      { background: rgba(185,28,28,0.15); color: var(--s-uc); }
+.outcome.warm     { background: rgba(234,88,12,0.18); color: #7C2D12; }
+.outcome.cold     { background: rgba(91,103,134,0.18); color: #334155; }
+.outcome.dnd      { background: var(--ink); color: var(--gold); }
+.outcome.voicemail{ background: var(--gold-wash); color: var(--ink); }
+.outcome.no-answer{ background: var(--cream-deep); color: var(--muted); }
+.outcome.unknown  { background: var(--cream-deep); color: var(--muted); }
+
+.caller { font-weight: 700; color: var(--ink); }
+.addr   { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.summary{ font-size: 13px; color: #2b3856; max-width: 480px; }
+.ts     { white-space: nowrap; font-family: ui-monospace, monospace; color: var(--muted); font-size: 12px; }
+.duration { font-family: ui-monospace, monospace; font-size: 12px; color: var(--ink); white-space: nowrap; }
+.actions a {
+  font-size: 11px; padding: 4px 8px; background: var(--ink); color: var(--gold);
+  text-decoration: none; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; margin-right: 4px;
+}
+.actions a:hover { background: var(--gold); color: var(--ink); }
+
+.empty   { text-align: center; color: var(--muted); padding: 36px; font-style: italic; background: var(--cream); border: 1px dashed var(--rule); }
+.loading { text-align: center; color: var(--muted); padding: 60px; font-style: italic; }
+
+.footer {
+  margin-top: 56px; padding-top: 20px;
+  border-top: 3px double var(--ink);
+  display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; flex-wrap: wrap; gap: 12px;
+}
+.footer .gold-stamp { display: inline-block; padding: 4px 10px; background: var(--gold); color: var(--ink); letter-spacing: 0.14em; }
+</style>
+<!-- Microsoft Clarity (heatmaps + session recordings) -->
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){
+  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window,document,"clarity","script","wwbe84z9my"); // TODO: replace wwbe84z9my with real project id from clarity.microsoft.com
+</script>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div class="brandrow">
+      <img src="logo.svg" alt="Atom Investments" style="height:32px;width:auto;display:inline-block;vertical-align:middle">
+      <span><span id="updated-at">Loading…</span> <span class="live-pill" id="live-pill"><span class="dot"></span>Live</span></span>
+    </div>
+    <h1>Blake <span class="accent">Live.</span></h1>
+    <p class="dek">Real-time view of every call Blake — APG's AI voice agent — has handled. Auto-polls our Cloudflare Worker every 10 seconds for the latest activity.</p>
+  </header>
+
+  <nav class="topnav">
+    <a href="/">Desk</a>
+    <a href="blake.html" class="active">Blake</a>
+    <a href="progress.html">Tracker</a>
+    <a href="projects.html">Roadmap</a>
+    <a href="index.html">Follow-ups</a>
+    <a href="deals.html">Deals</a>
+    <a href="weekly.html">Docket</a>
+    <a href="priorities.html">Priority</a>
+    <a href="markets.html">Markets</a>
+    <a href="/insights">Insights</a>
+    <a href="sms-test.html">SMS Test</a>
+  </nav>
+
+  <section>
+    <h2><span class="num">00</span>At a Glance</h2>
+    <div class="kpi-row" id="kpi-row">
+      <div class="kpi"><div class="label">Loading…</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">01</span>Warm-Up State</h2>
+    <div id="warmup-section"><div class="loading">Loading warm-up state…</div></div>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span>Recent Calls<span class="sec-count" id="calls-count"></span></h2>
+    <div id="calls-section"><div class="loading">Loading recent calls…</div></div>
+  </section>
+
+  <div class="footer">
+    <span>Live data via Cloudflare Worker · 10-sec polling · 30-sec backend cache</span>
+    <span class="gold-stamp">Blake · Live</span>
+  </div>
+
+</div>
+
+<script>
+const DATA_URL = "https://apg-dashboard.mithchell.workers.dev/dashboard-data";
+const POLL_INTERVAL_MS = 10000;
+const ET_TZ = "America/New_York";
+
+let lastSeenConvIds = new Set();
+let fetchCounter = 0;
+
+function fmtDuration(secs) {
+  if (!secs) return "—";
+  secs = Math.round(secs);
+  if (secs < 60) return secs + "s";
+  const m = Math.floor(secs / 60), s = secs % 60;
+  return m + "m " + String(s).padStart(2, "0") + "s";
+}
+
+function fmtTsEt(unix) {
+  if (!unix) return "";
+  const d = new Date(unix * 1000);
+  return d.toLocaleString("en-US", {
+    timeZone: ET_TZ, month: "short", day: "numeric",
+    hour: "numeric", minute: "2-digit",
+  }) + " ET";
+}
+
+function escapeHtml(s) {
+  return (s == null ? "" : String(s)).replace(/[&<>\"']/g, (ch) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[ch]));
+}
+
+function renderKpis(kpis) {
+  const html = `
+    <div class="kpi live"><div class="label">Calls Today</div><p class="v">${kpis.calls_today ?? 0}</p><div class="sub">UTC day</div></div>
+    <div class="kpi"><div class="label">Calls This Week</div><p class="v">${kpis.calls_week ?? 0}</p><div class="sub">last 7 days</div></div>
+    <div class="kpi"><div class="label">Total Calls</div><p class="v">${kpis.calls_total ?? 0}</p><div class="sub">all time</div></div>
+    <div class="kpi warm"><div class="label">Avg Duration</div><p class="v">${kpis.avg_duration_secs ?? 0}<small>s</small></p><div class="sub">across calls</div></div>
+    <div class="kpi uc"><div class="label">Hot Leads</div><p class="v">${kpis.hot_count ?? 0}</p><div class="sub">flagged hot</div></div>
+    <div class="kpi"><div class="label">Engaged Rate</div><p class="v">${kpis.engaged_pct ?? 0}<small>%</small></p><div class="sub">hot+warm / total</div></div>`;
+  document.getElementById("kpi-row").innerHTML = html;
+}
+
+function renderWarmup(w) {
+  if (!w) {
+    document.getElementById("warmup-section").innerHTML = '<div class="empty">No warm-up data yet.</div>';
+    return;
+  }
+  const pct = Math.min(100, Math.round((w.dialed_today / Math.max(1, w.daily_quota)) * 100));
+  const grid = [];
+  for (let d = 1; d <= 14; d++) {
+    const cls = d === w.day ? "today" : (d < w.day ? "past" : "");
+    grid.push(`<div class="day ${cls}">D${d}</div>`);
+  }
+  document.getElementById("warmup-section").innerHTML = `
+    <div class="warmup-panel">
+      <h3>Day ${w.day} of the warm-up curve</h3>
+      <p style="color:var(--muted);font-size:13px;margin:0 0 4px">
+        Today's cap: <strong style="color:var(--ink)">${w.daily_quota}</strong> calls ·
+        Dialed so far: <strong style="color:var(--ink)">${w.dialed_today}</strong> ·
+        Remaining: <strong style="color:var(--ink)">${w.remaining_today}</strong>
+      </p>
+      <div class="warmup-bar"><div class="fill" style="width:${pct}%;">${pct}%</div></div>
+      <div class="warmup-grid">${grid.join("")}</div>
+      <p style="font-size:11px;color:var(--muted);margin-top:10px;letter-spacing:0.06em;text-transform:uppercase">
+        Steady state (Day 14+): 300 calls / day. Anchor: ${escapeHtml(w.anchor_date || "—")}
+      </p>
+    </div>`;
+}
+
+function renderCalls(calls, blakeAgentId, locationId) {
+  if (!calls || !calls.length) {
+    document.getElementById("calls-section").innerHTML =
+      '<div class="empty">No calls yet. Once Blake handles a call, it appears here within ~30 seconds of hanging up.</div>';
+    document.getElementById("calls-count").textContent = "0 shown";
+    return;
+  }
+  const hydratedCount = calls.filter((c) => c.hydrated).length;
+  document.getElementById("calls-count").textContent =
+    `${calls.length} total · ${hydratedCount} with detail`;
+
+  const rows = calls.map((c) => {
+    const isNew = fetchCounter > 1 && !lastSeenConvIds.has(c.conv_id);
+    const isSparse = c.hydrated === false;
+    const ghlLink = c.ghl_contact_id
+      ? `https://app.gohighlevel.com/v2/location/${locationId}/contacts/detail/${c.ghl_contact_id}`
+      : "";
+    const elLink = c.conv_id
+      ? `https://elevenlabs.io/app/conversational-ai/agents/${blakeAgentId}/history/${c.conv_id}`
+      : "";
+    const callerCell = isSparse
+      ? `<div class="caller" style="color:var(--muted);font-weight:600">${escapeHtml(c.caller_name || "—")}</div>`
+      : `<div class="caller">${escapeHtml(c.caller_name || "(unknown)")}</div>
+         <div class="addr">${escapeHtml(c.caller_address || "—")} · ${escapeHtml(c.caller_phone || "")}</div>`;
+    const summaryCell = isSparse
+      ? '<div class="summary" style="color:var(--muted-soft)">&mdash;</div>'
+      : `<div class="summary">${escapeHtml(c.summary || "")}</div>`;
+    return `
+      <tr${isNew ? ' class="new"' : ""}${isSparse ? ' style="opacity:0.75"' : ""}>
+        <td class="ts">${escapeHtml(fmtTsEt(c.started_unix))}</td>
+        <td>${callerCell}</td>
+        <td><span class="outcome ${escapeHtml(c.outcome_tag)}">${escapeHtml(c.outcome_label || "Completed")}</span></td>
+        <td class="duration">${escapeHtml(fmtDuration(c.duration_secs))}</td>
+        <td>${summaryCell}</td>
+        <td class="actions">
+          ${elLink ? `<a href="${escapeHtml(elLink)}" target="_blank">Transcript</a>` : ""}
+          ${ghlLink ? `<a href="${escapeHtml(ghlLink)}" target="_blank">GHL</a>` : ""}
+        </td>
+      </tr>`;
+  }).join("");
+
+  document.getElementById("calls-section").innerHTML = `
+    <table class="calls-table">
+      <thead><tr>
+        <th style="width:140px">When</th>
+        <th>Caller</th>
+        <th style="width:120px">Outcome</th>
+        <th style="width:90px">Duration</th>
+        <th>Summary</th>
+        <th style="width:140px">Links</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  // Update seen set AFTER rendering so the flash class applies to brand-new
+  // conv_ids on this fetch (but won't re-flash on next poll).
+  lastSeenConvIds = new Set(calls.map((c) => c.conv_id).filter(Boolean));
+}
+
+async function refresh() {
+  fetchCounter += 1;
+  const pill = document.getElementById("live-pill");
+  pill.classList.remove("stale", "error");
+  pill.firstChild.style.animationPlayState = "running";
+  try {
+    const r = await fetch(DATA_URL, { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+    renderKpis(data.kpis || {});
+    renderWarmup(data.warmup);
+    renderCalls(data.recent_calls || [], data.blake_agent_id, data.location_id);
+    const fetchedAt = new Date(data.updated_at);
+    document.getElementById("updated-at").textContent =
+      "Updated " + fetchedAt.toLocaleTimeString("en-US", { timeZone: ET_TZ }) + " ET";
+  } catch (e) {
+    console.error("dashboard fetch failed", e);
+    pill.classList.add("error");
+    pill.lastChild.textContent = "Connection error";
+    document.getElementById("updated-at").textContent = "Last update failed: " + e.message;
+  }
+}
+
+refresh();
+setInterval(refresh, POLL_INTERVAL_MS);
+</script>
+</body>
+</html>

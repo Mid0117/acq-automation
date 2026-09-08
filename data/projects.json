@@ -1,0 +1,421 @@
+{
+  "_meta": {
+    "generated": "2026-09-08T05:24:45Z",
+    "source": "vault_to_dashboard.py · projects()",
+    "schema_version": 2
+  },
+  "projects": [
+    {
+      "id": "apg",
+      "name": "APG",
+      "full_name": "Atom Property Group",
+      "tagline": "Real-estate acquisitions · the legacy RE side",
+      "color": "#F5C518",
+      "accent": "#0A1F44",
+      "members": [
+        "mido",
+        "adam"
+      ],
+      "status": "on-hold",
+      "lede": "Real-estate acquisitions + construction services + outbound voice automation. The four-pillar build: Blake voice agent, listing pipeline, vault + self-improvement, training videos.",
+      "frame": "Real-time, event-driven, no cron. Webhooks + Cloudflare Workers. Source-of-truth PoR — see site/por.html for the full v1 doc.",
+      "roadmap": [
+        {
+          "id": "apg-p0",
+          "name": "Phase 0 — This Week",
+          "when": "By 2026-06-13",
+          "items": [
+            "RJ call-audio analysis",
+            "RJ direct conversation + decision",
+            "Updated NDA signed",
+            "Adam voice recording session",
+            "Confirm APG-hold question with Kebrina"
+          ]
+        },
+        {
+          "id": "apg-p1",
+          "name": "Phase 1 — Dashboard asks",
+          "when": "By 2026-06-22",
+          "items": [
+            "Appointment drill-down",
+            "Claude conversation-rating agent",
+            "Success-rate-vs-target widget",
+            "Calendar view",
+            "Permission tiers"
+          ]
+        },
+        {
+          "id": "apg-p2",
+          "name": "Phase 2 — Outbound rebuild",
+          "when": "By 2026-07-15",
+          "items": [
+            "Blake v4.0 deployed",
+            "Cloudflare Workers backbone",
+            "Pre/post-call context",
+            "GHL workflow audit",
+            "Slack call-incoming routing"
+          ]
+        },
+        {
+          "id": "apg-p3",
+          "name": "Phase 3 — Realtor engine",
+          "when": "By 2026-08-31",
+          "items": [
+            "Zillow → MAO → SMS pipeline hardening",
+            "Realtor partner motion",
+            "Entry-offer lead magnet",
+            "14-day close guarantee"
+          ]
+        },
+        {
+          "id": "apg-p4",
+          "name": "Phase 4 — Pivot concepts",
+          "when": "2026-Q3+",
+          "items": [
+            "NDA-gated meeting project",
+            "Dating app concept",
+            "Legacy / memorialization app",
+            "Vault architecture decision"
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "apg-t1",
+          "title": "RJ call-audio analysis + go/no-go",
+          "owner": "adam",
+          "owner_label": "adam",
+          "status": "inflight",
+          "start": "2026-06-08",
+          "end": "2026-06-13",
+          "pillar": "Strategy",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t2",
+          "title": "Updated NDA signed",
+          "owner": "adam",
+          "owner_label": "adam",
+          "status": "notstart",
+          "start": "2026-06-09",
+          "end": "2026-06-13",
+          "pillar": "Strategy",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t3",
+          "title": "Adam voice recording session",
+          "owner": "adam",
+          "owner_label": "adam",
+          "status": "notstart",
+          "start": "2026-06-10",
+          "end": "2026-06-14",
+          "pillar": "Blake / A",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t4",
+          "title": "Appointment drill-down",
+          "owner": "mido",
+          "owner_label": "mido",
+          "status": "notstart",
+          "start": "2026-06-13",
+          "end": "2026-06-18",
+          "pillar": "Dashboard",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t5",
+          "title": "Claude conversation-rating agent",
+          "owner": "mido",
+          "owner_label": "mido",
+          "status": "notstart",
+          "start": "2026-06-15",
+          "end": "2026-06-22",
+          "pillar": "Blake / A",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t6",
+          "title": "Calendar view",
+          "owner": "mido",
+          "owner_label": "mido",
+          "status": "notstart",
+          "start": "2026-06-16",
+          "end": "2026-06-22",
+          "pillar": "Dashboard",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t7",
+          "title": "Permission tiers",
+          "owner": "mido",
+          "owner_label": "mido",
+          "status": "inflight",
+          "start": "2026-06-08",
+          "end": "2026-06-22",
+          "pillar": "Dashboard",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t8",
+          "title": "Blake v4.0 prompt deploy",
+          "owner": "mido",
+          "owner_label": "mido",
+          "status": "blocked",
+          "start": "2026-06-22",
+          "end": "2026-07-15",
+          "pillar": "Blake / A",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t9",
+          "title": "Cloudflare Workers event backbone",
+          "owner": "mido",
+          "owner_label": "mido",
+          "status": "notstart",
+          "start": "2026-06-25",
+          "end": "2026-07-10",
+          "pillar": "Infra",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t10",
+          "title": "Zillow → MAO → SMS hardening",
+          "owner": "mido",
+          "owner_label": "mido",
+          "status": "inflight",
+          "start": "2026-07-01",
+          "end": "2026-08-15",
+          "pillar": "Listings / B",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t11",
+          "title": "Realtor partner motion",
+          "owner": "adam",
+          "owner_label": "adam",
+          "status": "notstart",
+          "start": "2026-07-15",
+          "end": "2026-08-31",
+          "pillar": "Strategy",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t12",
+          "title": "Entry-offer lead magnet (positioning)",
+          "owner": "adam",
+          "owner_label": "adam",
+          "status": "notstart",
+          "start": "2026-08-01",
+          "end": "2026-08-31",
+          "pillar": "Strategy",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t13",
+          "title": "Niche decision — Roofing+Siding NJ vs MF 5+ HNW",
+          "owner": "adam",
+          "owner_label": "adam",
+          "status": "inflight",
+          "start": "2026-06-09",
+          "end": "2026-06-22",
+          "pillar": "Strategy",
+          "project_id": "apg"
+        },
+        {
+          "id": "apg-t16",
+          "title": "Vault concepts & pivot direction",
+          "owner": "kabrina",
+          "owner_label": "kabrina",
+          "status": "inflight",
+          "start": "2026-06-08",
+          "end": "2026-07-31",
+          "pillar": "Concepts",
+          "project_id": "apg"
+        }
+      ],
+      "decisions": [
+        {
+          "title": "Dashboard build proceeds with Adam's three asks",
+          "status": "decided",
+          "date": "2026-06-03",
+          "body": "Adam set direction; Mike Yasser executes (drill-down, Claude conversation ratings, success-rate-vs-target, calendar view)."
+        },
+        {
+          "title": "231 Lafayette — $7,500 refund accepted from Mario",
+          "status": "decided",
+          "date": "2026-06-03",
+          "body": "Adam called; relationship amicable; project paused; $12k still out of pocket."
+        },
+        {
+          "title": "APG hold to pivot toward three concepts",
+          "status": "pending",
+          "date": null,
+          "body": "Adam + Kebrina deciding; pending Kebrina confirmation. Mike Yasser holds builds until direction settles."
+        },
+        {
+          "title": "RJ go/no-go decision",
+          "status": "pending",
+          "date": null,
+          "body": "Adam owns. Tied to RJ call-audio analysis result (Friday)."
+        },
+        {
+          "title": "Niche down 90 days",
+          "status": "pending",
+          "date": null,
+          "body": "Adam owns. Roofing+siding Northern NJ vs MF 5+ HNW."
+        }
+      ],
+      "backlog": [
+        {
+          "id": "O1",
+          "title": "Add 14-day close / $1k risk-reversal guarantee to every outbound surface"
+        },
+        {
+          "id": "O2",
+          "title": "Replace cold 'we buy houses' SMS with 24-hr written cash-offer range"
+        },
+        {
+          "id": "O3",
+          "title": "Niche down 90 days: roofing+siding Northern NJ OR MF 5+ HNW"
+        },
+        {
+          "id": "I1",
+          "title": "Reroute Call-Incoming Notification from RJ email to Slack #base1-sms-leadgen"
+        },
+        {
+          "id": "I5",
+          "title": "Decommission sms_followup.py cron → event-driven Cloudflare Worker"
+        }
+      ],
+      "links": [
+        {
+          "label": "Full Plan of Record",
+          "href": "por.html"
+        },
+        {
+          "label": "Priorities",
+          "href": "priorities.html"
+        },
+        {
+          "label": "Weekly snapshot",
+          "href": "weekly.html"
+        }
+      ]
+    },
+    {
+      "id": "kin",
+      "name": "Kin",
+      "full_name": "Kin — Legacy & Pocket Guide",
+      "tagline": "Legacy/memorialization consumer app · APG pivot flagship",
+      "color": "#7C5CD1",
+      "accent": "#5B3FA8",
+      "members": [
+        "mido",
+        "adam",
+        "kabrina"
+      ],
+      "status": "active",
+      "lede": "ElevenLabs voice-clone + family tree (Legacy Book) plus configurable AI mentor (Pocket Guide). Adam + Kabrina + Mido. MVP on Replit, Sonnet 4.6 backbone.",
+      "frame": "Two pillars: Legacy Book is the lead marketing mode. Pocket Guide is the relational layer. APG (legacy RE) on hold while Kin ships.",
+      "roadmap": [
+        {
+          "id": "kin-p0",
+          "name": "Phase 0 — Foundation",
+          "when": "2026-06-13 → 2026-07-04",
+          "items": [
+            "ElevenLabs voice-clone wiring",
+            "Family tree data model",
+            "Replit + Sonnet 4.6 stack stood up"
+          ]
+        },
+        {
+          "id": "kin-p1",
+          "name": "Phase 1 — Legacy Book MVP",
+          "when": "2026-07-04 → 2026-08-01",
+          "items": [
+            "End-to-end clone → question → reply demo",
+            "Family interview pipeline (Kabrina's family)",
+            "Brand + Kabrina-led positioning locked"
+          ]
+        },
+        {
+          "id": "kin-p2",
+          "name": "Phase 2 — Pocket Guide",
+          "when": "2026-08-01 → 2026-09-15",
+          "items": [
+            "Persona builder UI",
+            "Configurable relationship modes",
+            "Adam GTM sign-off"
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "kin-t1",
+          "title": "Legacy Book MVP — ElevenLabs voice clone + family tree shell",
+          "owner": "mido",
+          "status": "notstart",
+          "start": "2026-06-13",
+          "end": "2026-07-04",
+          "pillar": "Legacy Book",
+          "project_id": "kin"
+        },
+        {
+          "id": "kin-t2",
+          "title": "Pocket Guide configurable persona builder",
+          "owner": "kabrina",
+          "status": "notstart",
+          "start": "2026-06-20",
+          "end": "2026-07-15",
+          "pillar": "Pocket Guide",
+          "project_id": "kin"
+        },
+        {
+          "id": "kin-t3",
+          "title": "Replit MVP plumbing — Sonnet 4.6 + ElevenLabs wiring",
+          "owner": "mido",
+          "status": "notstart",
+          "start": "2026-06-15",
+          "end": "2026-07-01",
+          "pillar": "Stack",
+          "project_id": "kin"
+        },
+        {
+          "id": "kin-t4",
+          "title": "Brand + product positioning — Kabrina-led",
+          "owner": "kabrina",
+          "status": "inflight",
+          "start": "2026-06-12",
+          "end": "2026-07-31",
+          "pillar": "Brand",
+          "project_id": "kin"
+        },
+        {
+          "id": "kin-t5",
+          "title": "Family-history seed interviews (Kabrina's family)",
+          "owner": "kabrina",
+          "status": "notstart",
+          "start": "2026-06-20",
+          "end": "2026-08-01",
+          "pillar": "Legacy Book",
+          "project_id": "kin"
+        },
+        {
+          "id": "kin-t6",
+          "title": "Adam sign-off on Kin GTM positioning",
+          "owner": "adam",
+          "status": "notstart",
+          "start": "2026-07-15",
+          "end": "2026-08-01",
+          "pillar": "Strategy",
+          "project_id": "kin"
+        }
+      ],
+      "decisions": [],
+      "backlog": [],
+      "links": []
+    }
+  ]
+}

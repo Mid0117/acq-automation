@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script>(function(){var h=location.hostname;if(h.indexOf('github.io')>-1||h.indexOf('githubusercontent')>-1){document.documentElement.style.display='none';location.replace('https://apg-dashboard.mithchell.workers.dev/login?next='+encodeURIComponent('/'));}})();</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atom Investments — Kin</title>
+<meta property="og:site_name" content="Atom Investments">
+<meta property="og:title" content="Kin — Project dashboard">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="apple-touch-icon" href="../favicon.svg">
+<meta name="theme-color" content="#7C5CD1">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../css/atom.css">
+<script src="../js/atom.js" defer></script>
+<style>
+  .shell { max-width: 1320px; margin: 0 auto; padding: 32px 28px 96px; }
+  .breadcrumb { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--text-3); margin-bottom: 8px; display: flex; gap: 8px; align-items: center; }
+  .breadcrumb a { color: var(--text-3); }
+  .breadcrumb a:hover { color: var(--text); }
+  .breadcrumb .sep { color: var(--text-3); opacity: 0.5; }
+
+  .hero {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+    padding: 28px 32px; margin-bottom: 22px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: var(--violet);
+  }
+  .hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .hero-title { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.025em; color: var(--text); }
+  .hero-sub { margin: 6px 0 0; font-size: 14.5px; color: var(--text-2); max-width: 700px; line-height: 1.55; }
+  .hero-meta { display: flex; gap: 18px; align-items: center; }
+  .hero-roster { display: flex; align-items: center; gap: 4px; }
+  .hero-roster .avatar { width: 28px; height: 28px; font-size: 10px; border: 2px solid var(--surface); margin-left: -4px; }
+  .hero-roster .avatar:first-child { margin-left: 0; }
+  .hero-roster .add-member {
+    width: 28px; height: 28px; border-radius: 50%; border: 1px dashed var(--rule);
+    display: flex; align-items: center; justify-content: center; color: var(--text-3);
+    cursor: pointer; transition: border-color 120ms, color 120ms; margin-left: 2px;
+    background: transparent;
+  }
+  .hero-roster .add-member:hover { border-color: var(--ink); color: var(--text); }
+
+  .quarter-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+  @media (max-width: 980px) { .quarter-row { grid-template-columns: repeat(2, 1fr); } }
+  .q-detail {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+    padding: 18px; position: relative;
+    --accent: var(--violet);
+  }
+  .q-detail::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent);
+  }
+  .q-detail-head { display: flex; align-items: center; gap: 14px; }
+  .q-detail-meta {
+    font-family: "JetBrains Mono", monospace; font-size: 11.5px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.14em;
+  }
+  .q-detail-title { margin: 6px 0 0; font-size: 15.5px; font-weight: 600; letter-spacing: -0.015em; color: var(--text); }
+  .q-detail-counts { font-size: 12px; color: var(--text-2); margin-top: 8px; font-family: "JetBrains Mono", monospace; }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+    padding: 22px; margin-bottom: 22px;
+  }
+  .panel h3 { margin: 0 0 14px; font-size: 15px; font-weight: 600; letter-spacing: -0.015em; color: var(--text); }
+  .panel-sub { font-size: 12.5px; color: var(--text-3); margin-bottom: 14px; }
+
+  .phase-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .phase-card {
+    background: var(--surface-3); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); padding: 16px;
+  }
+  .phase-card h4 { margin: 0; font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .phase-when { font-size: 11px; color: var(--text-3); font-family: "JetBrains Mono", monospace; margin-top: 2px; }
+  .phase-items { list-style: none; padding: 0; margin: 12px 0 0; }
+  .phase-items li { padding: 5px 0; border-top: 1px solid var(--rule-2); font-size: 12.5px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+  .phase-items li::before { content: "·"; color: var(--text-3); }
+
+  .task-list { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+  .task-row {
+    display: grid; grid-template-columns: 14px 1fr 120px 96px 90px;
+    align-items: center; gap: 12px; padding: 11px 18px;
+    border-bottom: 1px solid var(--rule-2); transition: background 100ms;
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-row:hover { background: var(--surface-3); }
+  .task-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--violet); }
+  .task-title { font-size: 13px; font-weight: 500; color: var(--text); }
+  .task-pillar { font-size: 10.5px; color: var(--text-3); font-family: "JetBrains Mono", monospace; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .task-owner { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+  .task-owner .avatar { width: 18px; height: 18px; font-size: 8.5px; }
+  .task-date { font-size: 11px; color: var(--text-3); font-family: "JetBrains Mono", monospace; text-align: right; }
+
+  .q-detail .q-ring { --accent: var(--violet); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark"><span></span><i></i></span>
+      <span class="brand-name">
+        <span class="top">Atom Investments</span>
+        <span class="sub">Operations</span>
+      </span>
+    </a>
+    <div class="tabs">
+      <a class="tab" href="../index.html">Overview</a>
+      <a class="tab is-active" href="../projects.html">Projects</a>
+      <a class="tab" href="../roadmap.html">Roadmap</a>
+      <a class="tab" href="../team.html">Team</a>
+    </div>
+    <div class="nav-actions">
+      <button class="profile-pill" type="button" data-profile-trigger aria-label="Open profile menu">
+        <span class="avatar mido">MY</span>
+        <span>Mido Yasser</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="shell">
+
+  <div class="breadcrumb">
+    <a href="../projects.html">Projects</a>
+    <span class="sep">/</span>
+    <strong style="color:var(--text)">Kin</strong>
+  </div>
+
+  <section class="hero" id="hero"></section>
+
+  <h2 style="margin:0 0 12px; font-size:13px; text-transform:uppercase; letter-spacing:0.16em; color:var(--text-3); font-family:'JetBrains Mono', monospace; font-weight:600;">Quarterly progression</h2>
+  <div class="quarter-row" id="quarters"></div>
+
+  <section class="panel">
+    <h3>Phases</h3>
+    <div class="panel-sub">Foundation → Legacy Book MVP → Pocket Guide.</div>
+    <div class="phase-row" id="phases"></div>
+  </section>
+
+  <section class="panel">
+    <h3>Tasks</h3>
+    <div class="panel-sub">Every Kin task — Replit MVP, ElevenLabs wiring, brand, family interviews.</div>
+    <div class="task-list" id="tasks"></div>
+  </section>
+
+</main>
+
+<script>
+(async function () {
+  const [r, p] = await Promise.all([
+    fetch("../data/roster.json").then(r => r.json()),
+    fetch("../data/projects.json").then(r => r.json()),
+  ]);
+  const ROSTER = r.people;
+  const proj = p.projects.find(x => x.id === "kin");
+  if (!proj) {
+    document.querySelector("main").innerHTML = '<div style="padding:40px;color:var(--text-3)">Kin project missing from data.</div>';
+    return;
+  }
+  const tasks = proj.tasks || [];
+
+  const members = (proj.members || []).map(id => ROSTER.find(u => u.id === id)).filter(Boolean);
+  const memberAvatars = members.map(m =>
+    `<span class="avatar ${m.id}" title="${m.name} · ${m.role}">${m.initials}</span>`
+  ).join("");
+  document.getElementById("hero").innerHTML = `
+    <div class="hero-top">
+      <div>
+        <h1 class="hero-title">${proj.name} · ${proj.full_name || ''}</h1>
+        <p class="hero-sub">${proj.lede || ''}</p>
+        <p class="hero-sub" style="font-size:13px; font-style:italic; color:var(--text-3); margin-top:8px">${proj.frame || ''}</p>
+      </div>
+      <div class="hero-meta">
+        <span class="pill ${proj.status}">${proj.status}</span>
+        <div class="hero-roster">
+          ${memberAvatars}
+          <button class="add-member" type="button" id="addMemberBtn" title="Add member" aria-label="Add member">+</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById("addMemberBtn").addEventListener("click", () => {
+    Atom.openAddMemberModal({ projectId: "kin" });
+  });
+
+  // Quarters
+  const quarters = ["2026-Q2", "2026-Q3", "2026-Q4", "2027-Q1"];
+  const qLabel = { "2026-Q2": "Apr — Jun '26", "2026-Q3": "Jul — Sep '26", "2026-Q4": "Oct — Dec '26", "2027-Q1": "Jan — Mar '27" };
+  const curQ = Atom.currentQuarterKey();
+  document.getElementById("quarters").innerHTML = quarters.map(q => {
+    const prog = Atom.quarterProgress(tasks, q);
+    const blocker = prog.tasks.find(t => t.status === "blocked");
+    const blockerLine = prog.total === 0
+      ? `<div class="q-block-line empty">No tasks scheduled</div>`
+      : blocker
+        ? `<div class="q-block-line">${blocker.title}</div>`
+        : `<div class="q-block-line empty">No active blockers</div>`;
+    const ring = Atom.renderQuarterRing(prog.pct, { size: 48, stroke: 4 });
+    return `
+      <div class="q-detail" ${q === curQ ? 'style="border-color:var(--violet)"' : ""}>
+        <div class="q-detail-meta">${qLabel[q]}${q === curQ ? " · NOW" : ""}</div>
+        <div class="q-detail-head" style="margin-top:8px">
+          ${ring}
+          <div>
+            <div class="q-detail-title">${prog.done}/${prog.total} done</div>
+            <div class="q-detail-counts">${prog.inflight} live · ${prog.blocked} blocked</div>
+          </div>
+        </div>
+        ${blockerLine}
+      </div>`;
+  }).join("");
+
+  // Phases
+  document.getElementById("phases").innerHTML = (proj.roadmap || []).map(ph => `
+    <div class="phase-card">
+      <h4>${ph.name}</h4>
+      <div class="phase-when">${ph.when}</div>
+      <ul class="phase-items">${(ph.items || []).map(i => `<li>${i}</li>`).join("")}</ul>
+    </div>
+  `).join("");
+
+  // Tasks
+  document.getElementById("tasks").innerHTML = tasks.map(t => {
+    const owner = ROSTER.find(u => u.id === t.owner);
+    const ownerHtml = owner
+      ? `<span class="avatar ${owner.id}">${owner.initials}</span><span>${owner.name.split(' ')[0]}</span>`
+      : `<span style="color:var(--text-3)">${t.owner_label || '—'}</span>`;
+    return `
+      <div class="task-row">
+        <span class="task-dot"></span>
+        <div><span class="task-title">${t.title}</span><span class="task-pillar">${t.pillar || ''}</span></div>
+        <span class="task-owner">${ownerHtml}</span>
+        <span class="pill ${t.status}">${t.status}</span>
+        <span class="task-date">${t.end || '—'}</span>
+      </div>`;
+  }).join("");
+})();
+</script>
+</body>
+</html>
